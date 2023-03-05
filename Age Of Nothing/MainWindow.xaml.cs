@@ -21,6 +21,7 @@ namespace Age_Of_Nothing
         private readonly Timer _timer = new Timer(Delay);
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
         private readonly Rectangle _selectionRectGu;
+        private readonly Mine _mine;
 
         private Point? _selectionPoint;
         private volatile bool _refreshing = false;
@@ -41,13 +42,13 @@ namespace Age_Of_Nothing
                 Opacity = 0.1
             };
 
-            var mine = new Mine(100, new Point(400, 120), 1);
+            _mine = new Mine(100, new Point(400, 120), 1);
 
             MainCanvas.Children.Add(_units[0].Visual);
             MainCanvas.Children.Add(_units[1].Visual);
             MainCanvas.Children.Add(_units[2].Visual);
             MainCanvas.Children.Add(_selectionRectGu);
-            MainCanvas.Children.Add(mine.Visual);
+            MainCanvas.Children.Add(_mine.Visual);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
@@ -68,8 +69,13 @@ namespace Age_Of_Nothing
 
         private void MainCanvas_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            var clickPosition = e.GetPosition(MainCanvas);
+            if (_mine.Surface.Contains(clickPosition))
+                clickPosition = _mine.Position;
             foreach (var unit in _units.Where(x => x.Selected))
-                unit.TargetPosition = e.GetPosition(MainCanvas);
+            {
+                unit.TargetPosition = clickPosition;
+            }
         }
 
         private void MainCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -88,7 +94,7 @@ namespace Age_Of_Nothing
         private void MainCanvas_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var endSelectionPoint = e.GetPosition(MainCanvas);
-            if (_selectionRectGu == e.Source && _selectionPoint.HasValue)
+            if (_selectionPoint.HasValue)
             {
                 var rect = new Rect(endSelectionPoint, _selectionPoint.Value);
                 _units.ForEach(x =>

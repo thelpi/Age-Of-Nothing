@@ -78,20 +78,11 @@ namespace Age_Of_Nothing
                     TargetPosition.Value.Y,
                     Speed);
 
-                var oldPosition = CurrentPosition;
                 CurrentPosition = new Point(x2, y2);
+                if (TargetPosition == CurrentPosition)
+                    TargetPosition = null;
 
-                if (!units.Any(x => x != this && x.Surface.IntersectsWith(Surface)))
-                {
-                    if (TargetPosition == CurrentPosition)
-                        TargetPosition = null;
-
-                    return true;
-                }
-                else
-                {
-                    CurrentPosition = oldPosition;
-                }
+                return true;
             }
 
             return false;
