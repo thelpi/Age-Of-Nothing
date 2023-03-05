@@ -45,49 +45,17 @@ namespace Age_Of_Nothing
                 Speed = 1
             });
 
+            _selectionRectGu = new Rectangle
+            {
+                Fill = Brushes.Red,
+                Opacity = 0.1,
+                Height = 0,
+                Width = 0
+            };
+            MainCanvas.Children.Add(_selectionRectGu);
+
             foreach (var unit in _units)
                 GenerateUnit(unit);
-        }
-
-        private void GenerateUnit(Unit unit)
-        {
-            var gu = new Ellipse
-            {
-                Width = 20,
-                Height = 20,
-                Fill = Brushes.Blue,
-                Tag = unit
-            };
-            SetGraphicUnitPosition(gu, unit);
-            gu.MouseEnter += (a, b) =>
-            {
-                gu.Fill = unit.Selected
-                    ? (Brush)new RadialGradientBrush(Colors.CornflowerBlue, Colors.Red)
-                    : Brushes.CornflowerBlue;
-            };
-            gu.MouseLeave += (a, b) =>
-            {
-                gu.Fill = unit.Selected
-                    ? (Brush)new RadialGradientBrush(Colors.Blue, Colors.Red)
-                    : Brushes.Blue;
-            };
-            gu.MouseLeftButtonDown += (a, b) =>
-            {
-                unit.Selected = !unit.Selected;
-                _units.ForEach(x =>
-                {
-                    if (x != unit)
-                    {
-                        x.Selected = false;
-                        FindGraphicUnit<Ellipse>(x).Fill = Brushes.Blue;
-                    }
-                });
-                gu.Fill = unit.Selected
-                    ? (Brush)new RadialGradientBrush(Colors.CornflowerBlue, Colors.Red)
-                    : Brushes.CornflowerBlue;
-            };
-
-            MainCanvas.Children.Add(gu);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
@@ -124,16 +92,7 @@ namespace Age_Of_Nothing
             _refreshing = false;
         }
 
-        private T FindGraphicUnit<T>(Unit unit) where T : FrameworkElement
-        {
-            return MainCanvas.Children.OfType<T>().First(x => x.Tag == unit);
-        }
-
-        private void SetGraphicUnitPosition(FrameworkElement gu, Unit unit)
-        {
-            gu.SetValue(Canvas.LeftProperty, unit.CurrentPosition.X - (gu.Width / 2));
-            gu.SetValue(Canvas.TopProperty, unit.CurrentPosition.Y - (gu.Height / 2));
-        }
+        #region Events
 
         private void MainCanvas_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -149,7 +108,7 @@ namespace Age_Of_Nothing
                 _units.ForEach(x =>
                 {
                     x.Selected = false;
-                    FindGraphicUnit<Ellipse>(x).Fill = Brushes.Blue;
+                    FindGraphicUnit<Ellipse>(x).Fill = x.Fill(false);
                 });
             }
         }
@@ -165,26 +124,16 @@ namespace Age_Of_Nothing
                     if (rect.Contains(x.CurrentPosition))
                     {
                         x.Selected = true;
-                        FindGraphicUnit<Ellipse>(x).Fill = new RadialGradientBrush(Colors.Blue, Colors.Red);
+                        FindGraphicUnit<Ellipse>(x).Fill = x.Fill(false);
                     }
                 });
             }
-            _selectionPoint = null;
-            if (_selectionRectGu != null)
-            {
-                MainCanvas.Children.Remove(_selectionRectGu);
-                _selectionRectGu = null;
-            }
+            ResetSelectionRectangle();
         }
 
         private void MainCanvas_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            _selectionPoint = null;
-            if (_selectionRectGu != null)
-            {
-                MainCanvas.Children.Remove(_selectionRectGu);
-                _selectionRectGu = null;
-            }
+            ResetSelectionRectangle();
         }
 
         private void MainCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -192,21 +141,66 @@ namespace Age_Of_Nothing
             if (_selectionPoint.HasValue)
             {
                 var rect = new Rect(_selectionPoint.Value, e.GetPosition(MainCanvas));
-
-                if (_selectionRectGu == null)
-                {
-                    _selectionRectGu = new Rectangle
-                    {
-                        Fill = Brushes.Red,
-                        Opacity = 0.1
-                    };
-                    MainCanvas.Children.Add(_selectionRectGu);
-                }
                 _selectionRectGu.Width = rect.Width;
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
             }
+        }
+
+        #endregion Events
+
+        private void ResetSelectionRectangle()
+        {
+            _selectionPoint = null;
+            _selectionRectGu.Width = 0;
+            _selectionRectGu.Height = 0;
+        }
+
+        private void GenerateUnit(Unit unit)
+        {
+            var gu = new Ellipse
+            {
+                Width = 20,
+                Height = 20,
+                Tag = unit
+            };
+            gu.Fill = unit.Fill(false);
+            SetGraphicUnitPosition(gu, unit);
+            gu.MouseEnter += (a, b) =>
+            {
+                gu.Fill = unit.Fill(true);
+            };
+            gu.MouseLeave += (a, b) =>
+            {
+                gu.Fill = unit.Fill(false);
+            };
+            gu.MouseLeftButtonDown += (a, b) =>
+            {
+                unit.Selected = !unit.Selected;
+                _units.ForEach(x =>
+                {
+                    if (x != unit)
+                    {
+                        x.Selected = false;
+                        FindGraphicUnit<Ellipse>(x).Fill = x.Fill(false);
+                    }
+                });
+                gu.Fill = unit.Fill(true);
+            };
+
+            MainCanvas.Children.Add(gu);
+        }
+
+        private T FindGraphicUnit<T>(Unit unit) where T : FrameworkElement
+        {
+            return MainCanvas.Children.OfType<T>().First(x => x.Tag == unit);
+        }
+
+        private void SetGraphicUnitPosition(FrameworkElement gu, Unit unit)
+        {
+            gu.SetValue(Canvas.LeftProperty, unit.CurrentPosition.X - (gu.Width / 2));
+            gu.SetValue(Canvas.TopProperty, unit.CurrentPosition.Y - (gu.Height / 2));
         }
     }
 }

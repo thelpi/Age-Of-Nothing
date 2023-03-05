@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 namespace Age_Of_Nothing
 {
@@ -10,5 +11,12 @@ namespace Age_Of_Nothing
 
         // pixels by frame
         public double Speed { get; set; }
+
+        public Brush Fill(bool hover)
+        {
+            return Selected
+                ? (Brush)new RadialGradientBrush(hover ? Colors.CornflowerBlue : Colors.Blue, Colors.Red)
+                : hover ? Brushes.CornflowerBlue : Brushes.Blue;
+        }
     }
 }
