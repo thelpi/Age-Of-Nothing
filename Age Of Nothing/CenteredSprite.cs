@@ -62,7 +62,7 @@ namespace Age_Of_Nothing
             new Point(Position.X - Size / 2, Position.Y - Size / 2),
             new Point(Position.X + Size / 2, Position.Y + Size / 2));
 
-        public void RefreshVisual(bool hover)
+        public virtual void RefreshVisual(bool hover)
         {
             Visual.Fill = hover
                 ? (Focused
