@@ -44,16 +44,5 @@ namespace Age_Of_Nothing
                 new GradientStop(IsIron ? HoverIronFill : HoverRockFill, 0.9),
                 new GradientStop(Colors.Red, 1)
             }));
-
-        public override void RefreshVisual(bool hover)
-        {
-            Visual.Fill = hover
-                ? (Focused
-                    ? HoverFocusFill
-                    : HoverFill)
-                : (Focused
-                    ? FocusFill
-                    : DefaultFill);
-        }
     }
 }

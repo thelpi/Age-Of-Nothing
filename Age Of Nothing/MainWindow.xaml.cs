@@ -21,6 +21,7 @@ namespace Age_Of_Nothing
         private readonly Timer _timer = new Timer(Delay);
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
         private readonly List<Mine> _mines = new List<Mine>(10); // TODO: adjust
+        private readonly List<Forest> _forest = new List<Forest>(10); // TODO: adjust
         private readonly List<CenteredSprite> _sprites = new List<CenteredSprite>(10); // TODO: adjust
         private readonly Rectangle _selectionRectGu;
 
@@ -44,7 +45,9 @@ namespace Age_Of_Nothing
             };
 
             _mines.Add(new Mine(100, new Point(400, 120), 1, false, _sprites));
-            _mines.Add(new Mine(75, new Point(200, 700), 1, true, _sprites));
+            _mines.Add(new Mine(75, new Point(200, 600), 1, true, _sprites));
+
+            _forest.Add(new Forest(new Rect(700, 200, 300, 100)));
 
             _sprites.Add(_units[0]);
             _sprites.Add(_units[1]);
@@ -54,6 +57,7 @@ namespace Age_Of_Nothing
 
             foreach (var sprite in _sprites)
                 MainCanvas.Children.Add(sprite.Visual);
+            MainCanvas.Children.Add(_forest[0].Visual);
             MainCanvas.Children.Add(_selectionRectGu);
         }
 

@@ -46,8 +46,8 @@ namespace Age_Of_Nothing
 
         public void RefreshPosition()
         {
-            Visual.SetValue(Canvas.LeftProperty, Position.X - (Size / 2));
-            Visual.SetValue(Canvas.TopProperty, Position.Y - (Size / 2));
+            Visual.SetValue(Canvas.LeftProperty, Surface.Left);
+            Visual.SetValue(Canvas.TopProperty, Surface.Top);
         }
 
         public Point Position { get; protected set; }
@@ -62,7 +62,7 @@ namespace Age_Of_Nothing
             new Point(Position.X - Size / 2, Position.Y - Size / 2),
             new Point(Position.X + Size / 2, Position.Y + Size / 2));
 
-        public virtual void RefreshVisual(bool hover)
+        public void RefreshVisual(bool hover)
         {
             Visual.Fill = hover
                 ? (Focused
