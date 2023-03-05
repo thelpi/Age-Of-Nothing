@@ -40,6 +40,7 @@ namespace Age_Of_Nothing
 
             RefreshVisual(false);
             RefreshPosition();
+            Visual.SetValue(Panel.ZIndexProperty, 2);
         }
 
         public Shape Visual { get; }
@@ -63,8 +64,8 @@ namespace Age_Of_Nothing
 
         public void RefreshPosition()
         {
-            Visual.SetValue(Canvas.LeftProperty, CurrentPosition.X - (Visual.Width / 2));
-            Visual.SetValue(Canvas.TopProperty, CurrentPosition.Y - (Visual.Height / 2));
+            Visual.SetValue(Canvas.LeftProperty, CurrentPosition.X - (_size / 2));
+            Visual.SetValue(Canvas.TopProperty, CurrentPosition.Y - (_size / 2));
         }
 
         public bool CheckForMovement(IEnumerable<Unit> units)

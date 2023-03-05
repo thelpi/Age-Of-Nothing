@@ -41,10 +41,13 @@ namespace Age_Of_Nothing
                 Opacity = 0.1
             };
 
+            var mine = new Mine(100, new Point(400, 120), 1);
+
             MainCanvas.Children.Add(_units[0].Visual);
             MainCanvas.Children.Add(_units[1].Visual);
             MainCanvas.Children.Add(_units[2].Visual);
             MainCanvas.Children.Add(_selectionRectGu);
+            MainCanvas.Children.Add(mine.Visual);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
