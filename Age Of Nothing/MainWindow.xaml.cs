@@ -20,6 +20,8 @@ namespace Age_Of_Nothing
         private readonly Timer _timer = new Timer(Delay);
         private volatile bool _refreshing = false;
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
+        private Point? _selectionPoint;
+        private Rectangle _selectionRectGu;
 
         public MainWindow()
         {
@@ -103,7 +105,10 @@ namespace Age_Of_Nothing
                         unit.TargetPosition.Value.Y,
                         unit.Speed);
 
-                    unit.CurrentPosition = new Point(x2, y2);
+                    var target = new Point(x2, y2);
+
+                    // TODO: manage colision
+                    unit.CurrentPosition = target;
 
                     if (unit.TargetPosition == unit.CurrentPosition)
                         unit.TargetPosition = null;
@@ -134,6 +139,74 @@ namespace Age_Of_Nothing
         {
             foreach (var unit in _units.Where(x => x.Selected))
                 unit.TargetPosition = e.GetPosition(MainCanvas);
+        }
+
+        private void MainCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender == e.Source)
+            {
+                _selectionPoint = e.GetPosition(MainCanvas);
+                _units.ForEach(x =>
+                {
+                    x.Selected = false;
+                    FindGraphicUnit<Ellipse>(x).Fill = Brushes.Blue;
+                });
+            }
+        }
+
+        private void MainCanvas_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var endSelectionPoint = e.GetPosition(MainCanvas);
+            if (_selectionRectGu == e.Source && _selectionPoint.HasValue)
+            {
+                var rect = new Rect(endSelectionPoint, _selectionPoint.Value);
+                _units.ForEach(x =>
+                {
+                    if (rect.Contains(x.CurrentPosition))
+                    {
+                        x.Selected = true;
+                        FindGraphicUnit<Ellipse>(x).Fill = new RadialGradientBrush(Colors.Blue, Colors.Red);
+                    }
+                });
+            }
+            _selectionPoint = null;
+            if (_selectionRectGu != null)
+            {
+                MainCanvas.Children.Remove(_selectionRectGu);
+                _selectionRectGu = null;
+            }
+        }
+
+        private void MainCanvas_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            _selectionPoint = null;
+            if (_selectionRectGu != null)
+            {
+                MainCanvas.Children.Remove(_selectionRectGu);
+                _selectionRectGu = null;
+            }
+        }
+
+        private void MainCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (_selectionPoint.HasValue)
+            {
+                var rect = new Rect(_selectionPoint.Value, e.GetPosition(MainCanvas));
+
+                if (_selectionRectGu == null)
+                {
+                    _selectionRectGu = new Rectangle
+                    {
+                        Fill = Brushes.Red,
+                        Opacity = 0.1
+                    };
+                    MainCanvas.Children.Add(_selectionRectGu);
+                }
+                _selectionRectGu.Width = rect.Width;
+                _selectionRectGu.Height = rect.Height;
+                _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
+                _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
+            }
         }
     }
 }
