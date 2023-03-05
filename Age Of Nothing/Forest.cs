@@ -5,26 +5,27 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing
 {
-    public class Forest
+    public class Forest : Sprite<Rectangle>
     {
-        public Forest(Rect rect)
+        public Forest(Rect rect) : base(rect.Width, rect.Height)
         {
             Surface = rect;
-            Visual = new Rectangle
-            {
-                Width = rect.Width,
-                Height = rect.Height
-            };
-            Visual.MouseEnter += (a, b) => RefreshVisual(true);
-            Visual.MouseLeave += (a, b) => RefreshVisual(false);
 
-            DefaultBrush = CreateBrush(Brushes.Green);
-            HoverBrush = CreateBrush(Brushes.ForestGreen);
+            DefaultFill = CreateBrush(Brushes.Green);
+            HoverFill = CreateBrush(Brushes.ForestGreen);
 
             RefreshVisual(false);
             RefreshPosition();
             Visual.SetValue(Panel.ZIndexProperty, 1);
         }
+
+        public override Rect Surface { get; }
+
+        protected override int IndexZ => 1;
+
+        protected override Brush DefaultFill { get; }
+
+        protected override Brush HoverFill { get; }
 
         private DrawingBrush CreateBrush(Brush singleBrush)
         {
@@ -40,23 +41,6 @@ namespace Age_Of_Nothing
             myBrush.Viewport = new Rect(0, 0, 1 / (Surface.Width / 10), 1 / (Surface.Height / 10));
             myBrush.TileMode = TileMode.Tile;
             return myBrush;
-        }
-
-        public Rect Surface { get; }
-        public Rectangle Visual { get; }
-
-        private Brush DefaultBrush { get; }
-        private Brush HoverBrush { get; }
-
-        public void RefreshVisual(bool hover)
-        {
-            Visual.Fill = hover ? HoverBrush : DefaultBrush;
-        }
-
-        public void RefreshPosition()
-        {
-            Visual.SetValue(Canvas.LeftProperty, Surface.Left);
-            Visual.SetValue(Canvas.TopProperty, Surface.Top);
         }
     }
 }

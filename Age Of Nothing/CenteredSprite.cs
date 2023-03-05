@@ -6,29 +6,19 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing
 {
-    public abstract class CenteredSprite
+    public abstract class CenteredSprite : Sprite<Ellipse>
     {
         protected IReadOnlyList<CenteredSprite> Sprites { get; }
 
-        protected abstract int IndexZ { get; }
-        protected abstract Brush DefaultFill { get; }
-        protected abstract Brush HoverFill { get; }
         protected abstract Brush FocusFill { get; }
         protected abstract Brush HoverFocusFill { get; }
 
         protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites)
+            : base(size, size)
         {
             Sprites = sprites;
             Position = position;
-            Size = size;
 
-            Visual = new Ellipse
-            {
-                Width = Size,
-                Height = Size
-            };
-            Visual.MouseEnter += (a, b) => RefreshVisual(true);
-            Visual.MouseLeave += (a, b) => RefreshVisual(false);
             Visual.MouseLeftButtonDown += (a, b) =>
             {
                 ChangeFocus(!Focused, true);
@@ -44,25 +34,15 @@ namespace Age_Of_Nothing
             Visual.SetValue(Panel.ZIndexProperty, IndexZ);
         }
 
-        public void RefreshPosition()
-        {
-            Visual.SetValue(Canvas.LeftProperty, Surface.Left);
-            Visual.SetValue(Canvas.TopProperty, Surface.Top);
-        }
-
         public Point Position { get; protected set; }
-
-        public double Size { get; }
-
-        public Ellipse Visual { get; }
 
         public bool Focused { get; private set; }
 
-        public Rect Surface => new Rect(
-            new Point(Position.X - Size / 2, Position.Y - Size / 2),
-            new Point(Position.X + Size / 2, Position.Y + Size / 2));
+        public override Rect Surface => new Rect(
+            new Point(Position.X - Width / 2, Position.Y - Width / 2),
+            new Point(Position.X + Height / 2, Position.Y + Height / 2));
 
-        public void RefreshVisual(bool hover)
+        public override void RefreshVisual(bool hover)
         {
             Visual.Fill = hover
                 ? (Focused
