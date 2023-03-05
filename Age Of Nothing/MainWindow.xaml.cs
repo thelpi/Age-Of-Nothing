@@ -50,11 +50,9 @@ namespace Age_Of_Nothing
             _sprites.Add(_units[2]);
             _sprites.Add(_mine);
 
-            MainCanvas.Children.Add(_units[0].Visual);
-            MainCanvas.Children.Add(_units[1].Visual);
-            MainCanvas.Children.Add(_units[2].Visual);
+            foreach (var sprite in _sprites)
+                MainCanvas.Children.Add(sprite.Visual);
             MainCanvas.Children.Add(_selectionRectGu);
-            MainCanvas.Children.Add(_mine.Visual);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
