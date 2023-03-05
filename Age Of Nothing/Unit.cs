@@ -19,21 +19,21 @@ namespace Age_Of_Nothing
 
         protected override int IndexZ => 2;
 
-        protected override Brush DefaultFill => Brushes.Blue;
+        protected override Brush DefaultFill => Brushes.SandyBrown;
 
-        protected override Brush HoverFill => Brushes.CornflowerBlue;
+        protected override Brush HoverFill => Brushes.PeachPuff;
 
         protected override Brush FocusFill => new RadialGradientBrush(
             new GradientStopCollection(new List<GradientStop>
             {
-                new GradientStop(Colors.Blue, 0.75),
+                new GradientStop(Colors.SandyBrown, 0.75),
                 new GradientStop(Colors.Red, 1)
             }));
 
         protected override Brush HoverFocusFill => new RadialGradientBrush(
             new GradientStopCollection(new List<GradientStop>
             {
-                new GradientStop(Colors.CornflowerBlue, 0.75),
+                new GradientStop(Colors.PeachPuff, 0.75),
                 new GradientStop(Colors.Red, 1)
             }));
 

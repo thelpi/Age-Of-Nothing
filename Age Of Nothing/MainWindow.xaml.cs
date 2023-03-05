@@ -20,9 +20,9 @@ namespace Age_Of_Nothing
 
         private readonly Timer _timer = new Timer(Delay);
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
+        private readonly List<Mine> _mines = new List<Mine>(10); // TODO: adjust
         private readonly List<CenteredSprite> _sprites = new List<CenteredSprite>(10); // TODO: adjust
         private readonly Rectangle _selectionRectGu;
-        private readonly Mine _mine;
 
         private Point? _selectionPoint;
         private volatile bool _refreshing = false;
@@ -43,12 +43,14 @@ namespace Age_Of_Nothing
                 Opacity = 0.1
             };
 
-            _mine = new Mine(100, new Point(400, 120), 1, _sprites);
+            _mines.Add(new Mine(100, new Point(400, 120), 1, false, _sprites));
+            _mines.Add(new Mine(75, new Point(200, 700), 1, true, _sprites));
 
             _sprites.Add(_units[0]);
             _sprites.Add(_units[1]);
             _sprites.Add(_units[2]);
-            _sprites.Add(_mine);
+            _sprites.Add(_mines[0]);
+            _sprites.Add(_mines[1]);
 
             foreach (var sprite in _sprites)
                 MainCanvas.Children.Add(sprite.Visual);
@@ -74,8 +76,11 @@ namespace Age_Of_Nothing
         private void MainCanvas_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var clickPosition = e.GetPosition(MainCanvas);
-            if (_mine.Surface.Contains(clickPosition))
-                clickPosition = _mine.Position;
+
+            var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+            if (mine != null)
+                clickPosition = mine.Position;
+
             foreach (var unit in _units.Where(x => x.Focused))
             {
                 unit.TargetPosition = clickPosition;

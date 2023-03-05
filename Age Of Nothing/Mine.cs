@@ -6,31 +6,42 @@ namespace Age_Of_Nothing
 {
     public class Mine : CenteredSprite
     {
-        public Mine(int quantity, Point position, double qtyScale, IReadOnlyList<CenteredSprite> sprites)
+        public Mine(int quantity, Point position, double qtyScale, bool isIron, IReadOnlyList<CenteredSprite> sprites)
             : base(position, qtyScale * quantity, sprites)
         {
             Quantity = quantity;
+            IsIron = isIron;
+
+            // otherwise the Iron color does not apply
+            RefreshVisual(false);
         }
+
+        public bool IsIron { get; }
 
         public int Quantity { get; }
 
         protected override int IndexZ => 1;
 
-        protected override Brush DefaultFill => Brushes.Silver;
+        private readonly Color HoverRockFill = Colors.Gainsboro;
+        private readonly Color DefaultRockFill = Colors.Silver;
+        private readonly Color HoverIronFill = Colors.LightSteelBlue;
+        private readonly Color DefaultIronFill = Colors.SteelBlue;
 
-        protected override Brush HoverFill => Brushes.Gainsboro;
+        protected override Brush DefaultFill => new SolidColorBrush(IsIron ? DefaultIronFill : DefaultRockFill);
+
+        protected override Brush HoverFill => new SolidColorBrush(IsIron ? HoverIronFill : HoverRockFill);
 
         protected override Brush FocusFill => new RadialGradientBrush(
             new GradientStopCollection(new List<GradientStop>
             {
-                new GradientStop(Colors.Silver, 0.9),
+                new GradientStop(IsIron ? DefaultIronFill : DefaultRockFill, 0.9),
                 new GradientStop(Colors.Red, 1)
             }));
 
         protected override Brush HoverFocusFill => new RadialGradientBrush(
             new GradientStopCollection(new List<GradientStop>
             {
-                new GradientStop(Colors.Gainsboro, 0.9),
+                new GradientStop(IsIron ? HoverIronFill : HoverRockFill, 0.9),
                 new GradientStop(Colors.Red, 1)
             }));
 

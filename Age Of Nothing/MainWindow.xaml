@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Age_Of_Nothing"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="900" Width="1600">
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
