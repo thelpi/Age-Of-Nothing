@@ -15,13 +15,15 @@ namespace Age_Of_Nothing
     public partial class MainWindow : Window
     {
         private const int Fps = 20;
+
         private static readonly double Delay = 1 / (Fps / (double)1000);
 
         private readonly Timer _timer = new Timer(Delay);
-        private volatile bool _refreshing = false;
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
+        private readonly Rectangle _selectionRectGu;
+
         private Point? _selectionPoint;
-        private Rectangle _selectionRectGu;
+        private volatile bool _refreshing = false;
 
         public MainWindow()
         {
@@ -145,6 +147,10 @@ namespace Age_Of_Nothing
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
+                _units.ForEach(x =>
+                {
+                    FindGraphicUnit<Ellipse>(x).Fill = x.Fill(rect.Contains(x.CurrentPosition));
+                });
             }
         }
 
