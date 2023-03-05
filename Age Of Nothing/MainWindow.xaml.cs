@@ -62,15 +62,20 @@ namespace Age_Of_Nothing
                         unit.TargetPosition.Value.Y,
                         unit.Speed);
 
-                    var target = new Point(x2, y2);
+                    var oldPosition = unit.CurrentPosition;
+                    unit.CurrentPosition = new Point(x2, y2);
 
-                    // TODO: manage colision
-                    unit.CurrentPosition = target;
+                    if (!_units.Any(x => x != unit && x.Surface.IntersectsWith(unit.Surface)))
+                    {
+                        if (unit.TargetPosition == unit.CurrentPosition)
+                            unit.TargetPosition = null;
 
-                    if (unit.TargetPosition == unit.CurrentPosition)
-                        unit.TargetPosition = null;
-
-                    Dispatcher.BeginInvoke(new Action(() => unit.RefreshPosition()));
+                        Dispatcher.BeginInvoke(new Action(() => unit.RefreshPosition()));
+                    }
+                    else
+                    {
+                        unit.CurrentPosition = oldPosition;
+                    }
                 }
             }
 

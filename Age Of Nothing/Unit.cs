@@ -8,15 +8,18 @@ namespace Age_Of_Nothing
 {
     public class Unit
     {
+        private readonly double _size;
+
         public Unit(Point position, double speed, double visualSize, IEnumerable<Unit> units)
         {
             CurrentPosition = position;
             Speed = speed;
+            _size = visualSize;
 
             Visual = new Ellipse
             {
-                Width = visualSize,
-                Height = visualSize
+                Width = _size,
+                Height = _size
             };
             Visual.MouseEnter += (a, b) => RefreshVisual(true);
             Visual.MouseLeave += (a, b) => RefreshVisual(false);
@@ -41,6 +44,10 @@ namespace Age_Of_Nothing
         public Shape Visual { get; }
         // pixels by frame
         public double Speed { get; }
+
+        public Rect Surface => new Rect(
+            new Point(CurrentPosition.X - _size / 2, CurrentPosition.Y - _size / 2),
+            new Point(CurrentPosition.X + _size / 2, CurrentPosition.Y + _size / 2));
 
         public bool Selected { get; set; }
         public Point? TargetPosition { get; set; }
