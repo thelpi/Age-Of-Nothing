@@ -1,47 +1,27 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace Age_Of_Nothing
 {
-    public class Mine
+    public class Mine : CenteredSprite
     {
-        public Mine(int value, Point position, double sizeRate)
+        public Mine(int quantity, Point position, double qtyScale, IReadOnlyList<CenteredSprite> sprites)
+            : base(position, qtyScale * quantity, sprites)
         {
-            Value = value;
-            Position = position;
-            Size = sizeRate * value;
-
-            Visual = new Ellipse
-            {
-                Width = Size,
-                Height = Size
-            };
-            Visual.MouseEnter += (a, b) => RefreshVisual(true);
-            Visual.MouseLeave += (a, b) => RefreshVisual(false);
-            RefreshVisual(false);
-
-            Visual.SetValue(Canvas.LeftProperty, Position.X - (Size / 2));
-            Visual.SetValue(Canvas.TopProperty, Position.Y - (Size / 2));
-            Visual.SetValue(Panel.ZIndexProperty, 1);
+            Quantity = quantity;
         }
 
-        public int Value { get; }
+        public int Quantity { get; }
 
-        public Point Position { get; }
+        protected override int IndexZ => 1;
 
-        public double Size { get; }
+        protected override Brush DefaultFill => Brushes.Gray;
 
-        public Ellipse Visual { get; }
+        protected override Brush HoverFill => Brushes.DarkGray;
 
-        public Rect Surface => new Rect(
-            new Point(Position.X - Size / 2, Position.Y - Size / 2),
-            new Point(Position.X + Size / 2, Position.Y + Size / 2));
+        protected override Brush FocusFill => Brushes.SlateGray;
 
-        public void RefreshVisual(bool hover)
-        {
-            Visual.Fill = hover ? Brushes.DarkGray : Brushes.Gray;
-        }
+        protected override Brush HoverFocusFill => Brushes.DarkSlateGray;
     }
 }

@@ -20,6 +20,7 @@ namespace Age_Of_Nothing
 
         private readonly Timer _timer = new Timer(Delay);
         private readonly List<Unit> _units = new List<Unit>(10); // TODO: adjust
+        private readonly List<CenteredSprite> _sprites = new List<CenteredSprite>(10); // TODO: adjust
         private readonly Rectangle _selectionRectGu;
         private readonly Mine _mine;
 
@@ -32,9 +33,9 @@ namespace Age_Of_Nothing
             _timer.Elapsed += Refresh;
             _timer.Start();
 
-            _units.Add(new Unit(new Point(200, 200), 4, 20, _units));
-            _units.Add(new Unit(new Point(100, 100), 3, 20, _units));
-            _units.Add(new Unit(new Point(300, 300), 3, 20, _units));
+            _units.Add(new Unit(new Point(200, 200), 4, 20, _sprites));
+            _units.Add(new Unit(new Point(100, 100), 3, 20, _sprites));
+            _units.Add(new Unit(new Point(300, 300), 3, 20, _sprites));
 
             _selectionRectGu = new Rectangle
             {
@@ -42,7 +43,12 @@ namespace Age_Of_Nothing
                 Opacity = 0.1
             };
 
-            _mine = new Mine(100, new Point(400, 120), 1);
+            _mine = new Mine(100, new Point(400, 120), 1, _sprites);
+
+            _sprites.Add(_units[0]);
+            _sprites.Add(_units[1]);
+            _sprites.Add(_units[2]);
+            _sprites.Add(_mine);
 
             MainCanvas.Children.Add(_units[0].Visual);
             MainCanvas.Children.Add(_units[1].Visual);
@@ -58,7 +64,7 @@ namespace Age_Of_Nothing
 
             foreach (var unit in _units)
             {
-                if (unit.CheckForMovement(_units))
+                if (unit.CheckForMovement())
                     Dispatcher.BeginInvoke(new Action(() => unit.RefreshPosition()));
             }
 
@@ -72,7 +78,7 @@ namespace Age_Of_Nothing
             var clickPosition = e.GetPosition(MainCanvas);
             if (_mine.Surface.Contains(clickPosition))
                 clickPosition = _mine.Position;
-            foreach (var unit in _units.Where(x => x.Selected))
+            foreach (var unit in _units.Where(x => x.Focused))
             {
                 unit.TargetPosition = clickPosition;
             }
@@ -83,11 +89,7 @@ namespace Age_Of_Nothing
             if (sender == e.Source)
             {
                 _selectionPoint = e.GetPosition(MainCanvas);
-                _units.ForEach(x =>
-                {
-                    x.Selected = false;
-                    x.RefreshVisual(false);
-                });
+                _units.ForEach(x => x.ChangeFocus(false, false));
             }
         }
 
@@ -99,11 +101,8 @@ namespace Age_Of_Nothing
                 var rect = new Rect(endSelectionPoint, _selectionPoint.Value);
                 _units.ForEach(x =>
                 {
-                    if (rect.Contains(x.CurrentPosition))
-                    {
-                        x.Selected = true;
-                        x.RefreshVisual(false);
-                    }
+                    if (rect.Contains(x.Position))
+                        x.ChangeFocus(true, false);
                 });
             }
             ResetSelectionRectangle();
@@ -123,7 +122,7 @@ namespace Age_Of_Nothing
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
-                _units.ForEach(x => x.RefreshVisual(rect.Contains(x.CurrentPosition)));
+                _units.ForEach(x => x.RefreshVisual(rect.Contains(x.Position)));
             }
         }
 
