@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -64,6 +65,35 @@ namespace Age_Of_Nothing
         {
             Visual.SetValue(Canvas.LeftProperty, CurrentPosition.X - (Visual.Width / 2));
             Visual.SetValue(Canvas.TopProperty, CurrentPosition.Y - (Visual.Height / 2));
+        }
+
+        public bool CheckForMovement(IEnumerable<Unit> units)
+        {
+            if (TargetPosition.HasValue)
+            {
+                var (x2, y2) = MathTools.ComputePointOnLine(CurrentPosition.X,
+                    CurrentPosition.Y,
+                    TargetPosition.Value.X,
+                    TargetPosition.Value.Y,
+                    Speed);
+
+                var oldPosition = CurrentPosition;
+                CurrentPosition = new Point(x2, y2);
+
+                if (!units.Any(x => x != this && x.Surface.IntersectsWith(Surface)))
+                {
+                    if (TargetPosition == CurrentPosition)
+                        TargetPosition = null;
+
+                    return true;
+                }
+                else
+                {
+                    CurrentPosition = oldPosition;
+                }
+            }
+
+            return false;
         }
     }
 }

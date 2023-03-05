@@ -31,9 +31,9 @@ namespace Age_Of_Nothing
             _timer.Elapsed += Refresh;
             _timer.Start();
 
-            _units.Add(new Unit(new Point(200, 200), 3, 20, _units));
-            _units.Add(new Unit(new Point(100, 100), 2, 20, _units));
-            _units.Add(new Unit(new Point(300, 300), 1, 20, _units));
+            _units.Add(new Unit(new Point(200, 200), 4, 20, _units));
+            _units.Add(new Unit(new Point(100, 100), 3, 20, _units));
+            _units.Add(new Unit(new Point(300, 300), 3, 20, _units));
 
             _selectionRectGu = new Rectangle
             {
@@ -54,29 +54,8 @@ namespace Age_Of_Nothing
 
             foreach (var unit in _units)
             {
-                if (unit.TargetPosition.HasValue)
-                {
-                    var (x2, y2) = MathTools.ComputePointOnLine(unit.CurrentPosition.X,
-                        unit.CurrentPosition.Y,
-                        unit.TargetPosition.Value.X,
-                        unit.TargetPosition.Value.Y,
-                        unit.Speed);
-
-                    var oldPosition = unit.CurrentPosition;
-                    unit.CurrentPosition = new Point(x2, y2);
-
-                    if (!_units.Any(x => x != unit && x.Surface.IntersectsWith(unit.Surface)))
-                    {
-                        if (unit.TargetPosition == unit.CurrentPosition)
-                            unit.TargetPosition = null;
-
-                        Dispatcher.BeginInvoke(new Action(() => unit.RefreshPosition()));
-                    }
-                    else
-                    {
-                        unit.CurrentPosition = oldPosition;
-                    }
-                }
+                if (unit.CheckForMovement(_units))
+                    Dispatcher.BeginInvoke(new Action(() => unit.RefreshPosition()));
             }
 
             _refreshing = false;
