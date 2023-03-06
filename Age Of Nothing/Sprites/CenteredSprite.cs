@@ -13,8 +13,8 @@ namespace Age_Of_Nothing.Sprites
         protected abstract Brush FocusFill { get; }
         protected abstract Brush HoverFocusFill { get; }
 
-        protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites)
-            : base(size, size, () => new Ellipse())
+        protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites, int zIndex)
+            : base(size, size, () => new Ellipse(), zIndex)
         {
             Sprites = sprites;
             Position = position;
@@ -31,7 +31,6 @@ namespace Age_Of_Nothing.Sprites
 
             RefreshVisual(false);
             RefreshPosition();
-            Visual.SetValue(Panel.ZIndexProperty, IndexZ);
         }
 
         public Point Position { get; protected set; }

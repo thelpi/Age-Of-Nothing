@@ -11,12 +11,11 @@ namespace Age_Of_Nothing.Sprites
         public double Width { get; }
         public double Height { get; }
 
-        protected abstract int IndexZ { get; }
         protected abstract Brush DefaultFill { get; }
         protected abstract Brush HoverFill { get; }
         public abstract Rect Surface { get; }
 
-        protected Sprite(double width, double height, Func<Shape> shaper)
+        protected Sprite(double width, double height, Func<Shape> shaper, int zIndex)
         {
             Width = width;
             Height = height;
@@ -28,7 +27,7 @@ namespace Age_Of_Nothing.Sprites
 
             RefreshVisual(false);
             RefreshPosition();
-            Visual.SetValue(Panel.ZIndexProperty, IndexZ);
+            Visual.SetValue(Panel.ZIndexProperty, zIndex);
         }
 
         public void RefreshPosition()

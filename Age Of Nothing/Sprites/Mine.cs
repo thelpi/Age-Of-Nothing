@@ -7,7 +7,7 @@ namespace Age_Of_Nothing.Sprites
     public class Mine : CenteredSprite
     {
         public Mine(int quantity, Point position, double qtyScale, bool isIron, IReadOnlyList<CenteredSprite> sprites)
-            : base(position, qtyScale * quantity, sprites)
+            : base(position, qtyScale * quantity, sprites, 1)
         {
             Quantity = quantity;
             IsIron = isIron;
@@ -19,8 +19,6 @@ namespace Age_Of_Nothing.Sprites
         public bool IsIron { get; }
 
         public int Quantity { get; }
-
-        protected override int IndexZ => 1;
 
         private readonly Color HoverRockFill = Colors.Gainsboro;
         private readonly Color DefaultRockFill = Colors.Silver;

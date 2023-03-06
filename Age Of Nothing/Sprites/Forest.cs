@@ -7,7 +7,7 @@ namespace Age_Of_Nothing.Sprites
 {
     public class Forest : Sprite
     {
-        public Forest(Rect rect) : base(rect.Width, rect.Height, () => new Rectangle())
+        public Forest(Rect rect) : base(rect.Width, rect.Height, () => new Rectangle(), 1)
         {
             Surface = rect;
 
@@ -20,8 +20,6 @@ namespace Age_Of_Nothing.Sprites
         }
 
         public override Rect Surface { get; }
-
-        protected override int IndexZ => 1;
 
         protected override Brush DefaultFill { get; }
 
