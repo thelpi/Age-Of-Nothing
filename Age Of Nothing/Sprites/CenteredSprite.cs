@@ -6,7 +6,7 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class CenteredSprite : Sprite<Ellipse>
+    public abstract class CenteredSprite : Sprite
     {
         protected IReadOnlyList<CenteredSprite> Sprites { get; }
 
@@ -14,7 +14,7 @@ namespace Age_Of_Nothing.Sprites
         protected abstract Brush HoverFocusFill { get; }
 
         protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites)
-            : base(size, size)
+            : base(size, size, () => new Ellipse())
         {
             Sprites = sprites;
             Position = position;

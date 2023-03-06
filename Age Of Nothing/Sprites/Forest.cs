@@ -5,9 +5,9 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Forest : Sprite<Rectangle>
+    public class Forest : Sprite
     {
-        public Forest(Rect rect) : base(rect.Width, rect.Height)
+        public Forest(Rect rect) : base(rect.Width, rect.Height, () => new Rectangle())
         {
             Surface = rect;
 
