@@ -6,6 +6,10 @@ namespace Age_Of_Nothing.Sprites
 {
     public class Unit : CenteredSprite
     {
+        private readonly LinkedList<Point> _targetCycle = new LinkedList<Point>();
+        private LinkedListNode<Point> _targetPositionNode;
+        private bool _loop;
+
         public Unit(Point position, double speed, double size, IReadOnlyList<CenteredSprite> sprites)
             : base(position, size, sprites)
         {
@@ -14,8 +18,6 @@ namespace Age_Of_Nothing.Sprites
 
         // pixels by frame
         public double Speed { get; }
-
-        public Point? TargetPosition { get; set; }
 
         protected override int IndexZ => 2;
 
@@ -39,17 +41,44 @@ namespace Age_Of_Nothing.Sprites
 
         public bool CheckForMovement()
         {
-            if (!TargetPosition.HasValue)
-                return false;
+            lock (_targetCycle)
+            {
+                if (_targetPositionNode == null)
+                    return false;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(Position.X, Position.Y,
-                TargetPosition.Value.X, TargetPosition.Value.Y, Speed);
+                var tp = _targetPositionNode.Value;
+                var (x2, y2) = MathTools.ComputePointOnLine(Position.X, Position.Y, tp.X, tp.Y, Speed);
 
-            Position = new Point(x2, y2);
-            if (TargetPosition == Position)
-                TargetPosition = null;
+                Position = new Point(x2, y2);
+                if (tp == Position)
+                {
+                    _targetPositionNode = _targetPositionNode.Next;
+                    if (_targetPositionNode == null && _loop)
+                        _targetPositionNode = _targetCycle.First;
+                }
 
-            return true;
+                return true;
+            }
+        }
+
+        public void SetCycle(params Point[] points)
+        {
+            lock (_targetCycle)
+            {
+                _targetCycle.Clear();
+                var first = true;
+                _loop = false;
+                LinkedListNode<Point> node = null;
+                foreach (var point in points)
+                {
+                    _loop = !first;
+                    node = first
+                        ? _targetCycle.AddFirst(point)
+                        : _targetCycle.AddAfter(node, point);
+                    first = false;
+                }
+                _targetPositionNode = _targetCycle.First;
+            }
         }
     }
 }

@@ -84,14 +84,23 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
+            var marketCycle = false;
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
+            {
                 clickPosition = mine.Position;
+                marketCycle = true;
+            }
             else if (_market.Surface.Contains(clickPosition))
                 clickPosition = _market.Position;
 
             foreach (var unit in _units.Where(x => x.Focused))
-                unit.TargetPosition = clickPosition;
+            {
+                if (marketCycle)
+                    unit.SetCycle(clickPosition, _market.Position);
+                else
+                    unit.SetCycle(clickPosition);
+            }
         }
     }
 }
