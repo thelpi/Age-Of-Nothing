@@ -22,7 +22,7 @@ namespace Age_Of_Nothing.Sprites
             Visual.MouseLeftButtonDown += (a, b) =>
             {
                 ChangeFocus(!Focused, true);
-                foreach (var x in sprites)
+                foreach (var x in Sprites)
                 {
                     if (x != this)
                         x.ChangeFocus(false, false);

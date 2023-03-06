@@ -11,19 +11,19 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
                 <Image Width="25" Height="25" Source="Resources/Images/wood.png" Margin="5, 0, 5, 0" />
-                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="0" TextAlignment="Center" VerticalAlignment="Stretch" Name="WoodValueText" />
+                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="{Binding Path=WoodQuantity}" TextAlignment="Center" VerticalAlignment="Stretch" Name="WoodValueText" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
                 <Image Width="25" Height="25" Source="Resources/Images/rock.png" Margin="5, 0, 5, 0" />
-                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="0" TextAlignment="Center" VerticalAlignment="Stretch" Name="RockValueText" />
+                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="{Binding Path=RockQuantity}" TextAlignment="Center" VerticalAlignment="Stretch" Name="RockValueText" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
                 <Image Width="25" Height="25" Source="Resources/Images/iron.png" Margin="5, 0, 5, 0" />
-                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="0" TextAlignment="Center" VerticalAlignment="Stretch" Name="IronValueText" />
+                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="{Binding Path=IronQuantity}" TextAlignment="Center" VerticalAlignment="Stretch" Name="IronValueText" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
                 <Image Width="25" Height="25" Source="Resources/Images/population.png" Margin="5, 0, 5, 0" />
-                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="0" TextAlignment="Center" VerticalAlignment="Stretch" Name="PopulationValueText" />
+                <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="{Binding Path=Population}" TextAlignment="Center" VerticalAlignment="Stretch" Name="PopulationValueText" />
             </StackPanel>
         </StackPanel>
         <Canvas DockPanel.Dock="Bottom" Name="MainCanvas"
@@ -32,6 +32,6 @@
             MouseLeftButtonDown="MainCanvas_MouseLeftButtonDown"
             MouseLeftButtonUp="MainCanvas_MouseLeftButtonUp"
             MouseLeave="MainCanvas_MouseLeave"
-            MouseMove="MainCanvas_MouseMove"/>
+            MouseMove="MainCanvas_MouseMove" />
     </DockPanel>
 </Window>

@@ -14,8 +14,17 @@ namespace Age_Of_Nothing
         private readonly Market _market;
         private readonly List<CenteredSprite> _sprites = new List<CenteredSprite>(100);
 
+        public int Population => _units.Count;
+        public int WoodQuantity { get; private set; }
+        public int RockQuantity { get; private set; }
+        public int IronQuantity { get; private set; }
+
         public Controller()
         {
+            WoodQuantity = 100;
+            RockQuantity = 100;
+            IronQuantity = 100;
+
             _units.Add(new Unit(new Point(200, 200), 4, 20, _sprites));
             _units.Add(new Unit(new Point(100, 100), 3, 20, _sprites));
             _units.Add(new Unit(new Point(300, 300), 3, 20, _sprites));

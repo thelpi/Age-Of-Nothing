@@ -36,6 +36,8 @@ namespace Age_Of_Nothing
             foreach (var vs in _controller.GetVisualSprites())
                 MainCanvas.Children.Add(vs);
             MainCanvas.Children.Add(_selectionRectGu);
+
+            DataContext = _controller;
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
