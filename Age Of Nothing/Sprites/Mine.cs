@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace Age_Of_Nothing
+namespace Age_Of_Nothing.Sprites
 {
     public class Mine : CenteredSprite
     {
