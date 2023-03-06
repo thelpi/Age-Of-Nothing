@@ -23,7 +23,7 @@ namespace Age_Of_Nothing
         private readonly List<Unit> _units = new List<Unit>(10);
         private readonly List<Mine> _mines = new List<Mine>(10);
         private readonly List<Forest> _forest = new List<Forest>(10);
-        private readonly List<Structure> _structures = new List<Structure>(10);
+        private readonly Market _market;
         private readonly List<CenteredSprite> _sprites = new List<CenteredSprite>(100);
         private readonly Rectangle _selectionRectGu;
 
@@ -51,7 +51,7 @@ namespace Age_Of_Nothing
 
             _forest.Add(new Forest(new Rect(700, 200, 300, 100)));
 
-            _structures.Add(new Market(new Rect(600, 500, 128, 128)));
+            _market = new Market(new Rect(600, 500, 128, 128));
 
             _sprites.Add(_units[0]);
             _sprites.Add(_units[1]);
@@ -62,7 +62,7 @@ namespace Age_Of_Nothing
             foreach (var sprite in _sprites)
                 MainCanvas.Children.Add(sprite.Visual);
             MainCanvas.Children.Add(_forest[0].Visual);
-            MainCanvas.Children.Add(_structures[0].Visual);
+            MainCanvas.Children.Add(_market.Visual);
             MainCanvas.Children.Add(_selectionRectGu);
         }
 
@@ -89,6 +89,8 @@ namespace Age_Of_Nothing
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
                 clickPosition = mine.Position;
+            else if (_market.Surface.Contains(clickPosition))
+                clickPosition = _market.Position;
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
