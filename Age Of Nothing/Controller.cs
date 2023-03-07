@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing
 {
-    public class Controller
+    public class Controller : INotifyPropertyChanged
     {
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
         private readonly List<Unit> _units = new List<Unit>(10);
@@ -14,6 +15,8 @@ namespace Age_Of_Nothing
         private readonly List<Forest> _forest = new List<Forest>(10);
         private readonly Market _market;
         private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public int Population => _units.Count;
         public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
@@ -49,12 +52,10 @@ namespace Age_Of_Nothing
 
         public IEnumerable<UIElement> GetVisualSprites()
         {
-            foreach (var unit in _units)
-                yield return unit.Visual;
+            foreach (var focusableSprite in _focusableSprites)
+                yield return focusableSprite.Visual;
             foreach (var forest in _forest)
                 yield return forest.Visual;
-            foreach (var mine in _mines)
-                yield return mine.Visual;
             yield return _market.Visual;
         }
 
@@ -64,7 +65,10 @@ namespace Age_Of_Nothing
             {
                 var (move, ship) = unit.CheckForMovement();
                 if (ship.HasValue)
+                {
                     _resourcesQty[ship.Value.r] += ship.Value.v;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{ship.Value.r}Quantity"));
+                }
                 if (move)
                     yield return new Action(() => unit.RefreshPosition());
             }
