@@ -1,0 +1,21 @@
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Media;
+
+namespace Age_Of_Nothing.Sprites
+{
+    public class RockMine : Mine
+    {
+        public RockMine(int quantity, Point position, double qtyScale, IReadOnlyList<CenteredSprite> sprites)
+            : base(quantity, position, qtyScale, sprites)
+        { }
+
+        protected override Brush DefaultFill => new SolidColorBrush(Colors.Silver);
+
+        protected override Brush HoverFill => new SolidColorBrush(Colors.Gainsboro);
+
+        protected override Brush FocusFill => GetHoverBrush(Colors.Silver);
+
+        protected override Brush HoverFocusFill => GetHoverBrush(Colors.Gainsboro);
+    }
+}
