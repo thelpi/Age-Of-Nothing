@@ -8,6 +8,7 @@ namespace Age_Of_Nothing
 {
     public class Controller
     {
+        private readonly Dictionary<PrimaryResources, int> _resourcesQty;
         private readonly List<Unit> _units = new List<Unit>(10);
         private readonly List<Mine> _mines = new List<Mine>(10);
         private readonly List<Forest> _forest = new List<Forest>(10);
@@ -15,15 +16,18 @@ namespace Age_Of_Nothing
         private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
 
         public int Population => _units.Count;
-        public int WoodQuantity { get; private set; }
-        public int RockQuantity { get; private set; }
-        public int IronQuantity { get; private set; }
+        public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
+        public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
+        public int IronQuantity => _resourcesQty[PrimaryResources.Iron];
 
         public Controller()
         {
-            WoodQuantity = 100;
-            RockQuantity = 100;
-            IronQuantity = 100;
+            _resourcesQty = new Dictionary<PrimaryResources, int>
+            {
+                { PrimaryResources.Iron, 100 },
+                { PrimaryResources.Rock, 100 },
+                { PrimaryResources.Wood, 100 }
+            };
 
             _units.Add(new Unit(new Point(200, 200), 4, 20, _focusableSprites));
             _units.Add(new Unit(new Point(100, 100), 3, 20, _focusableSprites));
@@ -58,7 +62,10 @@ namespace Age_Of_Nothing
         {
             foreach (var unit in _units)
             {
-                if (unit.CheckForMovement())
+                var (move, ship) = unit.CheckForMovement();
+                if (ship.HasValue)
+                    _resourcesQty[ship.Value.r] += ship.Value.v;
+                if (move)
                     yield return new Action(() => unit.RefreshPosition());
             }
         }
@@ -101,22 +108,34 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
+            TargetType tgt = TargetType.Void;
             var marketCycle = false;
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
             {
                 clickPosition = mine.Center;
                 marketCycle = true;
+                tgt = mine is IronMine
+                    ? TargetType.IronMine
+                    : TargetType.RockMine;
             }
             else if (_market.Surface.Contains(clickPosition))
+            {
                 clickPosition = _market.Center;
+                tgt = TargetType.Market;
+            }
+            else if (_forest.Any(x => x.Surface.Contains(clickPosition)))
+            {
+                marketCycle = true;
+                tgt = TargetType.Forest;
+            }
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
                 if (marketCycle)
-                    unit.SetCycle(clickPosition, _market.Center);
+                    unit.SetCycle((clickPosition, tgt), (_market.Center, TargetType.Market));
                 else
-                    unit.SetCycle(clickPosition);
+                    unit.SetCycle((clickPosition, tgt));
             }
         }
     }
