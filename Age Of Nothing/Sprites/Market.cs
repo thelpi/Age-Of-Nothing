@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Market : Structure, ICentered
+    public class Market : Structure, ICenteredSprite
     {
         public Point Center { get; protected set; }
 

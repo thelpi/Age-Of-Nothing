@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Unit : FocusableSprite, ICentered
+    public class Unit : FocusableSprite, ICenteredSprite
     {
         private Point _center;
         private readonly LinkedList<Point> _targetCycle = new LinkedList<Point>();

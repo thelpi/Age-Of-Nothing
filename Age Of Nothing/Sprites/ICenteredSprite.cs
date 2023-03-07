@@ -2,7 +2,7 @@
 
 namespace Age_Of_Nothing.Sprites
 {
-    public interface ICentered
+    public interface ICenteredSprite
     {
         Point Center { get; }
     }

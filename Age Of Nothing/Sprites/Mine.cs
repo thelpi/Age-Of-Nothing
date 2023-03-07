@@ -5,7 +5,7 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Mine : FocusableSprite, ICentered
+    public abstract class Mine : FocusableSprite, ICenteredSprite
     {
         public Point Center { get; }
 
