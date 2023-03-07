@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Windows;
 
 namespace Age_Of_Nothing
 {
-    public static class MathTools
+    public static class GeometryTools
     {
         /// <summary>
         /// Compute the next point on a grid of an object moving in straight line between two points.
@@ -64,6 +65,20 @@ namespace Age_Of_Nothing
             return beyondXTarget || beyondYTarget
                 ? (xTarget, yTarget)
                 : (x2, y2);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Rect ComputeSurfaceFromMiddlePoint(this Point center, double width, double height)
+        {
+            return new Rect(
+                new Point(center.X - width / 2, center.Y - height / 2),
+                new Point(center.X + width / 2, center.Y + height / 2));
         }
     }
 }

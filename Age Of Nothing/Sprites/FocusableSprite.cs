@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -7,18 +8,15 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class FocusableSprite : Sprite
     {
-        private Point _position;
-
         protected IReadOnlyList<FocusableSprite> Sprites { get; }
 
         protected abstract Brush FocusFill { get; }
         protected abstract Brush HoverFocusFill { get; }
 
-        protected FocusableSprite(Point position, double size, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
-            : base(ComputeSurfaceFromMiddlePoint(position, size, size), () => new Ellipse(), zIndex, canMove)
+        protected FocusableSprite(Rect surface, Func<Shape> shaper, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
+            : base(surface, shaper, zIndex, canMove)
         {
             Sprites = sprites;
-            _position = position;
 
             Visual.MouseLeftButtonDown += (a, b) =>
             {
@@ -29,16 +27,6 @@ namespace Age_Of_Nothing.Sprites
                         x.ChangeFocus(false, false);
                 }
             };
-        }
-
-        public Point Position
-        {
-            get { return _position; }
-            protected set
-            {
-                _position = value;
-                Move(ComputeSurfaceFromMiddlePoint(Position, Surface.Width, Surface.Height).TopLeft);
-            }
         }
 
         public bool Focused { get; private set; }
@@ -58,13 +46,6 @@ namespace Age_Of_Nothing.Sprites
         {
             Focused = focus;
             RefreshVisual(hover);
-        }
-
-        private static Rect ComputeSurfaceFromMiddlePoint(Point point, double width, double height)
-        {
-            return new Rect(
-                new Point(point.X - width / 2, point.Y - height / 2),
-                new Point(point.X + width / 2, point.Y + height / 2));
         }
     }
 }

@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Mine : FocusableSprite
+    public abstract class Mine : FocusableSprite, ICentered
     {
-        protected Mine(int quantity, Point position, double qtyScale, IReadOnlyList<FocusableSprite> sprites)
-            : base(position, qtyScale * quantity, sprites)
+        public Point Center { get; }
+
+        protected Mine(int quantity, Point center, double qtyScale, IReadOnlyList<FocusableSprite> sprites)
+            : base(center.ComputeSurfaceFromMiddlePoint(qtyScale * quantity, qtyScale * quantity), () => new Ellipse(), sprites)
         {
             Quantity = quantity;
+            Center = center;
         }
 
         public int Quantity { get; }

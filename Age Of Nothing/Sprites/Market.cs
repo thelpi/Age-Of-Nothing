@@ -3,14 +3,14 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Market : Structure
+    public class Market : Structure, ICentered
     {
-        public Point Position { get; }
+        public Point Center { get; protected set; }
 
         public Market(Rect rect)
             : base(rect)
         {
-            Position = new Point(
+            Center = new Point(
                 rect.Left + rect.Width / 2,
                 rect.Top + rect.Height / 2);
         }

@@ -16,7 +16,7 @@ namespace Age_Of_Nothing_Unit_Tests
             var yf = 16;
             var distance = 5D;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(x1, y1, xf, yf, distance);
+            var (x2, y2) = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
 
             Assert.Equal(x2Expected, x2);
             Assert.Equal(y2Expected, y2);
@@ -33,7 +33,7 @@ namespace Age_Of_Nothing_Unit_Tests
             var yf = 16;
             var distance = 11D;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(x1, y1, xf, yf, distance);
+            var (x2, y2) = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
 
             Assert.Equal(xf, x2);
             Assert.Equal(yf, y2);
@@ -44,7 +44,7 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 20D;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(10, 10, 50, 10, distance);
+            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 50, 10, distance);
 
             Assert.Equal(30, x2);
             Assert.Equal(10, y2);
@@ -55,7 +55,7 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 20D;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(10, 10, 10, 50, distance);
+            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
 
             Assert.Equal(10, x2);
             Assert.Equal(30, y2);
@@ -66,7 +66,7 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 60D;
 
-            var (x2, y2) = MathTools.ComputePointOnLine(10, 10, 10, 50, distance);
+            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
 
             Assert.Equal(10, x2);
             Assert.Equal(50, y2);

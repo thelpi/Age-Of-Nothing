@@ -73,7 +73,7 @@ namespace Age_Of_Nothing
             var hasUnitSelected = false;
             _units.ForEach(x =>
             {
-                if (zone.Contains(x.Position))
+                if (zone.Contains(x.Center))
                 {
                     x.ChangeFocus(true, false);
                     hasUnitSelected = true;
@@ -85,7 +85,7 @@ namespace Age_Of_Nothing
                 // take the first focus
                 foreach (var x in _focusableSprites.Where(x => !(x is Unit)))
                 {
-                    if (zone.Contains(x.Position))
+                    if (zone.IntersectsWith(x.Surface))
                     {
                         x.ChangeFocus(true, false);
                         break;
@@ -96,7 +96,7 @@ namespace Age_Of_Nothing
 
         public void RefreshHover(Rect zone)
         {
-            _focusableSprites.ForEach(x => x.RefreshVisual(zone.Contains(x.Position)));
+            _focusableSprites.ForEach(x => x.RefreshVisual(zone.IntersectsWith(x.Surface)));
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
@@ -105,16 +105,16 @@ namespace Age_Of_Nothing
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
             {
-                clickPosition = mine.Position;
+                clickPosition = mine.Center;
                 marketCycle = true;
             }
             else if (_market.Surface.Contains(clickPosition))
-                clickPosition = _market.Position;
+                clickPosition = _market.Center;
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
                 if (marketCycle)
-                    unit.SetCycle(clickPosition, _market.Position);
+                    unit.SetCycle(clickPosition, _market.Center);
                 else
                     unit.SetCycle(clickPosition);
             }
