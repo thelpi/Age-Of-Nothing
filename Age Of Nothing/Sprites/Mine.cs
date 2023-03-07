@@ -7,7 +7,7 @@ namespace Age_Of_Nothing.Sprites
     public class Mine : CenteredSprite
     {
         public Mine(int quantity, Point position, double qtyScale, bool isIron, IReadOnlyList<CenteredSprite> sprites)
-            : base(position, qtyScale * quantity, sprites, 1)
+            : base(position, qtyScale * quantity, sprites)
         {
             Quantity = quantity;
             IsIron = isIron;
@@ -29,18 +29,18 @@ namespace Age_Of_Nothing.Sprites
 
         protected override Brush HoverFill => new SolidColorBrush(IsIron ? HoverIronFill : HoverRockFill);
 
-        protected override Brush FocusFill => new RadialGradientBrush(
-            new GradientStopCollection(new List<GradientStop>
-            {
-                new GradientStop(IsIron ? DefaultIronFill : DefaultRockFill, 0.9),
-                new GradientStop(Colors.Red, 1)
-            }));
+        protected override Brush FocusFill => GetHoverBrush(IsIron ? DefaultIronFill : DefaultIronFill);
 
-        protected override Brush HoverFocusFill => new RadialGradientBrush(
-            new GradientStopCollection(new List<GradientStop>
-            {
-                new GradientStop(IsIron ? HoverIronFill : HoverRockFill, 0.9),
-                new GradientStop(Colors.Red, 1)
-            }));
+        protected override Brush HoverFocusFill => GetHoverBrush(IsIron ? HoverIronFill : HoverRockFill);
+
+        private Brush GetHoverBrush(Color color)
+        {
+            return new RadialGradientBrush(
+                new GradientStopCollection(new List<GradientStop>
+                {
+                    new GradientStop(color, 0.9),
+                    new GradientStop(Colors.Red, 1)
+                }));
+        }
     }
 }

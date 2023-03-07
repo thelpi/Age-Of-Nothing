@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -8,16 +7,18 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class CenteredSprite : Sprite
     {
+        private Point _position;
+
         protected IReadOnlyList<CenteredSprite> Sprites { get; }
 
         protected abstract Brush FocusFill { get; }
         protected abstract Brush HoverFocusFill { get; }
 
-        protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites, int zIndex)
-            : base(size, size, () => new Ellipse(), zIndex)
+        protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites, int zIndex = 1, bool canMove = false)
+            : base(ComputeSurfaceFromMiddlePoint(position, size, size), () => new Ellipse(), zIndex, canMove)
         {
             Sprites = sprites;
-            Position = position;
+            _position = position;
 
             Visual.MouseLeftButtonDown += (a, b) =>
             {
@@ -28,18 +29,19 @@ namespace Age_Of_Nothing.Sprites
                         x.ChangeFocus(false, false);
                 }
             };
-
-            RefreshVisual(false);
-            RefreshPosition();
         }
 
-        public Point Position { get; protected set; }
+        public Point Position
+        {
+            get { return _position; }
+            protected set
+            {
+                _position = value;
+                Move(ComputeSurfaceFromMiddlePoint(Position, Surface.Width, Surface.Height).TopLeft);
+            }
+        }
 
         public bool Focused { get; private set; }
-
-        public override Rect Surface => new Rect(
-            new Point(Position.X - Width / 2, Position.Y - Width / 2),
-            new Point(Position.X + Height / 2, Position.Y + Height / 2));
 
         public override void RefreshVisual(bool hover)
         {
@@ -56,6 +58,13 @@ namespace Age_Of_Nothing.Sprites
         {
             Focused = focus;
             RefreshVisual(hover);
+        }
+
+        private static Rect ComputeSurfaceFromMiddlePoint(Point point, double width, double height)
+        {
+            return new Rect(
+                new Point(point.X - width / 2, point.Y - height / 2),
+                new Point(point.X + width / 2, point.Y + height / 2));
         }
     }
 }

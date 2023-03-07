@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -7,38 +6,30 @@ namespace Age_Of_Nothing.Sprites
 {
     public class Forest : Sprite
     {
-        public Forest(Rect rect) : base(rect.Width, rect.Height, () => new Rectangle(), 1)
-        {
-            Surface = rect;
+        public Forest(Rect rect)
+            : base(rect, () => new Rectangle())
+        { }
 
-            DefaultFill = CreateBrush(Brushes.Green);
-            HoverFill = CreateBrush(Brushes.ForestGreen);
+        protected override Brush DefaultFill => CreateBrush(Brushes.Green);
 
-            RefreshVisual(false);
-            RefreshPosition();
-            Visual.SetValue(Panel.ZIndexProperty, 1);
-        }
-
-        public override Rect Surface { get; }
-
-        protected override Brush DefaultFill { get; }
-
-        protected override Brush HoverFill { get; }
+        protected override Brush HoverFill => CreateBrush(Brushes.ForestGreen);
 
         private DrawingBrush CreateBrush(Brush singleBrush)
         {
-            var myBrush = new DrawingBrush();
-
-            var backgroundSquare = new GeometryDrawing(
-                singleBrush, null, new EllipseGeometry(new Rect(0, 0, Surface.Width, Surface.Height)));
-
             var checkersDrawingGroup = new DrawingGroup();
-            checkersDrawingGroup.Children.Add(backgroundSquare);
+            checkersDrawingGroup.Children.Add(
+                new GeometryDrawing(
+                    singleBrush,
+                    null,
+                    new EllipseGeometry(
+                        new Rect(0, 0, Surface.Width, Surface.Height))));
 
-            myBrush.Drawing = checkersDrawingGroup;
-            myBrush.Viewport = new Rect(0, 0, 1 / (Surface.Width / 10), 1 / (Surface.Height / 10));
-            myBrush.TileMode = TileMode.Tile;
-            return myBrush;
+            return new DrawingBrush
+            {
+                Drawing = checkersDrawingGroup,
+                Viewport = new Rect(0, 0, 1 / (Surface.Width / 10), 1 / (Surface.Height / 10)),
+                TileMode = TileMode.Tile
+            };
         }
     }
 }

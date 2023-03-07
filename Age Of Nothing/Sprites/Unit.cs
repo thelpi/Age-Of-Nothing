@@ -11,7 +11,7 @@ namespace Age_Of_Nothing.Sprites
         private bool _loop;
 
         public Unit(Point position, double speed, double size, IReadOnlyList<CenteredSprite> sprites)
-            : base(position, size, sprites, 2)
+            : base(position, size, sprites, 2, true)
         {
             Speed = speed;
         }

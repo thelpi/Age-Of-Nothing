@@ -6,15 +6,9 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class Structure : Sprite
     {
-        public override Rect Surface { get; }
-
-        protected Structure(Rect rect) : base(rect.Width, rect.Height, () => new Rectangle(), 1)
-        {
-            Surface = rect;
-
-            RefreshVisual(false);
-            RefreshPosition();
-        }
+        protected Structure(Rect rect)
+            : base(rect, () => new Rectangle())
+        { }
 
         protected abstract override Brush DefaultFill { get; }
 

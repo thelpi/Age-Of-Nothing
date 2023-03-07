@@ -8,20 +8,18 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class Sprite
     {
-        public double Width { get; }
-        public double Height { get; }
-
         protected abstract Brush DefaultFill { get; }
         protected abstract Brush HoverFill { get; }
-        public abstract Rect Surface { get; }
+        public Rect Surface { get; private set; }
+        public bool CanMove { get; }
 
-        protected Sprite(double width, double height, Func<Shape> shaper, int zIndex)
+        protected Sprite(Rect surface, Func<Shape> shaper, int zIndex = 1, bool canMove = false)
         {
-            Width = width;
-            Height = height;
+            Surface = surface;
+            CanMove = canMove;
             Visual = shaper();
-            Visual.Width = Width;
-            Visual.Height = Height;
+            Visual.Width = Surface.Width;
+            Visual.Height = Surface.Height;
             Visual.MouseEnter += (a, b) => RefreshVisual(true);
             Visual.MouseLeave += (a, b) => RefreshVisual(false);
 
@@ -43,6 +41,15 @@ namespace Age_Of_Nothing.Sprites
             Visual.Fill = hover
                 ? HoverFill
                 : DefaultFill;
+        }
+
+        protected bool Move(Point topLeftPoint)
+        {
+            if (!CanMove)
+                return false;
+
+            Surface = new Rect(topLeftPoint, Surface.Size);
+            return true;
         }
     }
 }

@@ -7,7 +7,8 @@ namespace Age_Of_Nothing.Sprites
     {
         public Point Position { get; }
 
-        public Market(Rect rect) : base(rect)
+        public Market(Rect rect)
+            : base(rect)
         {
             Position = new Point(
                 rect.Left + rect.Width / 2,
