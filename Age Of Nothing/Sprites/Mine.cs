@@ -4,9 +4,9 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Mine : CenteredSprite
+    public abstract class Mine : FocusableSprite
     {
-        protected Mine(int quantity, Point position, double qtyScale, IReadOnlyList<CenteredSprite> sprites)
+        protected Mine(int quantity, Point position, double qtyScale, IReadOnlyList<FocusableSprite> sprites)
             : base(position, qtyScale * quantity, sprites)
         {
             Quantity = quantity;

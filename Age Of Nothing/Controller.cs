@@ -12,7 +12,7 @@ namespace Age_Of_Nothing
         private readonly List<Mine> _mines = new List<Mine>(10);
         private readonly List<Forest> _forest = new List<Forest>(10);
         private readonly Market _market;
-        private readonly List<CenteredSprite> _focusableSprites = new List<CenteredSprite>(100);
+        private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
 
         public int Population => _units.Count;
         public int WoodQuantity { get; private set; }

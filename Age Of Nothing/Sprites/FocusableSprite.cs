@@ -5,16 +5,16 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class CenteredSprite : Sprite
+    public abstract class FocusableSprite : Sprite
     {
         private Point _position;
 
-        protected IReadOnlyList<CenteredSprite> Sprites { get; }
+        protected IReadOnlyList<FocusableSprite> Sprites { get; }
 
         protected abstract Brush FocusFill { get; }
         protected abstract Brush HoverFocusFill { get; }
 
-        protected CenteredSprite(Point position, double size, IReadOnlyList<CenteredSprite> sprites, int zIndex = 1, bool canMove = false)
+        protected FocusableSprite(Point position, double size, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
             : base(ComputeSurfaceFromMiddlePoint(position, size, size), () => new Ellipse(), zIndex, canMove)
         {
             Sprites = sprites;

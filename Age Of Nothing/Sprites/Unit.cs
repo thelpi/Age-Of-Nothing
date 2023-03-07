@@ -4,13 +4,13 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Unit : CenteredSprite
+    public class Unit : FocusableSprite
     {
         private readonly LinkedList<Point> _targetCycle = new LinkedList<Point>();
         private LinkedListNode<Point> _targetPositionNode;
         private bool _loop;
 
-        public Unit(Point position, double speed, double size, IReadOnlyList<CenteredSprite> sprites)
+        public Unit(Point position, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
             : base(position, size, sprites, 2, true)
         {
             Speed = speed;
