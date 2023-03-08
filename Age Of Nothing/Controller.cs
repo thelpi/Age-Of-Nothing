@@ -15,9 +15,14 @@ namespace Age_Of_Nothing
         private readonly List<Forest> _forest = new List<Forest>(10);
         private readonly Market _market;
         private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
+        private readonly List<Dwelling> _dwellings = new List<Dwelling>();
 
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        // todo: notify property changed
+        public string PopulationInformation => $"{Population} / {PotentialPopulation}";
 
+        public int PotentialPopulation => _dwellings.Count * Dwelling.VillagerCapacity;
         public int Population => _units.Count;
         public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
         public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
@@ -41,7 +46,10 @@ namespace Age_Of_Nothing
 
             _forest.Add(new Forest(new Rect(700, 200, 300, 100)));
 
-            _market = new Market(new Rect(600, 500, 128, 128));
+            _market = new Market(new Point(600, 500));
+
+            _dwellings.Add(new Dwelling(new Point(1100, 10)));
+            _dwellings.Add(new Dwelling(new Point(1100, 90)));
 
             _focusableSprites.Add(_units[0]);
             _focusableSprites.Add(_units[1]);
@@ -56,6 +64,8 @@ namespace Age_Of_Nothing
                 yield return focusableSprite.Visual;
             foreach (var forest in _forest)
                 yield return forest.Visual;
+            foreach (var _dwelling in _dwellings)
+                yield return _dwelling.Visual;
             yield return _market.Visual;
         }
 

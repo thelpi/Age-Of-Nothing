@@ -7,7 +7,7 @@ namespace Age_Of_Nothing.Sprites
     {
         private const double _speed = 5;
         private const double _size = 20;
-        private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCpacity = new Dictionary<PrimaryResources, int>
+        private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
         {
             { PrimaryResources.Iron, 10 },
             { PrimaryResources.Wood, 10 },
@@ -30,7 +30,7 @@ namespace Age_Of_Nothing.Sprites
             }
             else if (tgt.Is<IResourceSprite>(out var rs))
             {
-                var realQty = rs.ReduceQuantity(_carryCpacity[rs.Resource]);
+                var realQty = rs.ReduceQuantity(_carryCapacity[rs.Resource]);
                 if (realQty > 0)
                     _carrying = (rs.Resource, realQty);
                 else
