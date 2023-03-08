@@ -12,6 +12,13 @@ namespace Age_Of_Nothing.Sprites
         private LinkedListNode<(Point pt, Sprite tgt)> _targetPositionNode;
         private bool _loop;
 
+        private static readonly IReadOnlyDictionary<PrimaryResources, int> _shipCapacity = new Dictionary<PrimaryResources, int>
+        {
+            { PrimaryResources.Iron, 10 },
+            { PrimaryResources.Wood, 10 },
+            { PrimaryResources.Rock, 10 }
+        };
+
         public Unit(Point center, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), sprites, 2, true)
         {
@@ -73,7 +80,7 @@ namespace Age_Of_Nothing.Sprites
                     }
                     else if (tgt.Is<IResourceSprite>(out var rs))
                     {
-                        var realQty = rs.ReduceQuantity(10);
+                        var realQty = rs.ReduceQuantity(_shipCapacity[rs.Resource]);
                         if (realQty > 0)
                             Shipment = (rs.Resource, realQty);
                         else
