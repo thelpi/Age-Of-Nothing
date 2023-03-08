@@ -66,9 +66,6 @@ namespace Age_Of_Nothing.Sprites
                 (PrimaryResources, int)? ship = null;
                 if (pt == Center)
                 {
-                    _targetPositionNode = _targetPositionNode.Next;
-                    if (_targetPositionNode == null && _loop)
-                        _targetPositionNode = _targetCycle.First;
                     if (tgt.Is<Market>())
                     {
                         ship = Shipment;
@@ -76,9 +73,18 @@ namespace Age_Of_Nothing.Sprites
                     }
                     else if (tgt.Is<IResourceSprite>(out var rs))
                     {
-                        Shipment = (rs.Resource, 10);
-                        rs.ReduceQuantity(10);
+                        var realQty = rs.ReduceQuantity(10);
+                        if (realQty > 0)
+                            Shipment = (rs.Resource, realQty);
+                        else
+                        {
+                            _loop = false;
+                            _targetCycle.Clear();
+                        }
                     }
+                    _targetPositionNode = _targetPositionNode.Next;
+                    if (_targetPositionNode == null && _loop)
+                        _targetPositionNode = _targetCycle.First;
                 }
 
                 return (true, ship);

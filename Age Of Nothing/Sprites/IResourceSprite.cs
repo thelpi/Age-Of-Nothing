@@ -6,6 +6,6 @@
 
         PrimaryResources Resource { get; }
 
-        void ReduceQuantity(int qtyLost);
+        int ReduceQuantity(int qtyLost);
     }
 }

@@ -23,9 +23,19 @@ namespace Age_Of_Nothing.Sprites
 
         protected override string Info => $"{Quantity}";
 
-        public void ReduceQuantity(int qtyLost)
+        public int ReduceQuantity(int qtyLost)
         {
-            Quantity -= qtyLost > Quantity ? Quantity : qtyLost;
+            if (qtyLost > Quantity)
+            {
+                var qtyReturned = Quantity;
+                Quantity = 0;
+                return qtyReturned;
+            }
+            else
+            {
+                Quantity -= qtyLost;
+                return qtyLost;
+            }
         }
 
         private DrawingBrush CreateBrush(Brush singleBrush)
