@@ -32,9 +32,9 @@ namespace Age_Of_Nothing
                 { PrimaryResources.Wood, 100 }
             };
 
-            _units.Add(new Unit(new Point(200, 200), 4, 20, _focusableSprites));
-            _units.Add(new Unit(new Point(100, 100), 3, 20, _focusableSprites));
-            _units.Add(new Unit(new Point(300, 300), 3, 20, _focusableSprites));
+            _units.Add(new Villager(new Point(200, 200), _focusableSprites));
+            _units.Add(new Villager(new Point(100, 100), _focusableSprites));
+            _units.Add(new Villager(new Point(300, 300), _focusableSprites));
 
             _mines.Add(new RockMine(100, new Point(400, 120), 1, _focusableSprites));
             _mines.Add(new IronMine(75, new Point(200, 600), 1, _focusableSprites));
@@ -63,11 +63,15 @@ namespace Age_Of_Nothing
         {
             foreach (var unit in _units)
             {
-                var (move, ship) = unit.CheckForMovement();
-                if (ship.HasValue)
+                var (move, tgt) = unit.CheckForMovement();
+                if (tgt != null && unit.Is<Villager>(out var villager))
                 {
-                    _resourcesQty[ship.Value.r] += ship.Value.v;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{ship.Value.r}Quantity"));
+                    var carry = villager.CheckCarry(tgt);
+                    if (carry.HasValue)
+                    {
+                        _resourcesQty[carry.Value.r] += carry.Value.v;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
+                    }
                 }
                 if (move)
                     yield return new Action(() => unit.RefreshPosition());

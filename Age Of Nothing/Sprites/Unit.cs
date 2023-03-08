@@ -5,21 +5,14 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Unit : FocusableSprite, ICenteredSprite
+    public abstract class Unit : FocusableSprite, ICenteredSprite
     {
         private Point _center;
         private readonly LinkedList<(Point pt, Sprite tgt)> _targetCycle = new LinkedList<(Point, Sprite)>();
         private LinkedListNode<(Point pt, Sprite tgt)> _targetPositionNode;
         private bool _loop;
 
-        private static readonly IReadOnlyDictionary<PrimaryResources, int> _shipCapacity = new Dictionary<PrimaryResources, int>
-        {
-            { PrimaryResources.Iron, 10 },
-            { PrimaryResources.Wood, 10 },
-            { PrimaryResources.Rock, 10 }
-        };
-
-        public Unit(Point center, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
+        protected Unit(Point center, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), sprites, 2, true)
         {
             Speed = speed;
@@ -28,8 +21,6 @@ namespace Age_Of_Nothing.Sprites
 
         // pixels by frame
         public double Speed { get; }
-
-        public (PrimaryResources r, int v)? Shipment { get; set; }
 
         protected override Brush DefaultFill => Brushes.SandyBrown;
 
@@ -59,7 +50,7 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        public (bool move, (PrimaryResources r, int v)? ship) CheckForMovement()
+        public (bool move, Sprite tgt) CheckForMovement()
         {
             lock (_targetCycle)
             {
@@ -70,31 +61,16 @@ namespace Age_Of_Nothing.Sprites
                 var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, pt.X, pt.Y, Speed);
 
                 Center = new Point(x2, y2);
-                (PrimaryResources, int)? ship = null;
                 if (pt == Center)
                 {
-                    if (tgt.Is<Market>())
-                    {
-                        ship = Shipment;
-                        Shipment = null;
-                    }
-                    else if (tgt.Is<IResourceSprite>(out var rs))
-                    {
-                        var realQty = rs.ReduceQuantity(_shipCapacity[rs.Resource]);
-                        if (realQty > 0)
-                            Shipment = (rs.Resource, realQty);
-                        else
-                        {
-                            _loop = false;
-                            _targetCycle.Clear();
-                        }
-                    }
                     _targetPositionNode = _targetPositionNode.Next;
                     if (_targetPositionNode == null && _loop)
                         _targetPositionNode = _targetCycle.First;
                 }
+                else
+                    tgt = null;
 
-                return (true, ship);
+                return (true, tgt);
             }
         }
 
@@ -115,8 +91,6 @@ namespace Age_Of_Nothing.Sprites
                     first = false;
                 }
                 _targetPositionNode = _targetCycle.First;
-                // lazy: any change on path will reset the shipment...
-                Shipment = null;
             }
         }
     }
