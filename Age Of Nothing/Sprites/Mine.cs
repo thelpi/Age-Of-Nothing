@@ -13,6 +13,8 @@ namespace Age_Of_Nothing.Sprites
 
         public abstract PrimaryResources Resource { get; }
 
+        protected override string Info => $"{Quantity}";
+
         protected Mine(int quantity, Point center, double qtyScale, IReadOnlyList<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(qtyScale * quantity, qtyScale * quantity), () => new Ellipse(), sprites)
         {

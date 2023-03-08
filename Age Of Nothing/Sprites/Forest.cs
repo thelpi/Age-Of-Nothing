@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites
         public Forest(Rect rect)
             : base(rect, () => new Rectangle())
         {
-            Quantity = (int)Math.Floor(rect.Width * rect.Height);
+            Quantity = (int)(Math.Floor(rect.Width * rect.Height) / 10);
         }
 
         public int Quantity { get; private set; }
@@ -20,6 +20,8 @@ namespace Age_Of_Nothing.Sprites
         protected override Brush DefaultFill => CreateBrush(Brushes.Green);
 
         protected override Brush HoverFill => CreateBrush(Brushes.ForestGreen);
+
+        protected override string Info => $"{Quantity}";
 
         public void ReduceQuantity(int qtyLost)
         {

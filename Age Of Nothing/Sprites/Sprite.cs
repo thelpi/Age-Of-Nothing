@@ -12,6 +12,7 @@ namespace Age_Of_Nothing.Sprites
         protected abstract Brush HoverFill { get; }
         public Rect Surface { get; private set; }
         public bool CanMove { get; }
+        protected virtual string Info { get; }
 
         protected Sprite(Rect surface, Func<Shape> shaper, int zIndex = 1, bool canMove = false)
         {
@@ -41,6 +42,13 @@ namespace Age_Of_Nothing.Sprites
             Visual.Fill = hover
                 ? HoverFill
                 : DefaultFill;
+            RefreshToolTip();
+        }
+
+        protected void RefreshToolTip()
+        {
+            if (Info != null)
+                Visual.ToolTip = Info;
         }
 
         protected bool Move(Point topLeftPoint)

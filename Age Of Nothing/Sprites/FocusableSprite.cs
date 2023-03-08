@@ -40,6 +40,7 @@ namespace Age_Of_Nothing.Sprites
                 : (Focused
                     ? FocusFill
                     : DefaultFill);
+            RefreshToolTip();
         }
 
         public void ChangeFocus(bool focus, bool hover)
