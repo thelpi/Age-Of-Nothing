@@ -51,5 +51,10 @@ namespace Age_Of_Nothing.Sprites
             Surface = new Rect(topLeftPoint, Surface.Size);
             return true;
         }
+
+        public bool Is<T>()
+        {
+            return typeof(T).IsAssignableFrom(GetType());
+        }
     }
 }

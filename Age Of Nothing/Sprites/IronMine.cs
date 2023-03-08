@@ -10,6 +10,8 @@ namespace Age_Of_Nothing.Sprites
             : base(quantity, position, qtyScale, sprites)
         { }
 
+        public override PrimaryResources Resource => PrimaryResources.Iron;
+
         protected override Brush DefaultFill => new SolidColorBrush(Colors.SteelBlue);
 
         protected override Brush HoverFill => new SolidColorBrush(Colors.LightSteelBlue);

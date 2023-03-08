@@ -1,14 +1,25 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Forest : Sprite
+    public class Forest : Sprite, IResourceSprite
     {
+        const int WoodDensity = 1;
+
+        private Rect _usefulSurface;
+
         public Forest(Rect rect)
             : base(rect, () => new Rectangle())
-        { }
+        {
+            _usefulSurface = Surface;
+        }
+
+        public int Quantity => (int)Math.Floor(_usefulSurface.Width * _usefulSurface.Height * WoodDensity);
+
+        public PrimaryResources Resource => PrimaryResources.Wood;
 
         protected override Brush DefaultFill => CreateBrush(Brushes.Green);
 

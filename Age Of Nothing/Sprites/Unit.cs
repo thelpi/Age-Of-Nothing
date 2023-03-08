@@ -8,8 +8,8 @@ namespace Age_Of_Nothing.Sprites
     public class Unit : FocusableSprite, ICenteredSprite
     {
         private Point _center;
-        private readonly LinkedList<(Point pt, TargetType tgt)> _targetCycle = new LinkedList<(Point, TargetType)>();
-        private LinkedListNode<(Point pt, TargetType tgt)> _targetPositionNode;
+        private readonly LinkedList<(Point pt, Sprite tgt)> _targetCycle = new LinkedList<(Point, Sprite)>();
+        private LinkedListNode<(Point pt, Sprite tgt)> _targetPositionNode;
         private bool _loop;
 
         public Unit(Point center, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
@@ -69,31 +69,27 @@ namespace Age_Of_Nothing.Sprites
                     _targetPositionNode = _targetPositionNode.Next;
                     if (_targetPositionNode == null && _loop)
                         _targetPositionNode = _targetCycle.First;
-                    if (tgt == TargetType.Market)
+                    if (tgt.Is<Market>())
                     {
                         ship = Shipment;
                         Shipment = null;
                     }
-                    else
-                    {
-                        var pr = tgt.ToResource();
-                        if (pr.HasValue)
-                            Shipment = (pr.Value, 10);
-                    }
+                    else if (tgt.Is<IResourceSprite>())
+                        Shipment = ((tgt as IResourceSprite).Resource, 10);
                 }
 
                 return (true, ship);
             }
         }
 
-        public void SetCycle(params (Point, TargetType)[] points)
+        public void SetCycle(params (Point, Sprite)[] points)
         {
             lock (_targetCycle)
             {
                 _targetCycle.Clear();
                 var first = true;
                 _loop = false;
-                LinkedListNode<(Point, TargetType)> node = null;
+                LinkedListNode<(Point, Sprite)> node = null;
                 foreach (var point in points)
                 {
                     _loop = !first;

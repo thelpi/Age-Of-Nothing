@@ -112,32 +112,34 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
-            TargetType tgt = TargetType.Void;
+            Sprite tgt = null;
             var marketCycle = false;
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
             {
                 clickPosition = mine.Center;
                 marketCycle = true;
-                tgt = mine is IronMine
-                    ? TargetType.IronMine
-                    : TargetType.RockMine;
+                tgt = mine;
             }
             else if (_market.Surface.Contains(clickPosition))
             {
                 clickPosition = _market.Center;
-                tgt = TargetType.Market;
+                tgt = _market;
             }
-            else if (_forest.Any(x => x.Surface.Contains(clickPosition)))
+            else
             {
-                marketCycle = true;
-                tgt = TargetType.Forest;
+                var forest = _forest.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+                if (forest != null)
+                {
+                    marketCycle = true;
+                    tgt = forest;
+                }
             }
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
                 if (marketCycle)
-                    unit.SetCycle((clickPosition, tgt), (_market.Center, TargetType.Market));
+                    unit.SetCycle((clickPosition, tgt), (_market.Center, _market));
                 else
                     unit.SetCycle((clickPosition, tgt));
             }
