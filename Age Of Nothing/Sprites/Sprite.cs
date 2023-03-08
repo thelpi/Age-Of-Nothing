@@ -52,9 +52,16 @@ namespace Age_Of_Nothing.Sprites
             return true;
         }
 
-        public bool Is<T>()
+        public bool Is<T>() where T : class
         {
-            return typeof(T).IsAssignableFrom(GetType());
+            return Is<T>(out _);
+        }
+
+        public bool Is<T>(out T data) where T : class
+        {
+            var isType = typeof(T).IsAssignableFrom(GetType());
+            data = isType ? this as T : default;
+            return isType;
         }
     }
 }

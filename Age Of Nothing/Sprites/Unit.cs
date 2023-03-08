@@ -74,8 +74,11 @@ namespace Age_Of_Nothing.Sprites
                         ship = Shipment;
                         Shipment = null;
                     }
-                    else if (tgt.Is<IResourceSprite>())
-                        Shipment = ((tgt as IResourceSprite).Resource, 10);
+                    else if (tgt.Is<IResourceSprite>(out var rs))
+                    {
+                        Shipment = (rs.Resource, 10);
+                        rs.ReduceQuantity(10);
+                    }
                 }
 
                 return (true, ship);

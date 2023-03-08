@@ -7,23 +7,24 @@ namespace Age_Of_Nothing.Sprites
 {
     public class Forest : Sprite, IResourceSprite
     {
-        const int WoodDensity = 1;
-
-        private Rect _usefulSurface;
-
         public Forest(Rect rect)
             : base(rect, () => new Rectangle())
         {
-            _usefulSurface = Surface;
+            Quantity = (int)Math.Floor(rect.Width * rect.Height);
         }
 
-        public int Quantity => (int)Math.Floor(_usefulSurface.Width * _usefulSurface.Height * WoodDensity);
+        public int Quantity { get; private set; }
 
         public PrimaryResources Resource => PrimaryResources.Wood;
 
         protected override Brush DefaultFill => CreateBrush(Brushes.Green);
 
         protected override Brush HoverFill => CreateBrush(Brushes.ForestGreen);
+
+        public void ReduceQuantity(int qtyLost)
+        {
+            Quantity -= qtyLost > Quantity ? Quantity : qtyLost;
+        }
 
         private DrawingBrush CreateBrush(Brush singleBrush)
         {

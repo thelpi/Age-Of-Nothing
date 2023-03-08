@@ -29,5 +29,10 @@ namespace Age_Of_Nothing.Sprites
                     new GradientStop(Colors.Red, 1)
                 }));
         }
+
+        public void ReduceQuantity(int qtyLost)
+        {
+            Quantity -= qtyLost > Quantity ? Quantity : qtyLost;
+        }
     }
 }

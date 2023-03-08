@@ -133,6 +133,7 @@ namespace Age_Of_Nothing
                 {
                     marketCycle = true;
                     tgt = forest;
+                    // TODO: find the proper target to be on the border of the forest (closest to current position)
                 }
             }
 
