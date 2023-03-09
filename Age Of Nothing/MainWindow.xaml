@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Age_Of_Nothing"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown"
         Title="MainWindow" Height="900" Width="1600">
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -38,6 +39,7 @@
             MouseLeftButtonDown="MainCanvas_MouseLeftButtonDown"
             MouseLeftButtonUp="MainCanvas_MouseLeftButtonUp"
             MouseLeave="MainCanvas_MouseLeave"
-            MouseMove="MainCanvas_MouseMove" />
+            MouseMove="MainCanvas_MouseMove"
+            />
     </DockPanel>
 </Window>

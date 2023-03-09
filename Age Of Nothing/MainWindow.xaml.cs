@@ -116,6 +116,17 @@ namespace Age_Of_Nothing
 
         }
 
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Delete
+                || e.Key == System.Windows.Input.Key.X)
+            {
+                var visual = _controller.CheckForDeletion();
+                if (visual != null)
+                    MainCanvas.Children.Remove(visual);
+            }
+        }
+
         #endregion Events
 
         private void ResetSelectionRectangle()

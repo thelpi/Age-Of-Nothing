@@ -13,7 +13,7 @@ namespace Age_Of_Nothing
         private readonly List<Unit> _units = new List<Unit>(10);
         private readonly List<Mine> _mines = new List<Mine>(10);
         private readonly List<Forest> _forest = new List<Forest>(10);
-        private readonly Market _market;
+        private Market _market;
         private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
         private readonly List<Dwelling> _dwellings = new List<Dwelling>();
 
@@ -50,7 +50,7 @@ namespace Age_Of_Nothing
 
         public bool HasMarketFocus()
         {
-            return _market.Focused;
+            return _market?.Focused == true;
         }
 
         public Controller()
@@ -111,7 +111,7 @@ namespace Age_Of_Nothing
 
         public Func<UIElement> CheckForVillagerCreation()
         {
-            if (Population >= PotentialPopulation)
+            if (Population >= PotentialPopulation || _market == null)
             {
                 // TODO: notify the game of population limit
                 return null;
@@ -137,6 +137,25 @@ namespace Age_Of_Nothing
             _focusableSprites.Add(v);
 
             return v.GetVisual;
+        }
+
+        public UIElement CheckForDeletion()
+        {
+            var sprite = _focusableSprites.FirstOrDefault(x => x.Focused && x.IsHomeMade);
+            if (sprite == null)
+                return null;
+
+            _focusableSprites.Remove(sprite);
+            sprite.ChangeFocus(false, false);
+            if (sprite.Is<Unit>(out var unit))
+                _units.Remove(unit);
+            else if (sprite.Is<Market>())
+                _market = null;
+            else if (sprite.Is<Dwelling>(out var dwl))
+                _dwellings.Remove(dwl);
+            SetPopulationInformation();
+
+            return sprite.GetVisual();
         }
 
         public IEnumerable<Action> CheckForMovement()
@@ -205,7 +224,7 @@ namespace Age_Of_Nothing
                 marketCycle = true;
                 tgt = mine;
             }
-            else if (_market.Surface.Contains(clickPosition))
+            else if (_market != null && _market.Surface.Contains(clickPosition))
             {
                 clickPosition = _market.Center;
                 tgt = _market;
@@ -223,7 +242,7 @@ namespace Age_Of_Nothing
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
-                if (marketCycle)
+                if (marketCycle && _market != null)
                     unit.SetCycle((clickPosition, tgt), (_market.Center, _market));
                 else
                     unit.SetCycle((clickPosition, tgt));
