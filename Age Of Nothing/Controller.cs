@@ -18,9 +18,19 @@ namespace Age_Of_Nothing
         private readonly List<Dwelling> _dwellings = new List<Dwelling>();
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
-        // todo: notify property changed
-        public string PopulationInformation => $"{Population} / {PotentialPopulation}";
+
+        private string _populationInformation;
+
+        // TODO: everytime a dwelling or unit is added or removed!
+        public string PopulationInformation
+        {
+            get { return _populationInformation; }
+            private set
+            {
+                _populationInformation = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PopulationInformation)));
+            }
+        }
 
         public int PotentialPopulation => _dwellings.Count * Dwelling.VillagerCapacity;
         public int Population => _units.Count;
@@ -50,6 +60,7 @@ namespace Age_Of_Nothing
             _units.Add(new Villager(new Point(200, 200), _focusableSprites));
             _units.Add(new Villager(new Point(100, 100), _focusableSprites));
             _units.Add(new Villager(new Point(300, 300), _focusableSprites));
+            SetPopulationInformation();
 
             _mines.Add(new RockMine(100, new Point(400, 120), 1, _focusableSprites));
             _mines.Add(new IronMine(75, new Point(200, 600), 1, _focusableSprites));
@@ -60,6 +71,7 @@ namespace Age_Of_Nothing
 
             _dwellings.Add(new Dwelling(new Point(1100, 10), _focusableSprites));
             _dwellings.Add(new Dwelling(new Point(1100, 90), _focusableSprites));
+            SetPopulationInformation();
 
             _focusableSprites.Add(_units[0]);
             _focusableSprites.Add(_units[1]);
@@ -71,6 +83,11 @@ namespace Age_Of_Nothing
             _focusableSprites.Add(_dwellings[1]);
 
             _focusableSprites.ForEach(fs => fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e));
+        }
+
+        private void SetPopulationInformation()
+        {
+            _populationInformation = $"{Population} / {PotentialPopulation}";
         }
 
         public IEnumerable<UIElement> GetVisualSprites()
