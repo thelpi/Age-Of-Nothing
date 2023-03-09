@@ -103,7 +103,9 @@ namespace Age_Of_Nothing
 
         private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var unitDisplay = _controller.CreateVillager();
+            if (unitDisplay != null)
+                MainCanvas.Children.Add(unitDisplay);
         }
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)

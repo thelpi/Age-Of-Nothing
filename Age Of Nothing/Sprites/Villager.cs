@@ -6,7 +6,7 @@ namespace Age_Of_Nothing.Sprites
     public class Villager : Unit
     {
         private const double _speed = 5;
-        private const double _size = 20;
+        public const double Size = 20;
         private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
         {
             { PrimaryResources.Iron, 10 },
@@ -15,7 +15,7 @@ namespace Age_Of_Nothing.Sprites
         };
 
         public Villager(Point center, IReadOnlyList<FocusableSprite> sprites)
-            : base(center, _speed, _size, sprites)
+            : base(center, _speed, Size, sprites)
         { }
 
         private (PrimaryResources r, int v)? _carrying;

@@ -87,7 +87,7 @@ namespace Age_Of_Nothing
 
         private void SetPopulationInformation()
         {
-            _populationInformation = $"{Population} / {PotentialPopulation}";
+            PopulationInformation = $"{Population} / {PotentialPopulation}";
         }
 
         public IEnumerable<UIElement> GetVisualSprites()
@@ -96,6 +96,24 @@ namespace Age_Of_Nothing
                 yield return focusableSprite.Visual;
             foreach (var forest in _forest)
                 yield return forest.Visual;
+        }
+
+        public UIElement CreateVillager()
+        {
+            if (Population >= PotentialPopulation)
+            {
+                // TODO: notify the game of population limit
+                return null;
+            }
+
+            var v = new Villager(_market.Center, _focusableSprites);
+
+            _units.Add(v);
+            SetPopulationInformation();
+
+            _focusableSprites.Add(v);
+
+            return v.Visual;
         }
 
         public IEnumerable<Action> CheckForMovement()
