@@ -93,9 +93,9 @@ namespace Age_Of_Nothing
         public IEnumerable<UIElement> GetVisualSprites()
         {
             foreach (var focusableSprite in _focusableSprites)
-                yield return focusableSprite.Visual;
+                yield return focusableSprite.GetVisual();
             foreach (var forest in _forest)
-                yield return forest.Visual;
+                yield return forest.GetVisual();
         }
 
         public UIElement CreateVillager()
@@ -113,7 +113,7 @@ namespace Age_Of_Nothing
 
             _focusableSprites.Add(v);
 
-            return v.Visual;
+            return v.GetVisual();
         }
 
         public IEnumerable<Action> CheckForMovement()

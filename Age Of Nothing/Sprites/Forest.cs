@@ -58,7 +58,7 @@ namespace Age_Of_Nothing.Sprites
 
         public override void RefreshVisual(bool hover)
         {
-            Visual.Fill = hover
+            GetVisual().Fill = hover
                 ? CreateBrush(HoverFill)
                 : CreateBrush(DefaultFill);
             RefreshToolTip();

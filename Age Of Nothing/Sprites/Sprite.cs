@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -14,39 +15,56 @@ namespace Age_Of_Nothing.Sprites
         public bool CanMove { get; }
         protected virtual string Info { get; }
 
+        protected MouseButtonEventHandler _mouseLeftButtonDownHandler;
+
         protected Sprite(Rect surface, Func<Shape> shaper, int zIndex = 1, bool canMove = false)
         {
             Surface = surface;
             CanMove = canMove;
-            Visual = shaper();
-            Visual.Width = Surface.Width;
-            Visual.Height = Surface.Height;
-            Visual.MouseEnter += (a, b) => RefreshVisual(true);
-            Visual.MouseLeave += (a, b) => RefreshVisual(false);
-
-            RefreshVisual(false);
-            RefreshPosition();
-            Visual.SetValue(Panel.ZIndexProperty, zIndex);
+            _shaper = shaper;
+            _indexZ = zIndex;
         }
 
         public void RefreshPosition()
         {
-            Visual.SetValue(Canvas.LeftProperty, Surface.Left);
-            Visual.SetValue(Canvas.TopProperty, Surface.Top);
+            GetVisual().SetValue(Canvas.LeftProperty, Surface.Left);
+            GetVisual().SetValue(Canvas.TopProperty, Surface.Top);
         }
 
-        public Shape Visual { get; }
+        private Shape _visual = null;
+
+        private readonly Func<Shape> _shaper;
+        private readonly int _indexZ;
+
+        public Shape GetVisual()
+        {
+            if (_visual == null)
+            {
+                _visual = _shaper();
+                _visual.Width = Surface.Width;
+                _visual.Height = Surface.Height;
+                _visual.MouseEnter += (a, b) => RefreshVisual(true);
+                _visual.MouseLeave += (a, b) => RefreshVisual(false);
+                if (_mouseLeftButtonDownHandler != null)
+                    _visual.MouseLeftButtonDown += _mouseLeftButtonDownHandler;
+
+                RefreshVisual(false);
+                RefreshPosition();
+                _visual.SetValue(Panel.ZIndexProperty, _indexZ);
+            }
+            return _visual;
+        }
 
         public virtual void RefreshVisual(bool hover)
         {
-            Visual.Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
+            GetVisual().Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
             RefreshToolTip();
         }
 
         protected void RefreshToolTip()
         {
             if (Info != null)
-                Visual.ToolTip = Info;
+                GetVisual().ToolTip = Info;
         }
 
         protected bool Move(Point topLeftPoint)

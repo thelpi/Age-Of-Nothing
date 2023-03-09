@@ -20,7 +20,7 @@ namespace Age_Of_Nothing.Sprites
         {
             Sprites = sprites;
             _hoverBorderRate = hoverBorderRate;
-            Visual.MouseLeftButtonDown += (a, b) =>
+            _mouseLeftButtonDownHandler = (a, b) =>
             {
                 ChangeFocus(!Focused, true);
                 foreach (var x in Sprites)
@@ -46,14 +46,14 @@ namespace Age_Of_Nothing.Sprites
         {
             if (Focused)
             {
-                Visual.Fill = hover
+                GetVisual().Fill = hover
                     ? GetFocusBrush(HoverFill)
                     : GetFocusBrush(DefaultFill);
             }
             else
             {
                 // TODO: refacto?
-                Visual.Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
+                GetVisual().Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
             }
             RefreshToolTip();
         }
