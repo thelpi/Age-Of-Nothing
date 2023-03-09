@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing
 {
@@ -32,6 +33,14 @@ namespace Age_Of_Nothing
             };
 
             _controller = new Controller();
+            _controller.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(FocusableSprite.Focused))
+                {
+                    CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
+                    CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
+                }
+            };
 
             foreach (var vs in _controller.GetVisualSprites())
                 MainCanvas.Children.Add(vs);
@@ -92,15 +101,6 @@ namespace Age_Of_Nothing
             }
         }
 
-        #endregion Events
-
-        private void ResetSelectionRectangle()
-        {
-            _selectionPoint = null;
-            _selectionRectGu.Width = 0;
-            _selectionRectGu.Height = 0;
-        }
-
         private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -109,6 +109,15 @@ namespace Age_Of_Nothing
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        #endregion Events
+
+        private void ResetSelectionRectangle()
+        {
+            _selectionPoint = null;
+            _selectionRectGu.Width = 0;
+            _selectionRectGu.Height = 0;
         }
     }
 }

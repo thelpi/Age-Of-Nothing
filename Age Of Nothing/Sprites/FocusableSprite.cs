@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class FocusableSprite : Sprite
+    public abstract class FocusableSprite : Sprite, INotifyPropertyChanged
     {
         protected IReadOnlyList<FocusableSprite> Sprites { get; }
 
         private readonly double _hoverBorderRate;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
             : base(surface, shaper, zIndex, canMove)
@@ -28,7 +31,16 @@ namespace Age_Of_Nothing.Sprites
             };
         }
 
-        public bool Focused { get; private set; }
+        private bool _focused;
+        public bool Focused
+        {
+            get { return _focused; }
+            private set
+            {
+                _focused = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Focused)));
+            }
+        }
 
         public override void RefreshVisual(bool hover)
         {

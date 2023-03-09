@@ -28,6 +28,16 @@ namespace Age_Of_Nothing
         public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
         public int IronQuantity => _resourcesQty[PrimaryResources.Iron];
 
+        public bool HasVillagerFocus()
+        {
+            return _units.Any(x => x.Is<Villager>() && x.Focused);
+        }
+
+        public bool HasMarketFocus()
+        {
+            return _market.Focused;
+        }
+
         public Controller()
         {
             _resourcesQty = new Dictionary<PrimaryResources, int>
@@ -59,6 +69,8 @@ namespace Age_Of_Nothing
             _focusableSprites.Add(_market);
             _focusableSprites.Add(_dwellings[0]);
             _focusableSprites.Add(_dwellings[1]);
+
+            _focusableSprites.ForEach(fs => fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e));
         }
 
         public IEnumerable<UIElement> GetVisualSprites()
