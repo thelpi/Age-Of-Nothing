@@ -1,17 +1,13 @@
-﻿using System.Windows;
-using System.Windows.Media;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Structure : Sprite
+    public abstract class Structure : FocusableSprite
     {
-        protected Structure(Rect rect)
-            : base(rect, () => new Rectangle())
+        protected Structure(Rect rect, IReadOnlyList<FocusableSprite> sprites)
+            : base(rect, () => new Rectangle(), 0.9, sprites)
         { }
-
-        protected abstract override Brush DefaultFill { get; }
-
-        protected abstract override Brush HoverFill { get; }
     }
 }

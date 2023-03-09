@@ -46,16 +46,19 @@ namespace Age_Of_Nothing
 
             _forest.Add(new Forest(new Rect(700, 200, 300, 100)));
 
-            _market = new Market(new Point(600, 500));
+            _market = new Market(new Point(600, 500), _focusableSprites);
 
-            _dwellings.Add(new Dwelling(new Point(1100, 10)));
-            _dwellings.Add(new Dwelling(new Point(1100, 90)));
+            _dwellings.Add(new Dwelling(new Point(1100, 10), _focusableSprites));
+            _dwellings.Add(new Dwelling(new Point(1100, 90), _focusableSprites));
 
             _focusableSprites.Add(_units[0]);
             _focusableSprites.Add(_units[1]);
             _focusableSprites.Add(_units[2]);
             _focusableSprites.Add(_mines[0]);
             _focusableSprites.Add(_mines[1]);
+            _focusableSprites.Add(_market);
+            _focusableSprites.Add(_dwellings[0]);
+            _focusableSprites.Add(_dwellings[1]);
         }
 
         public IEnumerable<UIElement> GetVisualSprites()
@@ -64,9 +67,6 @@ namespace Age_Of_Nothing
                 yield return focusableSprite.Visual;
             foreach (var forest in _forest)
                 yield return forest.Visual;
-            foreach (var _dwelling in _dwellings)
-                yield return _dwelling.Visual;
-            yield return _market.Visual;
         }
 
         public IEnumerable<Action> CheckForMovement()

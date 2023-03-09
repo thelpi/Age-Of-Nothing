@@ -100,5 +100,15 @@ namespace Age_Of_Nothing
             _selectionRectGu.Width = 0;
             _selectionRectGu.Height = 0;
         }
+
+        private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

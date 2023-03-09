@@ -10,14 +10,13 @@ namespace Age_Of_Nothing.Sprites
     {
         protected IReadOnlyList<FocusableSprite> Sprites { get; }
 
-        protected abstract Brush FocusFill { get; }
-        protected abstract Brush HoverFocusFill { get; }
+        private readonly double _hoverBorderRate;
 
-        protected FocusableSprite(Rect surface, Func<Shape> shaper, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
+        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false)
             : base(surface, shaper, zIndex, canMove)
         {
             Sprites = sprites;
-
+            _hoverBorderRate = hoverBorderRate;
             Visual.MouseLeftButtonDown += (a, b) =>
             {
                 ChangeFocus(!Focused, true);
@@ -33,13 +32,17 @@ namespace Age_Of_Nothing.Sprites
 
         public override void RefreshVisual(bool hover)
         {
-            Visual.Fill = hover
-                ? (Focused
-                    ? HoverFocusFill
-                    : HoverFill)
-                : (Focused
-                    ? FocusFill
-                    : DefaultFill);
+            if (Focused)
+            {
+                Visual.Fill = hover
+                    ? GetFocusBrush(HoverFill)
+                    : GetFocusBrush(DefaultFill);
+            }
+            else
+            {
+                // TODO: refacto?
+                Visual.Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
+            }
             RefreshToolTip();
         }
 
@@ -47,6 +50,16 @@ namespace Age_Of_Nothing.Sprites
         {
             Focused = focus;
             RefreshVisual(hover);
+        }
+
+        private Brush GetFocusBrush(Color color)
+        {
+            return new RadialGradientBrush(
+                new GradientStopCollection(new List<GradientStop>
+                {
+                    new GradientStop(color, _hoverBorderRate),
+                    new GradientStop(Colors.PaleVioletRed, 1)
+                }));
         }
     }
 }

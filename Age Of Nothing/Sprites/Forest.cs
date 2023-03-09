@@ -17,11 +17,11 @@ namespace Age_Of_Nothing.Sprites
 
         public PrimaryResources Resource => PrimaryResources.Wood;
 
-        protected override Brush DefaultFill => CreateBrush(Brushes.Green);
-
-        protected override Brush HoverFill => CreateBrush(Brushes.ForestGreen);
-
         protected override string Info => $"{Quantity}";
+
+        protected override Color DefaultFill => Colors.Green;
+
+        protected override Color HoverFill => Colors.ForestGreen;
 
         public int ReduceQuantity(int qtyLost)
         {
@@ -38,12 +38,12 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        private DrawingBrush CreateBrush(Brush singleBrush)
+        private DrawingBrush CreateBrush(Color singleColor)
         {
             var checkersDrawingGroup = new DrawingGroup();
             checkersDrawingGroup.Children.Add(
                 new GeometryDrawing(
-                    singleBrush,
+                    new SolidColorBrush(singleColor),
                     null,
                     new EllipseGeometry(
                         new Rect(0, 0, Surface.Width, Surface.Height))));
@@ -54,6 +54,14 @@ namespace Age_Of_Nothing.Sprites
                 Viewport = new Rect(0, 0, 1 / (Surface.Width / 10), 1 / (Surface.Height / 10)),
                 TileMode = TileMode.Tile
             };
+        }
+
+        public override void RefreshVisual(bool hover)
+        {
+            Visual.Fill = hover
+                ? CreateBrush(HoverFill)
+                : CreateBrush(DefaultFill);
+            RefreshToolTip();
         }
     }
 }

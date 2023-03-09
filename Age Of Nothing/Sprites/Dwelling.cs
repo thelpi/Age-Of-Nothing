@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
@@ -9,12 +10,12 @@ namespace Age_Of_Nothing.Sprites
 
         public const int VillagerCapacity = 5;
 
-        public Dwelling(Point topleft)
-            : base(new Rect(topleft, new Point(topleft.X + _size, topleft.Y + _size)))
+        public Dwelling(Point topleft, IReadOnlyList<FocusableSprite> sprites)
+            : base(new Rect(topleft, new Point(topleft.X + _size, topleft.Y + _size)), sprites)
         { }
 
-        protected override Brush DefaultFill => Brushes.Yellow;
+        protected override Color DefaultFill => Colors.Yellow;
 
-        protected override Brush HoverFill => Brushes.LightYellow;
+        protected override Color HoverFill => Colors.LightYellow;
     }
 }

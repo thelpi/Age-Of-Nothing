@@ -8,8 +8,8 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class Sprite
     {
-        protected abstract Brush DefaultFill { get; }
-        protected abstract Brush HoverFill { get; }
+        protected abstract Color DefaultFill { get; }
+        protected abstract Color HoverFill { get; }
         public Rect Surface { get; private set; }
         public bool CanMove { get; }
         protected virtual string Info { get; }
@@ -39,9 +39,7 @@ namespace Age_Of_Nothing.Sprites
 
         public virtual void RefreshVisual(bool hover)
         {
-            Visual.Fill = hover
-                ? HoverFill
-                : DefaultFill;
+            Visual.Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
             RefreshToolTip();
         }
 

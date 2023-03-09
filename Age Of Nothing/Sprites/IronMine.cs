@@ -12,12 +12,8 @@ namespace Age_Of_Nothing.Sprites
 
         public override PrimaryResources Resource => PrimaryResources.Iron;
 
-        protected override Brush DefaultFill => new SolidColorBrush(Colors.SteelBlue);
+        protected override Color DefaultFill => Colors.SteelBlue;
 
-        protected override Brush HoverFill => new SolidColorBrush(Colors.LightSteelBlue);
-
-        protected override Brush FocusFill => GetHoverBrush(Colors.SteelBlue);
-
-        protected override Brush HoverFocusFill => GetHoverBrush(Colors.LightSteelBlue);
+        protected override Color HoverFill => Colors.LightSteelBlue;
     }
 }

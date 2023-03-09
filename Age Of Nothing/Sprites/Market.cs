@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
@@ -9,16 +10,16 @@ namespace Age_Of_Nothing.Sprites
 
         private const int _size = 128;
 
-        public Market(Point topLeft)
-            : base(new Rect(topLeft, new Point(topLeft.X + _size, topLeft.Y + _size)))
+        public Market(Point topLeft, IReadOnlyList<FocusableSprite> sprites)
+            : base(new Rect(topLeft, new Point(topLeft.X + _size, topLeft.Y + _size)), sprites)
         {
             Center = new Point(
                 Surface.Left + Surface.Width / 2,
                 Surface.Top + Surface.Height / 2);
         }
 
-        protected override Brush DefaultFill => Brushes.Purple;
+        protected override Color DefaultFill => Colors.Purple;
 
-        protected override Brush HoverFill => Brushes.MediumPurple;
+        protected override Color HoverFill => Colors.MediumPurple;
     }
 }

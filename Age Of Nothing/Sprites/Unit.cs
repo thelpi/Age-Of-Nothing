@@ -13,7 +13,7 @@ namespace Age_Of_Nothing.Sprites
         private bool _loop;
 
         protected Unit(Point center, double speed, double size, IReadOnlyList<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), sprites, 2, true)
+            : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), 0.75, sprites, 2, true)
         {
             Speed = speed;
             _center = center;
@@ -22,23 +22,9 @@ namespace Age_Of_Nothing.Sprites
         // pixels by frame
         public double Speed { get; }
 
-        protected override Brush DefaultFill => Brushes.SandyBrown;
+        protected override Color DefaultFill => Colors.SandyBrown;
 
-        protected override Brush HoverFill => Brushes.PeachPuff;
-
-        protected override Brush FocusFill => new RadialGradientBrush(
-            new GradientStopCollection(new List<GradientStop>
-            {
-                new GradientStop(Colors.SandyBrown, 0.75),
-                new GradientStop(Colors.Red, 1)
-            }));
-
-        protected override Brush HoverFocusFill => new RadialGradientBrush(
-            new GradientStopCollection(new List<GradientStop>
-            {
-                new GradientStop(Colors.PeachPuff, 0.75),
-                new GradientStop(Colors.Red, 1)
-            }));
+        protected override Color HoverFill => Colors.PeachPuff;
 
         public Point Center
         {
