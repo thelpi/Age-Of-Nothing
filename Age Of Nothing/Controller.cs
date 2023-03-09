@@ -17,6 +17,11 @@ namespace Age_Of_Nothing
         private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
         private readonly List<Dwelling> _dwellings = new List<Dwelling>();
 
+        private const int MaxVillagerCreationStack = 20;
+
+        private int _villagerCreationStack;
+        private int _currentVillagerCreationTicks;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string _populationInformation;
@@ -98,13 +103,31 @@ namespace Age_Of_Nothing
                 yield return forest.GetVisual();
         }
 
-        public UIElement CreateVillager()
+        internal void AddVillagerCreationToStack()
+        {
+            if (_villagerCreationStack < MaxVillagerCreationStack)
+                _villagerCreationStack++;
+        }
+
+        public Func<UIElement> CheckForVillagerCreation()
         {
             if (Population >= PotentialPopulation)
             {
                 // TODO: notify the game of population limit
                 return null;
             }
+
+            if (_villagerCreationStack == 0)
+            {
+                return null;
+            }
+
+            _currentVillagerCreationTicks++;
+            if (_currentVillagerCreationTicks < Villager.BuildTimeTick)
+                return null;
+
+            _villagerCreationStack--;
+            _currentVillagerCreationTicks = 0;
 
             var v = new Villager(_market.Center, _focusableSprites);
 
@@ -113,7 +136,7 @@ namespace Age_Of_Nothing
 
             _focusableSprites.Add(v);
 
-            return v.GetVisual();
+            return v.GetVisual;
         }
 
         public IEnumerable<Action> CheckForMovement()
@@ -131,7 +154,7 @@ namespace Age_Of_Nothing
                     }
                 }
                 if (move)
-                    yield return new Action(() => unit.RefreshPosition());
+                    yield return unit.RefreshPosition;
             }
         }
 

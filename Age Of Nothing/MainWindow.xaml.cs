@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -57,6 +58,10 @@ namespace Age_Of_Nothing
             foreach (var move in _controller.CheckForMovement())
                 Dispatcher.BeginInvoke(move);
 
+            var creation = _controller.CheckForVillagerCreation();
+            if (creation != null)
+                Dispatcher.BeginInvoke(new Action(() => MainCanvas.Children.Add(creation())));
+
             _refreshing = false;
         }
 
@@ -103,9 +108,7 @@ namespace Age_Of_Nothing
 
         private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
         {
-            var unitDisplay = _controller.CreateVillager();
-            if (unitDisplay != null)
-                MainCanvas.Children.Add(unitDisplay);
+            _controller.AddVillagerCreationToStack();
         }
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
