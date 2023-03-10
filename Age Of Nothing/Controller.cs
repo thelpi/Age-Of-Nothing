@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing
@@ -29,7 +29,7 @@ namespace Age_Of_Nothing
 
         public string PopulationInformation
         {
-            get { return _populationInformation; }
+            get => _populationInformation;
             private set
             {
                 _populationInformation = value;
@@ -53,12 +53,32 @@ namespace Age_Of_Nothing
                 { PrimaryResources.Wood, 100 }
             };
 
-            _sprites.CollectionChanged += (x, y) =>
+            _sprites.CollectionChanged += (s, e) =>
             {
+                if (e.NewItems != null)
+                {
+                    foreach (var item in e.NewItems)
+                    {
+                        var sprite = item as Sprite;
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite.GetVisual, true));
+                        if (sprite.Is<FocusableSprite>(out var fs))
+                            fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
+                    }
+                }
+
+                if (e.OldItems != null)
+                {
+                    foreach (var item in e.OldItems)
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Sprite).GetVisual, false));
+                }
+
                 // TODO: we should do this logic into view with a converter
                 PopulationInformation = $"{Population} / {PotentialPopulation}";
             };
+        }
 
+        public void Initialize()
+        {
             _sprites.Add(new Villager(new Point(200, 200), _focusables));
             _sprites.Add(new Villager(new Point(100, 100), _focusables));
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
@@ -68,9 +88,6 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
-
-            foreach (var fs in _focusables)
-                fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
         }
 
         public bool HasVillagerFocus()
@@ -83,57 +100,20 @@ namespace Age_Of_Nothing
             return _market?.Focused == true;
         }
 
-        public IEnumerable<UIElement> GetVisualSprites()
-        {
-            foreach (var sprite in _sprites)
-                yield return sprite.GetVisual();
-        }
-
-        internal void AddVillagerCreationToStack()
+        public void AddVillagerCreationToStack()
         {
             if (_villagerCreationStack < MaxVillagerCreationStack)
                 _villagerCreationStack++;
         }
 
-        public Func<UIElement> CheckForVillagerCreation()
-        {
-            if (Population >= PotentialPopulation || _market == null)
-            {
-                // TODO: notify the game of population limit
-                return null;
-            }
-
-            if (_villagerCreationStack == 0)
-            {
-                return null;
-            }
-
-            _currentVillagerCreationTicks++;
-            if (_currentVillagerCreationTicks < Villager.BuildTimeTick)
-                return null;
-
-            _villagerCreationStack--;
-            _currentVillagerCreationTicks = 0;
-
-            var v = new Villager(_market.Center, _focusables);
-
-            _sprites.Add(v);
-
-            return v.GetVisual;
-        }
-
-        public UIElement CheckForDeletion()
+        public void CheckForDeletion()
         {
             var sprite = _focusables.FirstOrDefault(x => x.Focused && x.IsHomeMade);
-            if (sprite == null)
-                return null;
-
-            _sprites.Remove(sprite);
-
-            return sprite.GetVisual();
+            if (sprite != null)
+                _sprites.Remove(sprite);
         }
 
-        public IEnumerable<Action> CheckForMovement()
+        public void NewFrameCheck()
         {
             foreach (var unit in _units)
             {
@@ -148,7 +128,21 @@ namespace Age_Of_Nothing
                     }
                 }
                 if (move)
-                    yield return unit.RefreshPosition;
+                    PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
+            }
+
+            if (Population < PotentialPopulation && _market != null && _villagerCreationStack != 0)
+            {
+                _currentVillagerCreationTicks++;
+                if (_currentVillagerCreationTicks >= Villager.BuildTimeTick)
+                {
+                    _villagerCreationStack--;
+                    _currentVillagerCreationTicks = 0;
+
+                    var v = new Villager(_market.Center, _focusables);
+
+                    _sprites.Add(v);
+                }
             }
         }
 
@@ -228,7 +222,9 @@ namespace Age_Of_Nothing
                         unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt));
                 }
                 else
+                {
                     unit.SetCycle((clickPosition, tgt));
+                }
             }
         }
     }

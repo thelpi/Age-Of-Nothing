@@ -28,7 +28,7 @@ namespace Age_Of_Nothing.Sprites
 
         public Point Center
         {
-            get { return _center; }
+            get => _center;
             protected set
             {
                 _center = value;
@@ -54,7 +54,9 @@ namespace Age_Of_Nothing.Sprites
                         _targetPositionNode = _targetCycle.First;
                 }
                 else
+                {
                     tgt = null;
+                }
 
                 return (true, tgt);
             }

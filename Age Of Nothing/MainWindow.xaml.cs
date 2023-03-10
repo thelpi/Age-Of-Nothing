@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Age_Of_Nothing.Sprites;
+using Age_Of_Nothing.Events;
 
 namespace Age_Of_Nothing
 {
@@ -14,12 +16,16 @@ namespace Age_Of_Nothing
     public partial class MainWindow : Window
     {
         private const int Fps = 20;
+
+        private static readonly Key[] _deleteKeys = new[] { Key.Delete, Key.X };
         private static readonly double Delay = 1 / (Fps / (double)1000);
+
         private readonly Timer _timer = new Timer(Delay);
         private readonly Rectangle _selectionRectGu;
+        private readonly Controller _controller;
+
         private Point? _selectionPoint;
         private volatile bool _refreshing = false;
-        private readonly Controller _controller;
 
         public MainWindow()
         {
@@ -36,18 +42,32 @@ namespace Age_Of_Nothing
             _controller = new Controller();
             _controller.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(FocusableSprite.Focused))
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
-                    CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
-                }
+                    switch (e.PropertyName)
+                    {
+                        case SpriteFocusChangedEventArgs.SpriteFocusPropertyName:
+                            CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
+                            CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
+                            break;
+                        case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
+                            MainCanvas.Children.Add((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
+                            break;
+                        case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
+                            MainCanvas.Children.Remove((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
+                            break;
+                        case SpritePositionChangedEventArgs.SpritePositionPropertyName:
+                            (e as SpritePositionChangedEventArgs).PositionCallback();
+                            break;
+                    }
+                }));
             };
 
-            foreach (var vs in _controller.GetVisualSprites())
-                MainCanvas.Children.Add(vs);
             MainCanvas.Children.Add(_selectionRectGu);
 
             DataContext = _controller;
+
+            _controller.Initialize();
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
@@ -55,24 +75,19 @@ namespace Age_Of_Nothing
             if (_refreshing) return;
             _refreshing = true;
 
-            foreach (var move in _controller.CheckForMovement())
-                Dispatcher.BeginInvoke(move);
-
-            var creation = _controller.CheckForVillagerCreation();
-            if (creation != null)
-                Dispatcher.BeginInvoke(new Action(() => MainCanvas.Children.Add(creation())));
+            _controller.NewFrameCheck();
 
             _refreshing = false;
         }
 
         #region Events
 
-        private void MainCanvas_MouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MainCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             _controller.SetTargetPositionsOnFocused(e.GetPosition(MainCanvas));
         }
 
-        private void MainCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MainCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender == e.Source)
             {
@@ -81,19 +96,19 @@ namespace Age_Of_Nothing
             }
         }
 
-        private void MainCanvas_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_selectionPoint.HasValue)
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
             ResetSelectionRectangle();
         }
 
-        private void MainCanvas_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private void MainCanvas_MouseLeave(object sender, MouseEventArgs e)
         {
             ResetSelectionRectangle();
         }
 
-        private void MainCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void MainCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             if (_selectionPoint.HasValue)
             {
@@ -113,18 +128,13 @@ namespace Age_Of_Nothing
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // TODO
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Delete
-                || e.Key == System.Windows.Input.Key.X)
-            {
-                var visual = _controller.CheckForDeletion();
-                if (visual != null)
-                    MainCanvas.Children.Remove(visual);
-            }
+            if (_deleteKeys.Contains(e.Key))
+                _controller.CheckForDeletion();
         }
 
         #endregion Events

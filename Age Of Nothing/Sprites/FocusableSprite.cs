@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Age_Of_Nothing.Events;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -37,11 +38,11 @@ namespace Age_Of_Nothing.Sprites
         private bool _focused;
         public bool Focused
         {
-            get { return _focused; }
+            get => _focused;
             private set
             {
                 _focused = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Focused)));
+                PropertyChanged?.Invoke(this, new SpriteFocusChangedEventArgs());
             }
         }
 
