@@ -15,7 +15,7 @@ namespace Age_Of_Nothing.Sprites
             { PrimaryResources.Rock, 10 }
         };
 
-        public Villager(Point center, IReadOnlyList<FocusableSprite> sprites)
+        public Villager(Point center, IEnumerable<FocusableSprite> sprites)
             : base(center, _speed, Size, sprites)
         { }
 

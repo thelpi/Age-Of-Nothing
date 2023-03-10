@@ -9,7 +9,7 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class FocusableSprite : Sprite, INotifyPropertyChanged
     {
-        protected IReadOnlyList<FocusableSprite> Sprites { get; }
+        protected IEnumerable<FocusableSprite> Sprites { get; }
 
         private readonly double _hoverBorderRate;
 
@@ -17,7 +17,7 @@ namespace Age_Of_Nothing.Sprites
 
         public bool IsHomeMade { get; }
 
-        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IReadOnlyList<FocusableSprite> sprites, int zIndex = 1, bool canMove = false, bool isHomeMade = true)
+        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IEnumerable<FocusableSprite> sprites, int zIndex = 1, bool canMove = false, bool isHomeMade = true)
             : base(surface, shaper, zIndex, canMove)
         {
             IsHomeMade = isHomeMade;

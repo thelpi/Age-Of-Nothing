@@ -9,24 +9,23 @@ namespace Age_Of_Nothing
 {
     public class Controller : INotifyPropertyChanged
     {
-        private readonly Dictionary<PrimaryResources, int> _resourcesQty;
-        private readonly List<Unit> _units = new List<Unit>(10);
-        private readonly List<Mine> _mines = new List<Mine>(10);
-        private readonly List<Forest> _forest = new List<Forest>(10);
-        private Market _market;
-        private readonly List<FocusableSprite> _focusableSprites = new List<FocusableSprite>(100);
-        private readonly List<Dwelling> _dwellings = new List<Dwelling>();
-
         private const int MaxVillagerCreationStack = 20;
+
+        private readonly List<Sprite> _sprites = new List<Sprite>(1000);
+        private readonly Dictionary<PrimaryResources, int> _resourcesQty;
 
         private int _villagerCreationStack;
         private int _currentVillagerCreationTicks;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private string _populationInformation;
 
-        // TODO: everytime a dwelling or unit is added or removed!
+        private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
+        private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
+        private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
+        private IEnumerable<Forest> _forests => _sprites.OfType<Forest>();
+        private Market _market => _sprites.OfType<Market>().FirstOrDefault();
+        private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
+        private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
+
         public string PopulationInformation
         {
             get { return _populationInformation; }
@@ -36,12 +35,38 @@ namespace Age_Of_Nothing
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PopulationInformation)));
             }
         }
-
-        public int PotentialPopulation => _dwellings.Count * Dwelling.VillagerCapacity;
-        public int Population => _units.Count;
+        public int PotentialPopulation => _dwellings.Count() * Dwelling.VillagerCapacity;
+        public int Population => _units.Count();
         public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
         public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
         public int IronQuantity => _resourcesQty[PrimaryResources.Iron];
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Controller()
+        {
+            _resourcesQty = new Dictionary<PrimaryResources, int>
+            {
+                { PrimaryResources.Iron, 100 },
+                { PrimaryResources.Rock, 100 },
+                { PrimaryResources.Wood, 100 }
+            };
+
+            _sprites.Add(new Villager(new Point(200, 200), _focusables));
+            _sprites.Add(new Villager(new Point(100, 100), _focusables));
+            _sprites.Add(new Villager(new Point(300, 300), _focusables));
+            _sprites.Add(new RockMine(100, new Point(400, 120), 1, _focusables));
+            _sprites.Add(new IronMine(75, new Point(200, 600), 1, _focusables));
+            _sprites.Add(new Forest(new Rect(700, 200, 300, 100)));
+            _sprites.Add(new Market(new Point(600, 500), _focusables));
+            _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
+            _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
+            
+            SetPopulationInformation();
+
+            foreach (var fs in _focusables)
+                fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
+        }
 
         public bool HasVillagerFocus()
         {
@@ -53,43 +78,6 @@ namespace Age_Of_Nothing
             return _market?.Focused == true;
         }
 
-        public Controller()
-        {
-            _resourcesQty = new Dictionary<PrimaryResources, int>
-            {
-                { PrimaryResources.Iron, 100 },
-                { PrimaryResources.Rock, 100 },
-                { PrimaryResources.Wood, 100 }
-            };
-
-            _units.Add(new Villager(new Point(200, 200), _focusableSprites));
-            _units.Add(new Villager(new Point(100, 100), _focusableSprites));
-            _units.Add(new Villager(new Point(300, 300), _focusableSprites));
-            SetPopulationInformation();
-
-            _mines.Add(new RockMine(100, new Point(400, 120), 1, _focusableSprites));
-            _mines.Add(new IronMine(75, new Point(200, 600), 1, _focusableSprites));
-
-            _forest.Add(new Forest(new Rect(700, 200, 300, 100)));
-
-            _market = new Market(new Point(600, 500), _focusableSprites);
-
-            _dwellings.Add(new Dwelling(new Point(1100, 10), _focusableSprites));
-            _dwellings.Add(new Dwelling(new Point(1100, 90), _focusableSprites));
-            SetPopulationInformation();
-
-            _focusableSprites.Add(_units[0]);
-            _focusableSprites.Add(_units[1]);
-            _focusableSprites.Add(_units[2]);
-            _focusableSprites.Add(_mines[0]);
-            _focusableSprites.Add(_mines[1]);
-            _focusableSprites.Add(_market);
-            _focusableSprites.Add(_dwellings[0]);
-            _focusableSprites.Add(_dwellings[1]);
-
-            _focusableSprites.ForEach(fs => fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e));
-        }
-
         private void SetPopulationInformation()
         {
             PopulationInformation = $"{Population} / {PotentialPopulation}";
@@ -97,10 +85,8 @@ namespace Age_Of_Nothing
 
         public IEnumerable<UIElement> GetVisualSprites()
         {
-            foreach (var focusableSprite in _focusableSprites)
-                yield return focusableSprite.GetVisual();
-            foreach (var forest in _forest)
-                yield return forest.GetVisual();
+            foreach (var sprite in _sprites)
+                yield return sprite.GetVisual();
         }
 
         internal void AddVillagerCreationToStack()
@@ -129,30 +115,21 @@ namespace Age_Of_Nothing
             _villagerCreationStack--;
             _currentVillagerCreationTicks = 0;
 
-            var v = new Villager(_market.Center, _focusableSprites);
+            var v = new Villager(_market.Center, _focusables);
 
-            _units.Add(v);
+            _sprites.Add(v);
             SetPopulationInformation();
-
-            _focusableSprites.Add(v);
 
             return v.GetVisual;
         }
 
         public UIElement CheckForDeletion()
         {
-            var sprite = _focusableSprites.FirstOrDefault(x => x.Focused && x.IsHomeMade);
+            var sprite = _focusables.FirstOrDefault(x => x.Focused && x.IsHomeMade);
             if (sprite == null)
                 return null;
 
-            _focusableSprites.Remove(sprite);
-            sprite.ChangeFocus(false, false);
-            if (sprite.Is<Unit>(out var unit))
-                _units.Remove(unit);
-            else if (sprite.Is<Market>())
-                _market = null;
-            else if (sprite.Is<Dwelling>(out var dwl))
-                _dwellings.Remove(dwl);
+            _sprites.Remove(sprite);
             SetPopulationInformation();
 
             return sprite.GetVisual();
@@ -179,25 +156,26 @@ namespace Age_Of_Nothing
 
         public void ClearFocus()
         {
-            _focusableSprites.ForEach(x => x.ChangeFocus(false, false));
+            foreach (var sp in _focusables)
+                sp.ChangeFocus(false, false);
         }
 
         public void FocusOnZone(Rect zone)
         {
             var hasUnitSelected = false;
-            _units.ForEach(x =>
+            foreach (var unit in _units)
             {
-                if (zone.Contains(x.Center))
+                if (zone.Contains(unit.Center))
                 {
-                    x.ChangeFocus(true, false);
+                    unit.ChangeFocus(true, false);
                     hasUnitSelected = true;
                 }
-            });
+            }
 
             if (!hasUnitSelected)
             {
                 // take the first focus
-                foreach (var x in _focusableSprites.Where(x => !(x is Unit)))
+                foreach (var x in _focusables.Where(x => !(x is Unit)))
                 {
                     if (zone.IntersectsWith(x.Surface))
                     {
@@ -210,7 +188,8 @@ namespace Age_Of_Nothing
 
         public void RefreshHover(Rect zone)
         {
-            _focusableSprites.ForEach(x => x.RefreshVisual(zone.IntersectsWith(x.Surface)));
+            foreach (var sp in _focusables)
+                sp.RefreshVisual(zone.IntersectsWith(sp.Surface));
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
@@ -231,7 +210,7 @@ namespace Age_Of_Nothing
             }
             else
             {
-                var forest = _forest.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+                var forest = _forests.FirstOrDefault(x => x.Surface.Contains(clickPosition));
                 if (forest != null)
                 {
                     marketCycle = true;

@@ -6,7 +6,7 @@ namespace Age_Of_Nothing.Sprites
 {
     public class IronMine : Mine
     {
-        public IronMine(int quantity, Point position, double qtyScale, IReadOnlyList<FocusableSprite> sprites)
+        public IronMine(int quantity, Point position, double qtyScale, IEnumerable<FocusableSprite> sprites)
             : base(quantity, position, qtyScale, sprites)
         { }
 

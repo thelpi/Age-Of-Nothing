@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites
 
         public const int VillagerCapacity = 5;
 
-        public Dwelling(Point topleft, IReadOnlyList<FocusableSprite> sprites)
+        public Dwelling(Point topleft, IEnumerable<FocusableSprite> sprites)
             : base(new Rect(topleft, new Point(topleft.X + _size, topleft.Y + _size)), sprites)
         { }
 

@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites
 
         private const int _size = 128;
 
-        public Market(Point topLeft, IReadOnlyList<FocusableSprite> sprites)
+        public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)
             : base(new Rect(topLeft, new Point(topLeft.X + _size, topLeft.Y + _size)), sprites)
         {
             Center = new Point(
