@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -11,7 +12,7 @@ namespace Age_Of_Nothing
     {
         private const int MaxVillagerCreationStack = 20;
 
-        private readonly List<Sprite> _sprites = new List<Sprite>(1000);
+        private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
 
         private int _villagerCreationStack;
@@ -52,6 +53,11 @@ namespace Age_Of_Nothing
                 { PrimaryResources.Wood, 100 }
             };
 
+            _sprites.CollectionChanged += (x, y) =>
+            {
+                PopulationInformation = $"{Population} / {PotentialPopulation}";
+            };
+
             _sprites.Add(new Villager(new Point(200, 200), _focusables));
             _sprites.Add(new Villager(new Point(100, 100), _focusables));
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
@@ -61,8 +67,6 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
-            
-            SetPopulationInformation();
 
             foreach (var fs in _focusables)
                 fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
@@ -76,11 +80,6 @@ namespace Age_Of_Nothing
         public bool HasMarketFocus()
         {
             return _market?.Focused == true;
-        }
-
-        private void SetPopulationInformation()
-        {
-            PopulationInformation = $"{Population} / {PotentialPopulation}";
         }
 
         public IEnumerable<UIElement> GetVisualSprites()
@@ -118,7 +117,6 @@ namespace Age_Of_Nothing
             var v = new Villager(_market.Center, _focusables);
 
             _sprites.Add(v);
-            SetPopulationInformation();
 
             return v.GetVisual;
         }
@@ -130,7 +128,6 @@ namespace Age_Of_Nothing
                 return null;
 
             _sprites.Remove(sprite);
-            SetPopulationInformation();
 
             return sprite.GetVisual();
         }
