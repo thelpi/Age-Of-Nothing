@@ -10,14 +10,14 @@ namespace Age_Of_Nothing
 {
     public class Controller : INotifyPropertyChanged
     {
-        private const int MaxVillagerCreationStack = 20;
+        private const int CraftQueueMaxSize = 100;
 
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
+        private readonly List<Craft> _craftQueue = new List<Craft>(1000);
 
-        private int _villagerCreationStack;
-        private int _currentVillagerCreationTicks;
         private string _populationInformation;
+        private int _frames;
 
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
@@ -102,19 +102,26 @@ namespace Age_Of_Nothing
 
         public void AddVillagerCreationToStack()
         {
-            if (_villagerCreationStack < MaxVillagerCreationStack)
-                _villagerCreationStack++;
+            lock (_craftQueue)
+            {
+                if (_craftQueue.Count < CraftQueueMaxSize)
+                    _craftQueue.Add(new Craft(_market, new Villager(_market.Center, _focusables), Unit.BuildFramesCount));
+            }
         }
 
         public void CheckForDeletion()
         {
-            var sprite = _focusables.FirstOrDefault(x => x.Focused && x.IsHomeMade);
-            if (sprite != null)
-                _sprites.Remove(sprite);
+            lock (_sprites)
+            {
+                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.IsCraft);
+                if (sprite != null)
+                    _sprites.Remove(sprite);
+            }
         }
 
         public void NewFrameCheck()
         {
+            _frames++;
             foreach (var unit in _units)
             {
                 var (move, tgt) = unit.CheckForMovement();
@@ -131,18 +138,32 @@ namespace Age_Of_Nothing
                     PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
 
-            if (Population < PotentialPopulation && _market != null && _villagerCreationStack != 0)
+            lock (_craftQueue) lock (_sprites)
             {
-                _currentVillagerCreationTicks++;
-                if (_currentVillagerCreationTicks >= Villager.BuildTimeTick)
+                // removes every pending craft where the source of creation doesn't exist anymore
+                _craftQueue.RemoveAll(x => !_sprites.Contains(x.Source));
+
+                var finishedCrafts = new List<Craft>(10);
+                foreach (var craft in _craftQueue)
                 {
-                    _villagerCreationStack--;
-                    _currentVillagerCreationTicks = 0;
-
-                    var v = new Villager(_market.Center, _focusables);
-
-                    _sprites.Add(v);
+                    if (craft.HasFinished(_frames))
+                    {
+                        // if the max pop. is reached, we keep the craft pending
+                        if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
+                        {
+                            _sprites.Add(craft.Target);
+                            finishedCrafts.Add(craft);
+                        }
+                    }
+                    // to start the craft, the source should not have another craft already pending
+                    else if (!craft.Started && !_craftQueue.Any(x => craft != x && x.Source == craft.Source && x.Started))
+                    {
+                        if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
+                            craft.SetStartingFrame(_frames);
+                    }
                 }
+
+                _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
             }
         }
 

@@ -16,12 +16,12 @@ namespace Age_Of_Nothing.Sprites
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public bool IsHomeMade { get; }
+        public bool IsCraft { get; }
 
-        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IEnumerable<FocusableSprite> sprites, int zIndex = 1, bool canMove = false, bool isHomeMade = true)
+        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IEnumerable<FocusableSprite> sprites, int zIndex = 1, bool canMove = false, bool isCraft = true)
             : base(surface, shaper, zIndex, canMove)
         {
-            IsHomeMade = isHomeMade;
+            IsCraft = isCraft;
             Sprites = sprites;
             _hoverBorderRate = hoverBorderRate;
             _mouseLeftButtonDownHandler = (a, b) =>

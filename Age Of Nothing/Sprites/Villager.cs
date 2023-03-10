@@ -7,7 +7,6 @@ namespace Age_Of_Nothing.Sprites
     {
         private const double _speed = 5;
         public const double Size = 20;
-        public const int BuildTimeTick = 120;
         private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
         {
             { PrimaryResources.Iron, 10 },
