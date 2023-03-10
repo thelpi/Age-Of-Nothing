@@ -55,6 +55,7 @@ namespace Age_Of_Nothing
 
             _sprites.CollectionChanged += (x, y) =>
             {
+                // TODO: we should do this logic into view with a converter
                 PopulationInformation = $"{Population} / {PotentialPopulation}";
             };
 
@@ -74,7 +75,7 @@ namespace Age_Of_Nothing
 
         public bool HasVillagerFocus()
         {
-            return _units.Any(x => x.Is<Villager>() && x.Focused);
+            return _villagers.Any(x => x.Focused);
         }
 
         public bool HasMarketFocus()
@@ -191,18 +192,19 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
+            Point? villagerOverrideClickPosition = null;
             Sprite tgt = null;
             var marketCycle = false;
             var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
             {
-                clickPosition = mine.Center;
+                villagerOverrideClickPosition = mine.Center;
                 marketCycle = true;
                 tgt = mine;
             }
             else if (_market != null && _market.Surface.Contains(clickPosition))
             {
-                clickPosition = _market.Center;
+                villagerOverrideClickPosition = _market.Center;
                 tgt = _market;
             }
             else
@@ -218,8 +220,13 @@ namespace Age_Of_Nothing
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
-                if (marketCycle && _market != null)
-                    unit.SetCycle((clickPosition, tgt), (_market.Center, _market));
+                if (unit.Is<Villager>())
+                {
+                    if (marketCycle && _market != null)
+                        unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt), (_market.Center, _market));
+                    else
+                        unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt));
+                }
                 else
                     unit.SetCycle((clickPosition, tgt));
             }
