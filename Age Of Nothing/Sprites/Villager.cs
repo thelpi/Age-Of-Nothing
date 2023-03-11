@@ -9,7 +9,7 @@ namespace Age_Of_Nothing.Sprites
         public const double Size = 20;
         private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
         {
-            { PrimaryResources.Iron, 10 },
+            { PrimaryResources.Gold, 10 },
             { PrimaryResources.Wood, 10 },
             { PrimaryResources.Rock, 10 }
         };

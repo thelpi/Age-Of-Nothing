@@ -14,8 +14,8 @@ namespace Age_Of_Nothing.Sprites
             : base(new Rect(topleft, new Point(topleft.X + Size, topleft.Y + Size)), sprites)
         { }
 
-        protected override Color DefaultFill => Colors.Yellow;
+        protected override Color DefaultFill => Colors.SteelBlue;
 
-        protected override Color HoverFill => Colors.LightYellow;
+        protected override Color HoverFill => Colors.LightSteelBlue;
     }
 }

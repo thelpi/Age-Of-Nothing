@@ -2,7 +2,7 @@
 {
     public enum PrimaryResources
     {
-        Iron,
+        Gold,
         Wood,
         Rock
     }

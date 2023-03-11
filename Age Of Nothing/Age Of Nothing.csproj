@@ -8,14 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Images\iron.png" />
+    <None Remove="Resources\Images\gold.png" />
     <None Remove="Resources\Images\population.png" />
     <None Remove="Resources\Images\rock.png" />
     <None Remove="Resources\Images\wood.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\iron.png">
+    <Resource Include="Resources\Images\gold.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\population.png">

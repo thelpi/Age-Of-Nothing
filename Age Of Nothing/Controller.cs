@@ -40,7 +40,7 @@ namespace Age_Of_Nothing
         public int Population => _units.Count();
         public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
         public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
-        public int IronQuantity => _resourcesQty[PrimaryResources.Iron];
+        public int GoldQuantity => _resourcesQty[PrimaryResources.Gold];
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -48,7 +48,7 @@ namespace Age_Of_Nothing
         {
             _resourcesQty = new Dictionary<PrimaryResources, int>
             {
-                { PrimaryResources.Iron, 100 },
+                { PrimaryResources.Gold, 100 },
                 { PrimaryResources.Rock, 100 },
                 { PrimaryResources.Wood, 100 }
             };
@@ -83,7 +83,7 @@ namespace Age_Of_Nothing
             _sprites.Add(new Villager(new Point(100, 100), _focusables));
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
             _sprites.Add(new RockMine(100, new Point(400, 120), 1, _focusables));
-            _sprites.Add(new IronMine(75, new Point(200, 600), 1, _focusables));
+            _sprites.Add(new GoldMine(75, new Point(200, 600), 1, _focusables));
             _sprites.Add(new Forest(new Rect(700, 200, 300, 100)));
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
