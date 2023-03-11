@@ -138,32 +138,43 @@ namespace Age_Of_Nothing
                     PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
 
-            lock (_craftQueue) lock (_sprites)
+            lock (_craftQueue)
             {
-                // removes every pending craft where the source of creation doesn't exist anymore
-                _craftQueue.RemoveAll(x => !_sprites.Contains(x.Source));
-
-                var finishedCrafts = new List<Craft>(10);
-                foreach (var craft in _craftQueue)
+                lock (_sprites)
                 {
-                    if (craft.HasFinished(_frames))
+                    var noMoreSources = new List<Craft>(10);
+                    foreach (var craft in _craftQueue)
                     {
-                        // if the max pop. is reached, we keep the craft pending
-                        if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
+                        foreach (var ms in craft.Sources.Where(x => !_sprites.Contains(x)))
                         {
-                            _sprites.Add(craft.Target);
-                            finishedCrafts.Add(craft);
+                            if (craft.RemoveSource(ms, _frames))
+                                noMoreSources.Add(craft);
                         }
                     }
-                    // to start the craft, the source should not have another craft already pending
-                    else if (!craft.Started && !_craftQueue.Any(x => craft != x && x.Source == craft.Source && x.Started))
-                    {
-                        if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
-                            craft.SetStartingFrame(_frames);
-                    }
-                }
+                    _craftQueue.RemoveAll(x => noMoreSources.Contains(x));
 
-                _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
+                    var finishedCrafts = new List<Craft>(10);
+                    foreach (var craft in _craftQueue)
+                    {
+                        if (craft.HasFinished(_frames))
+                        {
+                            // if the max pop. is reached, we keep the craft pending
+                            if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
+                            {
+                                _sprites.Add(craft.Target);
+                                finishedCrafts.Add(craft);
+                            }
+                        }
+                        // to start the craft, any of the sources should not have another craft already started
+                        else if (!craft.Started && !_craftQueue.Any(x => x.IsStartedWithCommonSource(craft)))
+                        {
+                            if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
+                                craft.SetStartingFrame(_frames);
+                        }
+                    }
+
+                    _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
+                }
             }
         }
 
