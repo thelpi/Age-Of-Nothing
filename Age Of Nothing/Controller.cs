@@ -273,7 +273,8 @@ namespace Age_Of_Nothing
 
         public Size GetSpriteSize<T>() where T : Sprite
         {
-            return new Size(Dwelling.Size, Dwelling.Size);
+            // HACK: we can't ensure T implements SizeAttribute
+            return ((SizeAttribute)System.Attribute.GetCustomAttribute(typeof(T), typeof(SizeAttribute))).Size;
         }
     }
 }

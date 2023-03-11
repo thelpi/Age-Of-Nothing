@@ -3,10 +3,12 @@ using System.Windows;
 
 namespace Age_Of_Nothing.Sprites
 {
+    [Size(Size)]
     public class Villager : Unit
     {
+        const double Size = 20;
+
         private const double _speed = 5;
-        public const double Size = 20;
         private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
         {
             { PrimaryResources.Gold, 10 },

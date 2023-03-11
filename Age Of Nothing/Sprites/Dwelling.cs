@@ -4,9 +4,10 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
+    [Size(Size)]
     public class Dwelling : Structure
     {
-        public const double Size = 50;
+        const int Size = 50;
 
         public const int VillagerCapacity = 5;
 

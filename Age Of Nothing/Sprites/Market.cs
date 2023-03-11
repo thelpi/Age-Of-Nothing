@@ -4,14 +4,15 @@ using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
+    [Size(Size)]
     public class Market : Structure, ICenteredSprite
     {
         public Point Center { get; protected set; }
 
-        private const int _size = 128;
+        const int Size = 128;
 
         public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)
-            : base(new Rect(topLeft, new Point(topLeft.X + _size, topLeft.Y + _size)), sprites)
+            : base(new Rect(topLeft, new Point(topLeft.X + Size, topLeft.Y + Size)), sprites)
         {
             Center = new Point(
                 Surface.Left + Surface.Width / 2,
