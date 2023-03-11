@@ -23,7 +23,7 @@ namespace Age_Of_Nothing
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
         private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
         private IEnumerable<Forest> _forests => _sprites.OfType<Forest>();
-        private Market _market => _sprites.OfType<Market>().FirstOrDefault();
+        private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
 
@@ -97,7 +97,7 @@ namespace Age_Of_Nothing
 
         public bool HasMarketFocus()
         {
-            return _market?.Focused == true;
+            return _markets.Any(x => x.Focused);
         }
 
         public void AddVillagerCreationToStack()
@@ -105,7 +105,10 @@ namespace Age_Of_Nothing
             lock (_craftQueue)
             {
                 if (_craftQueue.Count < CraftQueueMaxSize)
-                    _craftQueue.Add(new Craft(_market, new Villager(_market.Center, _focusables), Unit.BuildFramesCount));
+                {
+                    var focusMarket = _markets.First(x => x.Focused);
+                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), Unit.BuildFramesCount));
+                }
             }
         }
 
@@ -228,19 +231,23 @@ namespace Age_Of_Nothing
                 marketCycle = true;
                 tgt = mine;
             }
-            else if (_market != null && _market.Surface.Contains(clickPosition))
-            {
-                villagerOverrideClickPosition = _market.Center;
-                tgt = _market;
-            }
             else
             {
-                var forest = _forests.FirstOrDefault(x => x.Surface.Contains(clickPosition));
-                if (forest != null)
+                var market = _markets.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+                if (market != null)
                 {
-                    marketCycle = true;
-                    tgt = forest;
-                    // TODO: find the proper target to be on the border of the forest (closest to current position)
+                    villagerOverrideClickPosition = market.Center;
+                    tgt = market;
+                }
+                else
+                {
+                    var forest = _forests.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+                    if (forest != null)
+                    {
+                        marketCycle = true;
+                        tgt = forest;
+                        // TODO: find the proper target to be on the border of the forest (closest to current position)
+                    }
                 }
             }
 
@@ -248,8 +255,12 @@ namespace Age_Of_Nothing
             {
                 if (unit.Is<Villager>())
                 {
-                    if (marketCycle && _market != null)
-                        unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt), (_market.Center, _market));
+                    if (marketCycle && _markets.Any())
+                    {
+                        var tgtPoint = villagerOverrideClickPosition.GetValueOrDefault(clickPosition);
+                        var closestMarket = _markets.OrderBy(x => Point.Subtract(tgtPoint, x.Center).LengthSquared).First();
+                        unit.SetCycle((tgtPoint, tgt), (closestMarket.Center, closestMarket));
+                    }
                     else
                         unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt));
                 }
