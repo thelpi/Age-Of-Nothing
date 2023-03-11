@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing
 {
@@ -107,7 +108,7 @@ namespace Age_Of_Nothing
                 if (_craftQueue.Count < CraftQueueMaxSize)
                 {
                     var focusMarket = _markets.First(x => x.Focused);
-                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), Unit.BuildFramesCount));
+                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
                 }
             }
         }
@@ -273,8 +274,20 @@ namespace Age_Of_Nothing
 
         public Size GetSpriteSize<T>() where T : Sprite
         {
+            return GetAttribute<T, SizeAttribute>().Size;
+        }
+
+        public int GetCraftTime<T>() where T : Sprite
+        {
+            return GetAttribute<T, CraftTimeAttribute>().CraftTime;
+        }
+
+        private static TAttr GetAttribute<TSprite, TAttr>()
+            where TSprite : Sprite
+            where TAttr : System.Attribute
+        {
             // HACK: we can't ensure T implements SizeAttribute
-            return ((SizeAttribute)System.Attribute.GetCustomAttribute(typeof(T), typeof(SizeAttribute))).Size;
+            return (TAttr)System.Attribute.GetCustomAttribute(typeof(TSprite), typeof(TAttr));
         }
     }
 }

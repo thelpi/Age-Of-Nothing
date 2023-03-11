@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
     [Size(Size)]
+    [CraftTime(120)]
     public class Villager : Unit
     {
         const double Size = 20;

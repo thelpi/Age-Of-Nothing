@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
     [Size(Size)]
+    [CraftTime(200)]
     public class Dwelling : Structure
     {
         const int Size = 50;

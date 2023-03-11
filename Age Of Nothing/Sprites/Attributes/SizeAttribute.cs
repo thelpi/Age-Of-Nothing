@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Age_Of_Nothing
+namespace Age_Of_Nothing.Sprites.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class SizeAttribute : Attribute

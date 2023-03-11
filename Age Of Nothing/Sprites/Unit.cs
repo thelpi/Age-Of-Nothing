@@ -11,7 +11,6 @@ namespace Age_Of_Nothing.Sprites
         private readonly LinkedList<(Point pt, Sprite tgt)> _targetCycle = new LinkedList<(Point, Sprite)>();
         private LinkedListNode<(Point pt, Sprite tgt)> _targetPositionNode;
         private bool _loop;
-        public const int BuildFramesCount = 120;
 
         protected Unit(Point center, double speed, double size, IEnumerable<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), 0.75, sprites, 2, true)
