@@ -259,5 +259,10 @@ namespace Age_Of_Nothing
                 }
             }
         }
+
+        public Size GetSpriteSize<T>() where T : Sprite
+        {
+            return new Size(Dwelling.Size, Dwelling.Size);
+        }
     }
 }

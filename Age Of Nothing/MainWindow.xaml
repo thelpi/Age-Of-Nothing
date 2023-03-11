@@ -35,6 +35,7 @@
         </Expander>
         <Canvas DockPanel.Dock="Bottom" Name="MainCanvas"
             Background="LightGreen"
+            MouseRightButtonDown="MainCanvas_MouseRightButtonDown"
             MouseRightButtonUp="MainCanvas_MouseRightButtonUp"
             MouseLeftButtonDown="MainCanvas_MouseLeftButtonDown"
             MouseLeftButtonUp="MainCanvas_MouseLeftButtonUp"

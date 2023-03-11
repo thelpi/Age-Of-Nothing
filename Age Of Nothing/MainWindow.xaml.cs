@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
+using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing
 {
@@ -22,8 +23,10 @@ namespace Age_Of_Nothing
 
         private readonly Timer _timer = new Timer(Delay);
         private readonly Rectangle _selectionRectGu;
+        private readonly Rectangle _structureShadowGu;
         private readonly Controller _controller;
 
+        private Size? _structureShadowSize;
         private Point? _selectionPoint;
         private volatile bool _refreshing = false;
 
@@ -32,6 +35,12 @@ namespace Age_Of_Nothing
             InitializeComponent();
             _timer.Elapsed += Refresh;
             _timer.Start();
+
+            _structureShadowGu = new Rectangle
+            {
+                Fill = Brushes.Black,
+                Opacity = 0.1
+            };
 
             _selectionRectGu = new Rectangle
             {
@@ -64,6 +73,7 @@ namespace Age_Of_Nothing
             };
 
             MainCanvas.Children.Add(_selectionRectGu);
+            MainCanvas.Children.Add(_structureShadowGu);
 
             DataContext = _controller;
 
@@ -82,8 +92,14 @@ namespace Age_Of_Nothing
 
         #region Events
 
+        private void MainCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ResetStructureShadow();
+        }
+
         private void MainCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
+            ResetStructureShadow();
             _controller.SetTargetPositionsOnFocused(e.GetPosition(MainCanvas));
         }
 
@@ -100,6 +116,11 @@ namespace Age_Of_Nothing
         {
             if (_selectionPoint.HasValue)
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
+            if (_structureShadowSize.HasValue)
+            {
+                // TODO stuff
+                ResetStructureShadow();
+            }
             ResetSelectionRectangle();
         }
 
@@ -119,20 +140,31 @@ namespace Age_Of_Nothing
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
                 _controller.RefreshHover(rect);
             }
+
+            if (_structureShadowSize.HasValue)
+            {
+                var pos = e.GetPosition(MainCanvas);
+                _structureShadowGu.Width = _structureShadowSize.Value.Width;
+                _structureShadowGu.Height = _structureShadowSize.Value.Height;
+                _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (_structureShadowSize.Value.Width / 2));
+                _structureShadowGu.SetValue(Canvas.TopProperty, pos.Y - (_structureShadowSize.Value.Height / 2));
+            }
         }
 
         private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetStructureShadow();
             _controller.AddVillagerCreationToStack();
         }
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO
+            _structureShadowSize = _controller.GetSpriteSize<Dwelling>();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
+            ResetStructureShadow();
             if (_deleteKeys.Contains(e.Key))
                 _controller.CheckForDeletion();
         }
@@ -144,6 +176,13 @@ namespace Age_Of_Nothing
             _selectionPoint = null;
             _selectionRectGu.Width = 0;
             _selectionRectGu.Height = 0;
+        }
+
+        private void ResetStructureShadow()
+        {
+            _structureShadowSize = null;
+            _structureShadowGu.Width = 0;
+            _structureShadowGu.Height = 0;
         }
     }
 }
