@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -80,6 +81,11 @@ namespace Age_Of_Nothing.Sprites
                 }
                 _targetPositionNode = _targetCycle.First;
             }
+        }
+
+        public bool FocusedOn(Sprite sprite)
+        {
+            return _targetCycle.Any(tc => tc.tgt == sprite);
         }
     }
 }

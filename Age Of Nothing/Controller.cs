@@ -102,19 +102,25 @@ namespace Age_Of_Nothing
 
         public void BuildDwelling(Point center)
         {
+            BuildStructure(center, (a, b) => new Dwelling(a, b));
+        }
+
+        private void BuildStructure<T>(Point center, System.Func<Point, IEnumerable<FocusableSprite>, T> ctor)
+            where T : Structure
+        {
             lock (_craftQueue)
             {
-                var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<Dwelling>());
+                var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<T>());
                 // TODO: surface should be inside the game area entirely
                 if (!SurfaceIsEngaged(surface))
                 {
                     var villagerFocused = _villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
                     {
-                        if (CheckStructureResources<Dwelling>())
+                        if (CheckStructureResources<T>())
                         {
-                            var sprite = new Dwelling(surface.TopLeft, _focusables);
-                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, GetCraftTime<Dwelling>()));
+                            var sprite = ctor(surface.TopLeft, _focusables);
+                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, GetCraftTime<T>()));
                             foreach (var unit in villagerFocused)
                                 unit.SetCycle((center, sprite));
                         }
@@ -138,6 +144,9 @@ namespace Age_Of_Nothing
                 _resourcesQty[PrimaryResources.Wood] -= wood;
                 _resourcesQty[PrimaryResources.Gold] -= gold;
                 _resourcesQty[PrimaryResources.Rock] -= rock;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
                 return true;
             }
 
@@ -253,17 +262,32 @@ namespace Age_Of_Nothing
             var cancelledCrafts = new List<Craft>(10);
 
             // Reasons for cancellation:
-            // - the surface for the structure is already engaged by another sprite (units excepted)
-            // - there is not source remaining to complete the craft (market for villager, villager for structure)
+            // - there is no source remaining to complete the craft
+            // - the surface for the structure is already occupied by another structure
+            // - villagers lost focus on structure to craft 
             foreach (var craft in _craftQueue)
             {
-                // TODO: remove path cycle from villager?
-                if (craft.Target.Is<Structure>() && SurfaceIsEngaged(craft.Target.Surface))
-                    cancelledCrafts.Add(craft);
-                foreach (var ms in craft.Sources.Where(x => !_sprites.Contains(x)))
+                var lost = craft.Sources
+                    .Where(x => !_sprites.Contains(x))
+                    .ToList();
+                foreach (var ms in lost)
                 {
                     if (craft.RemoveSource(ms))
                         cancelledCrafts.Add(craft);
+                }
+
+                if (craft.Target.Is<Structure>())
+                {
+                    if (SurfaceIsEngaged(craft.Target.Surface))
+                        cancelledCrafts.Add(craft);
+                    var unfocused = craft.Sources
+                        .Where(x => x.Is<Villager>(out var villager) && !villager.FocusedOn(craft.Target))
+                        .ToList();
+                    foreach (var ms in unfocused)
+                    {
+                        if (craft.RemoveSource(ms))
+                            cancelledCrafts.Add(craft);
+                    }
                 }
             }
 
@@ -285,6 +309,9 @@ namespace Age_Of_Nothing
             _resourcesQty[PrimaryResources.Gold] += attrValue.Gold;
             _resourcesQty[PrimaryResources.Wood] += attrValue.Wood;
             _resourcesQty[PrimaryResources.Rock] += attrValue.Rock;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
         }
 
         public void ClearFocus()
