@@ -8,7 +8,7 @@ namespace Age_Of_Nothing.Sprites
     [CraftTime(120)]
     public class Villager : Unit
     {
-        const double Size = 20;
+        private const double Size = 20;
 
         private const double _speed = 5;
         private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>

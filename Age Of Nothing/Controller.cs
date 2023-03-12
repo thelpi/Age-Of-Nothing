@@ -11,8 +11,6 @@ namespace Age_Of_Nothing
 {
     public class Controller : INotifyPropertyChanged
     {
-        private const int CraftQueueMaxSize = 100;
-
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
         private readonly List<Craft> _craftQueue = new List<Craft>(1000);
@@ -106,23 +104,28 @@ namespace Age_Of_Nothing
         {
             lock (_craftQueue)
             {
-                if (_craftQueue.Count < CraftQueueMaxSize)
+                var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<Dwelling>());
+                // TODO: surface should be inside the game area entirely
+                if (!SurfaceIsEngaged(surface))
                 {
-                    var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<Dwelling>());
-                    // TODO: surface should be inside the game area entirely
-                    if (!_nonUnits.Any(x => x.Surface.IntersectsWith(surface)))
+                    var villagerFocused = _villagers.Where(x => x.Focused);
+                    if (villagerFocused.Any())
                     {
-                        var villagerFocused = _villagers.Where(x => x.Focused);
-                        if (villagerFocused.Any())
+                        if (CheckStructureResources<Dwelling>())
                         {
-                            if (CheckStructureResources<Dwelling>())
-                            {
-                                _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), new Dwelling(surface.TopLeft, _focusables), GetCraftTime<Dwelling>()));
-                            }
+                            var sprite = new Dwelling(surface.TopLeft, _focusables);
+                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, GetCraftTime<Dwelling>()));
+                            foreach (var unit in villagerFocused)
+                                unit.SetCycle((center, sprite));
                         }
                     }
                 }
             }
+        }
+
+        private bool SurfaceIsEngaged(Rect surface)
+        {
+            return _nonUnits.Any(x => x.Surface.IntersectsWith(surface));
         }
 
         private bool CheckStructureResources<T>() where T : Structure
@@ -145,12 +148,9 @@ namespace Age_Of_Nothing
         {
             lock (_craftQueue)
             {
-                if (_craftQueue.Count < CraftQueueMaxSize)
-                {
-                    var focusMarket = _markets.FirstOrDefault(x => x.Focused);
-                    if (focusMarket != null)
-                        _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
-                }
+                var focusMarket = _markets.FirstOrDefault(x => x.Focused);
+                if (focusMarket != null)
+                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
             }
         }
 
@@ -167,6 +167,20 @@ namespace Age_Of_Nothing
         public void NewFrameCheck()
         {
             _frames++;
+            ManageUnitsMovements();
+
+            lock (_craftQueue)
+            {
+                lock (_sprites)
+                {
+                    ManageCraftsToCancel();
+                    ManageCraftsInProgress();
+                }
+            }
+        }
+
+        private void ManageUnitsMovements()
+        {
             foreach (var unit in _units)
             {
                 var (move, tgt) = unit.CheckForMovement();
@@ -182,48 +196,83 @@ namespace Age_Of_Nothing
                 if (move)
                     PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
+        }
 
-            lock (_craftQueue)
+        private void ManageCraftsInProgress()
+        {
+            var finishedCrafts = new List<Craft>(10);
+            foreach (var craft in _craftQueue)
             {
-                lock (_sprites)
+                if (craft.Target.Is<Unit>())
                 {
-                    var noMoreSources = new List<Craft>(10);
-                    foreach (var craft in _craftQueue)
+                    if (craft.HasFinished(_frames))
                     {
-                        foreach (var ms in craft.Sources.Where(x => !_sprites.Contains(x)))
+                        // if the max pop. is reached, we keep the craft pending
+                        if (Population < PotentialPopulation)
                         {
-                            if (craft.RemoveSource(ms, _frames))
-                            {
-                                noMoreSources.Add(craft);
-                                if (!craft.Started)
-                                    RefundResources(craft.Target.GetType());
-                            }
+                            _sprites.Add(craft.Target);
+                            finishedCrafts.Add(craft);
                         }
                     }
-                    _craftQueue.RemoveAll(x => noMoreSources.Contains(x));
-
-                    var finishedCrafts = new List<Craft>(10);
-                    foreach (var craft in _craftQueue)
+                    // to start the craft, any of the sources should not have another craft already started
+                    else if (!craft.Started && !_craftQueue.Any(x => x.IsStartedWithCommonSource(craft)))
                     {
-                        if (craft.HasFinished(_frames))
-                        {
-                            // if the max pop. is reached, we keep the craft pending
-                            if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
-                            {
-                                _sprites.Add(craft.Target);
-                                finishedCrafts.Add(craft);
-                            }
-                        }
-                        // to start the craft, any of the sources should not have another craft already started
-                        else if (!craft.Started && !_craftQueue.Any(x => x.IsStartedWithCommonSource(craft)))
-                        {
-                            if (!craft.Target.Is<Unit>() || Population < PotentialPopulation)
-                                craft.SetStartingFrame(_frames);
-                        }
+                        if (Population < PotentialPopulation)
+                            craft.SetStartingFrame(_frames);
                     }
-
-                    _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
                 }
+                else if (craft.Target.Is<Structure>(out var tgtStruct))
+                {
+                    if (craft.HasFinished(_frames))
+                    {
+                        _sprites.Add(craft.Target);
+                        finishedCrafts.Add(craft);
+                    }
+                    else
+                    {
+                        var availableSources = craft.Sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
+                        if (!craft.Started)
+                        {
+                            if (availableSources > 0)
+                                craft.SetStartingFrame(_frames, availableSources);
+                        }
+                        else
+                        {
+                            if (availableSources != craft.CurrentSources)
+                                craft.UpdateSources(_frames, availableSources);
+                        }
+                    }
+                }
+            }
+
+            _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
+        }
+
+        private void ManageCraftsToCancel()
+        {
+            var cancelledCrafts = new List<Craft>(10);
+
+            // Reasons for cancellation:
+            // - the surface for the structure is already engaged by another sprite (units excepted)
+            // - there is not source remaining to complete the craft (market for villager, villager for structure)
+            foreach (var craft in _craftQueue)
+            {
+                // TODO: remove path cycle from villager?
+                if (craft.Target.Is<Structure>() && SurfaceIsEngaged(craft.Target.Surface))
+                    cancelledCrafts.Add(craft);
+                foreach (var ms in craft.Sources.Where(x => !_sprites.Contains(x)))
+                {
+                    if (craft.RemoveSource(ms))
+                        cancelledCrafts.Add(craft);
+                }
+            }
+
+            // "Distinct" because the craft can have several reasons for cancellation at the same time
+            foreach (var craft in cancelledCrafts.Distinct())
+            {
+                if (!craft.Started)
+                    RefundResources(craft.Target.GetType());
+                _craftQueue.Remove(craft);
             }
         }
 
@@ -318,7 +367,9 @@ namespace Age_Of_Nothing
                         unit.SetCycle((tgtPoint, tgt), (closestMarket.Center, closestMarket));
                     }
                     else
+                    {
                         unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt));
+                    }
                 }
                 else
                 {

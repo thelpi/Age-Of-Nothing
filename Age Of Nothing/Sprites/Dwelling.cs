@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites
     [Resources(0, 50, 10)]
     public class Dwelling : Structure
     {
-        const int Size = 50;
+        private const int Size = 50;
 
         public const int VillagerCapacity = 5;
 

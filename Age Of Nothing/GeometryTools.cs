@@ -89,6 +89,8 @@ namespace Age_Of_Nothing
         /// <param name="height"></param>
         /// <returns></returns>
         public static Rect ComputeSurfaceFromMiddlePoint(this Point center, Size size)
-            => center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height);
+        {
+            return center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height);
+        }
     }
 }

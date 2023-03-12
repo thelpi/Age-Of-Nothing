@@ -8,7 +8,7 @@ namespace Age_Of_Nothing
     public class Craft
     {
         private int _startingFrame;
-        private List<Sprite> _sources;
+        private readonly List<Sprite> _sources;
 
         // Assumes all sources are the same
         public IReadOnlyList<Sprite> Sources => _sources;
@@ -19,19 +19,16 @@ namespace Age_Of_Nothing
         public int UnitaryFramesToPerform { get; }
         public bool Started { get; private set; }
 
+        public int CurrentSources { get; private set; }
+
         public Craft(Sprite source, FocusableSprite target, int framesToPerform)
-        {
-            _sources = new List<Sprite> { source };
-            Target = target;
-            TotalFramesCount = framesToPerform;
-            UnitaryFramesToPerform = framesToPerform;
-        }
+            : this(new List<Sprite> { source }, target, framesToPerform)
+        { }
 
         public Craft(List<Sprite> sources, FocusableSprite target, int singleCompleteFramesCount)
         {
             _sources = sources;
             Target = target;
-            TotalFramesCount = ComputeRemainingFramesToPerform(singleCompleteFramesCount);
             UnitaryFramesToPerform = singleCompleteFramesCount;
         }
 
@@ -40,30 +37,33 @@ namespace Age_Of_Nothing
             return Started && currentFrame - _startingFrame >= TotalFramesCount;
         }
 
-        public void SetStartingFrame(int currentFrame)
+        public void SetStartingFrame(int currentFrame, int availableSourcesCount = 1)
         {
             if (!Started)
             {
+                CurrentSources = availableSourcesCount;
                 _startingFrame = currentFrame;
+                TotalFramesCount = ComputeRemainingFramesToPerform(UnitaryFramesToPerform);
                 Started = true;
             }
         }
 
-        public bool RemoveSource(Sprite sprite, int currentFrame)
+        public void UpdateSources(int currentFrame, int availableSourcesCount)
         {
-            _sources.Remove(sprite);
-
-            if (_sources.Count == 0)
-                return true;
-
+            CurrentSources = availableSourcesCount;
             var framesElapsed = Started ? currentFrame - _startingFrame : 0;
             TotalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(UnitaryFramesToPerform - framesElapsed);
-            return false;
+        }
+
+        public bool RemoveSource(Sprite sprite)
+        {
+            _sources.Remove(sprite);
+            return _sources.Count == 0;
         }
 
         private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
         {
-            return (int)Math.Round(unitaryFramesToPerformRemaining / (double)_sources.Count);
+            return (int)Math.Round(unitaryFramesToPerformRemaining / (double)CurrentSources);
         }
 
         public bool IsStartedWithCommonSource(Craft craft)
