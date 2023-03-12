@@ -191,21 +191,23 @@ namespace Age_Of_Nothing
 
         public void NewFrameCheck()
         {
+            var dat = System.DateTime.Now;
             _frames++;
-            ManageUnitsMovements();
-
-            lock (_craftQueue)
+            lock (_sprites)
             {
-                lock (_sprites)
+                ManageUnitsMovements();
+                lock (_craftQueue)
                 {
                     ManageCraftsToCancel();
                     ManageCraftsInProgress();
                 }
             }
+            System.Diagnostics.Debug.WriteLine((System.DateTime.Now - dat).TotalMilliseconds);
         }
 
         private void ManageUnitsMovements()
         {
+            var emptyResources = new List<Sprite>(5);
             foreach (var unit in _units)
             {
                 var (move, tgt) = unit.CheckForMovement();
@@ -217,10 +219,15 @@ namespace Age_Of_Nothing
                         _resourcesQty[carry.Value.r] += carry.Value.v;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
                     }
+
+                    if (tgt.Is<IResourceSprite>(out var rs) && rs.Quantity == 0 && !emptyResources.Contains(tgt))
+                        emptyResources.Add(tgt);
                 }
                 if (move)
                     PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
+
+            emptyResources.ForEach(x => _sprites.Remove(x));
         }
 
         private void ManageCraftsInProgress()

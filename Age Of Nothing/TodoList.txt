@@ -3,8 +3,5 @@ créer des patchs de plusieurs carrés contigues de foret
 les villageois "attaquent" la foret par les bords
 quand un bord est terminé, on attaque le coeur
 
-Resources en général :
-faire disparaitre le sprite quand épuisé
-
 Construction :
 afficher le timer pendant la construction dans le menu
