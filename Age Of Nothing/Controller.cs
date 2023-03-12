@@ -14,6 +14,7 @@ namespace Age_Of_Nothing
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
+        private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
 
         private string _populationInformation;
         private int _frames;
@@ -101,8 +102,10 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
-            var forests = Forest.GenerateForestRectangle(new Rect(700, 200, 300, 100), _focusables);
-            foreach (var forest in forests)
+            
+            var forests = Forest.GenerateForestRectangle(new Rect(700, 200, 300, 100), _focusables, 0);
+            _forestPatchs.Add(forests.ToList());
+            foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
         }
 
@@ -220,14 +223,34 @@ namespace Age_Of_Nothing
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
                     }
 
-                    if (tgt.Is<IResourceSprite>(out var rs) && rs.Quantity == 0 && !emptyResources.Contains(tgt))
+                    if (tgt.Is<IResourceSprite>(out var rs) && rs.Quantity == 0)
+                    {
                         emptyResources.Add(tgt);
+                        if (tgt.Is<Forest>(out var f))
+                            ManageNextForestPatch(villager, f);
+                    }
                 }
                 if (move)
                     PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
 
             emptyResources.ForEach(x => _sprites.Remove(x));
+        }
+
+        private void ManageNextForestPatch(Villager villager, Forest f)
+        {
+            var patch = _forestPatchs[f.ForestPatchIndex];
+            if (patch.Contains(f))
+                patch.Remove(f);
+            if (patch.Count > 0 && _markets.Any())
+            {
+                var fpOk = patch.First();
+                var closestMarket = GetClosestMarket(fpOk.Center);
+                if (villager.IsCarryingMax(PrimaryResources.Wood))
+                    villager.SetCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
+                else
+                    villager.SetCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
+            }
         }
 
         private void ManageCraftsInProgress()
@@ -406,7 +429,7 @@ namespace Age_Of_Nothing
                     if (marketCycle && _markets.Any())
                     {
                         var tgtPoint = villagerOverrideClickPosition.GetValueOrDefault(clickPosition);
-                        var closestMarket = _markets.OrderBy(x => Point.Subtract(tgtPoint, x.Center).LengthSquared).First();
+                        var closestMarket = GetClosestMarket(tgtPoint);
                         unit.SetCycle((tgtPoint, tgt), (closestMarket.Center, closestMarket));
                     }
                     else
@@ -419,6 +442,11 @@ namespace Age_Of_Nothing
                     unit.SetCycle((clickPosition, tgt));
                 }
             }
+        }
+
+        private Market GetClosestMarket(Point tgtPoint)
+        {
+            return _markets.OrderBy(x => Point.Subtract(tgtPoint, x.Center).LengthSquared).First();
         }
 
         public (int gold, int wood, int rock) GetResources<T>() where T : Sprite

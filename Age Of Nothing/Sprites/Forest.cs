@@ -18,9 +18,12 @@ namespace Age_Of_Nothing.Sprites
 
         protected override string Info => $"{Quantity}";
 
-        public Forest(Point center, IEnumerable<FocusableSprite> sprites)
+        public int ForestPatchIndex { get; }
+
+        private Forest(Point center, int forestPatchIndex, IEnumerable<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(_size, _size), () => new Ellipse(), 0.9, sprites, isCraft: false)
         {
+            ForestPatchIndex = forestPatchIndex;
             Quantity = _quantity;
             Center = center;
         }
@@ -44,13 +47,13 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        public static IEnumerable<Forest> GenerateForestRectangle(Rect rect, IEnumerable<FocusableSprite> sprites)
+        public static IEnumerable<Forest> GenerateForestRectangle(Rect rect, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
         {
             for (var i = rect.X; i < rect.BottomRight.X; i += _size)
             {
                 for (var j = rect.Y; j < rect.BottomRight.Y; j += _size)
                 {
-                    yield return new Forest(new Point(i + _size / (double)2, j + _size / (double)2), sprites);
+                    yield return new Forest(new Point(i + _size / (double)2, j + _size / (double)2), forestPatchIndex, sprites);
                 }
             }
         }

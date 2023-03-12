@@ -1,5 +1,4 @@
 ﻿Foret :
-créer des patchs de plusieurs carrés contigues de foret
 les villageois "attaquent" la foret par les bords
 quand un bord est terminé, on attaque le coeur
 

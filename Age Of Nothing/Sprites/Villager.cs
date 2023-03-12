@@ -42,5 +42,10 @@ namespace Age_Of_Nothing.Sprites
             }
             return carry;
         }
+
+        public bool IsCarryingMax(PrimaryResources rsc)
+        {
+            return _carrying.HasValue && _carrying.Value.v >= _carryCapacity[rsc];
+        }
     }
 }
