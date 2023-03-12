@@ -1,23 +1,29 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public class Forest : Sprite, IResourceSprite
+    public class Forest : FocusableSprite, ICenteredSprite, IResourceSprite
     {
-        public Forest(Rect rect)
-            : base(rect, () => new Rectangle())
-        {
-            Quantity = (int)(Math.Floor(rect.Width * rect.Height) / 10);
-        }
+        private const int _size = 30;
+        private const int _quantity = 100;
+
+        public Point Center { get; }
 
         public int Quantity { get; private set; }
 
         public PrimaryResources Resource => PrimaryResources.Wood;
 
         protected override string Info => $"{Quantity}";
+
+        public Forest(Point center, IEnumerable<FocusableSprite> sprites)
+            : base(center.ComputeSurfaceFromMiddlePoint(_size, _size), () => new Ellipse(), 0.9, sprites, isCraft: false)
+        {
+            Quantity = _quantity;
+            Center = center;
+        }
 
         protected override Color DefaultFill => Colors.Green;
 
@@ -38,29 +44,15 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        private DrawingBrush CreateBrush(Color singleColor)
+        public static IEnumerable<Forest> GenerateForestRectangle(Rect rect, IEnumerable<FocusableSprite> sprites)
         {
-            var checkersDrawingGroup = new DrawingGroup();
-            checkersDrawingGroup.Children.Add(
-                new GeometryDrawing(
-                    new SolidColorBrush(singleColor),
-                    null,
-                    new EllipseGeometry(
-                        new Rect(0, 0, Surface.Width, Surface.Height))));
-
-            return new DrawingBrush
+            for (var i = rect.X; i < rect.BottomRight.X; i += _size)
             {
-                Drawing = checkersDrawingGroup,
-                Viewport = new Rect(0, 0, 1 / (Surface.Width / 10), 1 / (Surface.Height / 10)),
-                TileMode = TileMode.Tile
-            };
-        }
-
-        public override void RefreshVisual(bool hover)
-        {
-            RefreshVisual(hover
-                ? CreateBrush(HoverFill)
-                : CreateBrush(DefaultFill));
+                for (var j = rect.Y; j < rect.BottomRight.Y; j += _size)
+                {
+                    yield return new Forest(new Point(i + _size / (double)2, j + _size / (double)2), sprites);
+                }
+            }
         }
     }
 }

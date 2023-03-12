@@ -21,8 +21,7 @@ namespace Age_Of_Nothing
         private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
-        private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
-        private IEnumerable<Forest> _forests => _sprites.OfType<Forest>();
+        private IEnumerable<FocusableSprite> _resources => _sprites.OfType<Mine>().Cast<FocusableSprite>().Concat(_sprites.OfType<Forest>());
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
@@ -99,10 +98,12 @@ namespace Age_Of_Nothing
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
             _sprites.Add(new RockMine(100, new Point(400, 120), 1, _focusables));
             _sprites.Add(new GoldMine(75, new Point(200, 600), 1, _focusables));
-            _sprites.Add(new Forest(new Rect(700, 200, 300, 100)));
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
+            var forests = Forest.GenerateForestRectangle(new Rect(700, 200, 300, 100), _focusables);
+            foreach (var forest in forests)
+                _sprites.Add(forest);
         }
 
         public bool HasVillagerFocus()
@@ -374,10 +375,10 @@ namespace Age_Of_Nothing
             Point? villagerOverrideClickPosition = null;
             Sprite tgt = null;
             var marketCycle = false;
-            var mine = _mines.FirstOrDefault(x => x.Surface.Contains(clickPosition));
+            var mine = _resources.FirstOrDefault(x => x.Surface.Contains(clickPosition));
             if (mine != null)
             {
-                villagerOverrideClickPosition = mine.Center;
+                villagerOverrideClickPosition = (mine as ICenteredSprite).Center;
                 marketCycle = true;
                 tgt = mine;
             }
@@ -388,15 +389,6 @@ namespace Age_Of_Nothing
                 {
                     villagerOverrideClickPosition = market.Center;
                     tgt = market;
-                }
-                else
-                {
-                    var forest = _forests.FirstOrDefault(x => x.Surface.Contains(clickPosition));
-                    if (forest != null)
-                    {
-                        marketCycle = true;
-                        tgt = forest;
-                    }
                 }
             }
 
