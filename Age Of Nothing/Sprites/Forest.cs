@@ -58,10 +58,9 @@ namespace Age_Of_Nothing.Sprites
 
         public override void RefreshVisual(bool hover)
         {
-            GetVisual().Fill = hover
+            RefreshVisual(hover
                 ? CreateBrush(HoverFill)
-                : CreateBrush(DefaultFill);
-            RefreshToolTip();
+                : CreateBrush(DefaultFill));
         }
     }
 }

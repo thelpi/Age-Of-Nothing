@@ -74,7 +74,12 @@ namespace Age_Of_Nothing.Sprites
 
         public virtual void RefreshVisual(bool hover)
         {
-            GetVisual().Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
+            RefreshVisual(new SolidColorBrush(hover ? HoverFill : DefaultFill));
+        }
+
+        protected void RefreshVisual(Brush brush)
+        {
+            GetVisual().Fill = brush;
             RefreshToolTip();
         }
 

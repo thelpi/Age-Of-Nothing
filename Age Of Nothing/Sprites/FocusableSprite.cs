@@ -49,17 +49,9 @@ namespace Age_Of_Nothing.Sprites
         public override void RefreshVisual(bool hover)
         {
             if (Focused)
-            {
-                GetVisual().Fill = hover
-                    ? GetFocusBrush(HoverFill)
-                    : GetFocusBrush(DefaultFill);
-            }
+                RefreshVisual(hover ? GetFocusBrush(HoverFill) : GetFocusBrush(DefaultFill));
             else
-            {
-                // TODO: refacto?
-                GetVisual().Fill = new SolidColorBrush(hover ? HoverFill : DefaultFill);
-            }
-            RefreshToolTip();
+                base.RefreshVisual(hover);
         }
 
         public void ChangeFocus(bool focus, bool hover)
