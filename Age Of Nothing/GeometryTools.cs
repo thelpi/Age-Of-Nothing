@@ -80,5 +80,15 @@ namespace Age_Of_Nothing
                 new Point(center.X - width / 2, center.Y - height / 2),
                 new Point(center.X + width / 2, center.Y + height / 2));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static Rect ComputeSurfaceFromMiddlePoint(this Point center, Size size)
+            => center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height);
     }
 }

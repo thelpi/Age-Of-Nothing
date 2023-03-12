@@ -20,6 +20,7 @@ namespace Age_Of_Nothing
         private string _populationInformation;
         private int _frames;
 
+        private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
         private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
@@ -101,14 +102,54 @@ namespace Age_Of_Nothing
             return _markets.Any(x => x.Focused);
         }
 
+        public void BuildDwelling(Point center)
+        {
+            lock (_craftQueue)
+            {
+                if (_craftQueue.Count < CraftQueueMaxSize)
+                {
+                    var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<Dwelling>());
+                    // TODO: surface should be inside the game area entirely
+                    if (!_nonUnits.Any(x => x.Surface.IntersectsWith(surface)))
+                    {
+                        var villagerFocused = _villagers.Where(x => x.Focused);
+                        if (villagerFocused.Any())
+                        {
+                            if (CheckStructureResources<Dwelling>())
+                            {
+                                _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), new Dwelling(surface.TopLeft, _focusables), GetCraftTime<Dwelling>()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool CheckStructureResources<T>() where T : Structure
+        {
+            var (gold, wood, rock) = GetResources<T>();
+            if (wood <= _resourcesQty[PrimaryResources.Wood]
+                && gold <= _resourcesQty[PrimaryResources.Gold]
+                && rock <= _resourcesQty[PrimaryResources.Rock])
+            {
+                _resourcesQty[PrimaryResources.Wood] -= wood;
+                _resourcesQty[PrimaryResources.Gold] -= gold;
+                _resourcesQty[PrimaryResources.Rock] -= rock;
+                return true;
+            }
+
+            return false;
+        }
+
         public void AddVillagerCreationToStack()
         {
             lock (_craftQueue)
             {
                 if (_craftQueue.Count < CraftQueueMaxSize)
                 {
-                    var focusMarket = _markets.First(x => x.Focused);
-                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
+                    var focusMarket = _markets.FirstOrDefault(x => x.Focused);
+                    if (focusMarket != null)
+                        _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
                 }
             }
         }
@@ -152,7 +193,11 @@ namespace Age_Of_Nothing
                         foreach (var ms in craft.Sources.Where(x => !_sprites.Contains(x)))
                         {
                             if (craft.RemoveSource(ms, _frames))
+                            {
                                 noMoreSources.Add(craft);
+                                if (!craft.Started)
+                                    RefundResources(craft.Target.GetType());
+                            }
                         }
                     }
                     _craftQueue.RemoveAll(x => noMoreSources.Contains(x));
@@ -180,6 +225,17 @@ namespace Age_Of_Nothing
                     _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
                 }
             }
+        }
+
+        private void RefundResources(System.Type type)
+        {
+            var attrValue = GetAttribute<ResourcesAttribute>(type);
+            if (attrValue == null)
+                return;
+
+            _resourcesQty[PrimaryResources.Gold] += attrValue.Gold;
+            _resourcesQty[PrimaryResources.Wood] += attrValue.Wood;
+            _resourcesQty[PrimaryResources.Rock] += attrValue.Rock;
         }
 
         public void ClearFocus()
@@ -247,7 +303,6 @@ namespace Age_Of_Nothing
                     {
                         marketCycle = true;
                         tgt = forest;
-                        // TODO: find the proper target to be on the border of the forest (closest to current position)
                     }
                 }
             }
@@ -272,22 +327,26 @@ namespace Age_Of_Nothing
             }
         }
 
+        public (int gold, int wood, int rock) GetResources<T>() where T : Sprite
+        {
+            var r = GetAttribute<ResourcesAttribute>(typeof(T));
+            return (r.Gold, r.Wood, r.Rock);
+        }
+
         public Size GetSpriteSize<T>() where T : Sprite
         {
-            return GetAttribute<T, SizeAttribute>().Size;
+            return GetAttribute<SizeAttribute>(typeof(T)).Size;
         }
 
         public int GetCraftTime<T>() where T : Sprite
         {
-            return GetAttribute<T, CraftTimeAttribute>().CraftTime;
+            return GetAttribute<CraftTimeAttribute>(typeof(T)).CraftTime;
         }
 
-        private static TAttr GetAttribute<TSprite, TAttr>()
-            where TSprite : Sprite
+        private static TAttr GetAttribute<TAttr>(System.Type targetType)
             where TAttr : System.Attribute
         {
-            // HACK: we can't ensure T implements SizeAttribute
-            return (TAttr)System.Attribute.GetCustomAttribute(typeof(TSprite), typeof(TAttr));
+            return System.Attribute.GetCustomAttribute(targetType, typeof(TAttr)) as TAttr;
         }
     }
 }

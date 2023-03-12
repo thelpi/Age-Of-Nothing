@@ -118,7 +118,8 @@ namespace Age_Of_Nothing
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
             if (_structureShadowSize.HasValue)
             {
-                // TODO stuff
+                _controller.BuildDwelling(e.GetPosition(MainCanvas));
+                // TODO: mark the spot until cancellation or completion
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();

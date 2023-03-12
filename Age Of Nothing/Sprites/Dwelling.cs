@@ -7,6 +7,7 @@ namespace Age_Of_Nothing.Sprites
 {
     [Size(Size)]
     [CraftTime(200)]
+    [Resources(0, 50, 10)]
     public class Dwelling : Structure
     {
         const int Size = 50;
