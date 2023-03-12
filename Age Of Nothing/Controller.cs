@@ -13,7 +13,7 @@ namespace Age_Of_Nothing
     {
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
         private readonly Dictionary<PrimaryResources, int> _resourcesQty;
-        private readonly List<Craft> _craftQueue = new List<Craft>(1000);
+        private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
 
         private string _populationInformation;
         private int _frames;
@@ -74,6 +74,21 @@ namespace Age_Of_Nothing
 
                 // TODO: we should do this logic into view with a converter
                 PopulationInformation = $"{Population} / {PotentialPopulation}";
+            };
+
+            _craftQueue.CollectionChanged += (s, e) =>
+            {
+                if (e.NewItems != null)
+                {
+                    foreach (var item in e.NewItems)
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, true, true));
+                }
+
+                if (e.OldItems != null)
+                {
+                    foreach (var item in e.OldItems)
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, false, true));
+                }
             };
         }
 
@@ -254,7 +269,9 @@ namespace Age_Of_Nothing
                 }
             }
 
-            _craftQueue.RemoveAll(x => finishedCrafts.Contains(x));
+            var craftsToRemove = _craftQueue.Where(x => finishedCrafts.Contains(x)).ToList();
+            foreach (var craft in craftsToRemove)
+                _craftQueue.Remove(craft);
         }
 
         private void ManageCraftsToCancel()

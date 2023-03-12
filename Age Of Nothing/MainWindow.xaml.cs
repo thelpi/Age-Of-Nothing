@@ -60,9 +60,11 @@ namespace Age_Of_Nothing
                             CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
+                        case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
                             MainCanvas.Children.Add((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
+                        case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
                             MainCanvas.Children.Remove((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
                             break;
                         case SpritePositionChangedEventArgs.SpritePositionPropertyName:
@@ -119,7 +121,6 @@ namespace Age_Of_Nothing
             if (_structureShadowSize.HasValue)
             {
                 _controller.BuildDwelling(e.GetPosition(MainCanvas));
-                // TODO: mark the spot until cancellation or completion
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();

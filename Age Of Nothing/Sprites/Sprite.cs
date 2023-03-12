@@ -32,6 +32,7 @@ namespace Age_Of_Nothing.Sprites
         }
 
         private Shape _visual = null;
+        private Shape _shadowVisual = null;
 
         private readonly Func<Shape> _shaper;
         private readonly int _indexZ;
@@ -53,6 +54,22 @@ namespace Age_Of_Nothing.Sprites
                 _visual.SetValue(Panel.ZIndexProperty, _indexZ);
             }
             return _visual;
+        }
+
+        public Shape GetShadowVisual()
+        {
+            if (_shadowVisual == null)
+            {
+                _shadowVisual = _shaper();
+                _shadowVisual.Width = Surface.Width;
+                _shadowVisual.Height = Surface.Height;
+                _shadowVisual.Fill = new SolidColorBrush(DefaultFill);
+                _shadowVisual.SetValue(Canvas.LeftProperty, Surface.Left);
+                _shadowVisual.SetValue(Canvas.TopProperty, Surface.Top);
+                _shadowVisual.SetValue(Panel.ZIndexProperty, _indexZ);
+                _shadowVisual.Opacity = 0.5;
+            }
+            return _shadowVisual;
         }
 
         public virtual void RefreshVisual(bool hover)
