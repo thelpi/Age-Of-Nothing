@@ -13,88 +13,76 @@ namespace Age_Of_Nothing.SpritesUi
     public partial class VillagerUi : UserControl
     {
         private const int IndexZ = 2;
+        private const double FocusStroke = 1;
+        private const double SpaceBetween = 1;
 
-        private readonly Ellipse _surround;
-        private readonly Ellipse _visual;
+        private static double StrokeAndSpace => FocusStroke + SpaceBetween;
+        private static double TotalStrokeSize => StrokeAndSpace * 2;
+
+        private readonly Shape _surround;
+        private readonly Shape _visual;
+        private readonly Villager _villager;
 
         public VillagerUi(Villager villager)
         {
             InitializeComponent();
-            MainCanvas.Width = villager.Surface.Width;
-            MainCanvas.Height = villager.Surface.Height;
-            SetValue(Canvas.LeftProperty, villager.Surface.Left);
-            SetValue(Canvas.TopProperty, villager.Surface.Top);
+
+            _villager = villager;
+
             SetValue(Panel.ZIndexProperty, IndexZ);
 
             _visual = new Ellipse
             {
-                Width = villager.Surface.Width,
-                Height = villager.Surface.Height,
+                Width = _villager.Surface.Width,
+                Height = _villager.Surface.Height,
                 Fill = Brushes.SandyBrown
             };
-            _visual.SetValue(Canvas.LeftProperty, double.NaN);
-            _visual.SetValue(Canvas.TopProperty, double.NaN);
             MainCanvas.Children.Add(_visual);
-
-            MouseEnter += (a, b) => _visual.Fill = Brushes.PeachPuff;
-            MouseLeave += (a, b) => _visual.Fill = Brushes.SandyBrown;
-            MouseLeftButtonDown += (a, b) => villager.ToggleFocus();
 
             _surround = new Ellipse
             {
                 Stroke = Brushes.Black,
-                StrokeThickness = 2,
-                Width = villager.Surface.Width + 4,
-                Height = villager.Surface.Height + 4,
+                StrokeThickness = FocusStroke,
+                Width = _villager.Surface.Width + TotalStrokeSize,
+                Height = _villager.Surface.Height + TotalStrokeSize,
                 Fill = Brushes.Transparent
             };
-            _surround.SetValue(Panel.ZIndexProperty, IndexZ);
+            
+            // do not move this line above the _visual definition
+            SetControlDimensionsAndPosition();
 
-            villager.PropertyChanged += (s, e) =>
+            MouseEnter += (a, b) => _visual.Fill = Brushes.PeachPuff;
+            MouseLeave += (a, b) => _visual.Fill = Brushes.SandyBrown;
+            MouseLeftButtonDown += (a, b) => _villager.ToggleFocus();
+
+            _villager.PropertyChanged += (s, e) =>
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-
                     if (e is SpriteFocusChangedEventArgs)
                     {
-                        if (villager.Focused)
-                        {
-                            MainCanvas.Width = villager.Surface.Width + 4;
-                            MainCanvas.Height = villager.Surface.Height + 4;
-                            SetValue(Canvas.LeftProperty, villager.Surface.Left - 2);
-                            SetValue(Canvas.TopProperty, villager.Surface.Top - 2);
-                            _visual.SetValue(Canvas.LeftProperty, 2D);
-                            _visual.SetValue(Canvas.TopProperty, 2D);
+                        SetControlDimensionsAndPosition();
+                        if (_villager.Focused)
                             MainCanvas.Children.Add(_surround);
-                        }
                         else
-                        {
-                            MainCanvas.Width = villager.Surface.Width;
-                            MainCanvas.Height = villager.Surface.Height;
-                            SetValue(Canvas.LeftProperty, villager.Surface.Left);
-                            SetValue(Canvas.TopProperty, villager.Surface.Top);
-                            _visual.SetValue(Canvas.LeftProperty, double.NaN);
-                            _visual.SetValue(Canvas.TopProperty, double.NaN);
                             MainCanvas.Children.Remove(_surround);
-                        }
                     }
                     else if (e is SpritePositionChangedEventArgs)
-                    {
-                        if (villager.Focused)
-                        {
-                            SetValue(Canvas.LeftProperty, villager.Surface.Left - 2);
-                            SetValue(Canvas.TopProperty, villager.Surface.Top - 2);
-                        }
-                        else
-                        {
-                            SetValue(Canvas.LeftProperty, villager.Surface.Left);
-                            SetValue(Canvas.TopProperty, villager.Surface.Top);
-                        }
-                    }
+                        SetControlDimensionsAndPosition();
                 }));
             };
 
-            Tag = villager;
+            Tag = _villager;
+        }
+
+        private void SetControlDimensionsAndPosition()
+        {
+            MainCanvas.Width = _villager.Surface.Width + (_villager.Focused ? TotalStrokeSize : 0);
+            MainCanvas.Height = _villager.Surface.Height + (_villager.Focused ? TotalStrokeSize : 0);
+            SetValue(Canvas.LeftProperty, _villager.Surface.Left - (_villager.Focused ? StrokeAndSpace : 0));
+            SetValue(Canvas.TopProperty, _villager.Surface.Top - (_villager.Focused ? StrokeAndSpace : 0));
+            _visual.SetValue(Canvas.LeftProperty, _villager.Focused ? StrokeAndSpace : double.NaN);
+            _visual.SetValue(Canvas.TopProperty, _villager.Focused ? StrokeAndSpace : double.NaN);
         }
     }
 }
