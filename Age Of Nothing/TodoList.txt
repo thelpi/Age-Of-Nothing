@@ -1,6 +1,2 @@
-﻿Foret :
-les villageois "attaquent" la foret par les bords
-quand un bord est terminé, on attaque le coeur
-
-Construction :
+﻿Construction :
 afficher le timer pendant la construction dans le menu
