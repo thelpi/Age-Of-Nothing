@@ -15,18 +15,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\gold.png">
+    <Content Include="Resources\Images\gold.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\population.png">
+    </Content>
+    <Content Include="Resources\Images\population.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\rock.png">
+    </Content>
+    <Content Include="Resources\Images\rock.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\wood.png">
+    </Content>
+    <Content Include="Resources\Images\wood.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </Content>
   </ItemGroup>
 
 </Project>

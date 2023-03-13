@@ -32,12 +32,16 @@ namespace Age_Of_Nothing.Sprites
             {
                 carry = _carrying;
                 _carrying = null;
+                NotifyResources();
             }
             else if (tgt.Is<IResourceSprite>(out var rs))
             {
                 var realQty = rs.ReduceQuantity(_carryCapacity[rs.Resource]);
                 if (realQty > 0)
+                {
                     _carrying = (rs.Resource, realQty);
+                    NotifyResources();
+                }
                 else
                     SetCycle();
             }
@@ -47,6 +51,11 @@ namespace Age_Of_Nothing.Sprites
         public bool IsCarryingMax(PrimaryResources rsc)
         {
             return _carrying.HasValue && _carrying.Value.v >= _carryCapacity[rsc];
+        }
+
+        public PrimaryResources? IsCarrying()
+        {
+            return _carrying.HasValue ? _carrying.Value.r : default(PrimaryResources?);
         }
     }
 }

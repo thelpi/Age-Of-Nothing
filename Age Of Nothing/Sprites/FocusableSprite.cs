@@ -82,5 +82,10 @@ namespace Age_Of_Nothing.Sprites
         {
             PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(null));
         }
+
+        protected void NotifyResources()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ResourcesChanged"));
+        }
     }
 }

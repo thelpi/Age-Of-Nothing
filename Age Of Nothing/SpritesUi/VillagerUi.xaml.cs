@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
@@ -69,6 +70,26 @@ namespace Age_Of_Nothing.SpritesUi
                     }
                     else if (e is SpritePositionChangedEventArgs)
                         SetControlDimensionsAndPosition();
+                    else if (e.PropertyName == "ResourcesChanged")
+                    {
+                        var carry = _villager.IsCarrying();
+                        if (carry == PrimaryResources.Gold)
+                        {
+                            _visual.Fill = new ImageBrush(new BitmapImage(new Uri(@"Resources/Images/gold.png", UriKind.Relative)));
+                        }
+                        else if (carry == PrimaryResources.Wood)
+                        {
+                            _visual.Fill = new ImageBrush(new BitmapImage(new Uri(@"Resources/Images/wood.png", UriKind.Relative)));
+                        }
+                        else if (carry == PrimaryResources.Rock)
+                        {
+                            _visual.Fill = new ImageBrush(new BitmapImage(new Uri(@"Resources/Images/rock.png", UriKind.Relative)));
+                        }
+                        else
+                        {
+                            _visual.Fill =  Brushes.SandyBrown;
+                        }
+                    }
                 }));
             };
 
