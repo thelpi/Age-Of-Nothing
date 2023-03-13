@@ -221,13 +221,20 @@ namespace Age_Of_Nothing
                     {
                         _resourcesQty[carry.Value.r] += carry.Value.v;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
+                        if (villager.FocusedOn<Forest>() is var f && f != null)
+                            ManageNextForestPatch(villager, _forestPatchs[f.ForestPatchIndex]);
                     }
 
                     if (tgt.Is<IResourceSprite>(out var rs) && rs.Quantity == 0)
                     {
                         emptyResources.Add(tgt);
                         if (tgt.Is<Forest>(out var f))
-                            ManageNextForestPatch(villager, f);
+                        {
+                            var patch = _forestPatchs[f.ForestPatchIndex];
+                            if (patch.Contains(f))
+                                patch.Remove(f);
+                            ManageNextForestPatch(villager, patch);
+                        }
                     }
                 }
                 if (move)
@@ -237,14 +244,11 @@ namespace Age_Of_Nothing
             emptyResources.ForEach(x => _sprites.Remove(x));
         }
 
-        private void ManageNextForestPatch(Villager villager, Forest f)
+        private void ManageNextForestPatch(Villager villager, List<Forest> patch)
         {
-            var patch = _forestPatchs[f.ForestPatchIndex];
-            if (patch.Contains(f))
-                patch.Remove(f);
             if (patch.Count > 0 && _markets.Any())
             {
-                var fpOk = patch.First();
+                var fpOk = patch.GetClosestSprite(villager.Center);
                 var closestMarket = _markets.GetClosestSprite(fpOk.Center);
                 if (villager.IsCarryingMax(PrimaryResources.Wood))
                     villager.SetCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
@@ -312,7 +316,8 @@ namespace Age_Of_Nothing
             // Reasons for cancellation:
             // - there is no source remaining to complete the craft
             // - the surface for the structure is already occupied by another structure
-            // - villagers lost focus on structure to craft 
+            // - villagers lost focus on structure to craft
+            // TODO: we should keep the craft pending in the last case
             foreach (var craft in _craftQueue)
             {
                 var lost = craft.Sources

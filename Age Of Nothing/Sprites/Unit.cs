@@ -87,5 +87,10 @@ namespace Age_Of_Nothing.Sprites
         {
             return _targetCycle.Any(tc => tc.tgt == sprite);
         }
+
+        public T FocusedOn<T>() where T : Sprite
+        {
+            return _targetCycle.FirstOrDefault(tc => tc.tgt.Is<T>()).tgt as T;
+        }
     }
 }
