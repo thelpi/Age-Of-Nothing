@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
+using Age_Of_Nothing.SpritesUi;
 
 namespace Age_Of_Nothing
 {
@@ -61,14 +62,41 @@ namespace Age_Of_Nothing
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
-                            MainCanvas.Children.Add((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
+                            var et1 = e as SpritesCollectionChangedEventArgs;
+                            if (et1.Sprite != null)
+                            {
+                                var ui1 = new VillagerUi(et1.Sprite as Villager);
+                                MainCanvas.Children.Add(ui1);
+                            }
+                            else
+                            {
+                                MainCanvas.Children.Add(et1.SpriteVisualRecipe());
+                            }
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
-                            MainCanvas.Children.Remove((e as SpritesCollectionChangedEventArgs).SpriteVisualRecipe());
-                            break;
-                        case SpritePositionChangedEventArgs.SpritePositionPropertyName:
-                            (e as SpritePositionChangedEventArgs).PositionCallback();
+                            var et2 = e as SpritesCollectionChangedEventArgs;
+                            if (et2.Sprite != null)
+                            {
+                                UIElement founded = null;
+                                foreach (var child in MainCanvas.Children)
+                                {
+                                    if (child is VillagerUi)
+                                    {
+                                        var sp = (child as VillagerUi).Tag as Villager;
+                                        if (sp == et2.Sprite)
+                                        {
+                                            founded = child as UIElement;
+                                            break;
+                                        }
+                                    }
+                                }
+                                MainCanvas.Children.Remove(founded);
+                            }
+                            else
+                            {
+                                MainCanvas.Children.Remove(et2.SpriteVisualRecipe());
+                            }
                             break;
                     }
                 }));

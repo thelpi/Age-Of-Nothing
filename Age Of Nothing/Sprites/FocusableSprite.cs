@@ -26,23 +26,31 @@ namespace Age_Of_Nothing.Sprites
             _hoverBorderRate = hoverBorderRate;
             _mouseLeftButtonDownHandler = (a, b) =>
             {
-                ChangeFocus(!Focused, true);
-                foreach (var x in Sprites)
-                {
-                    if (x != this)
-                        x.ChangeFocus(false, false);
-                }
+                ToggleFocus();
             };
+        }
+
+        public void ToggleFocus()
+        {
+            ChangeFocus(!Focused, true);
+            foreach (var x in Sprites)
+            {
+                if (x != this)
+                    x.ChangeFocus(false, false);
+            }
         }
 
         private bool _focused;
         public bool Focused
         {
             get => _focused;
-            private set
+            set
             {
-                _focused = value;
-                PropertyChanged?.Invoke(this, new SpriteFocusChangedEventArgs());
+                if (_focused != value)
+                {
+                    _focused = value;
+                    PropertyChanged?.Invoke(this, new SpriteFocusChangedEventArgs());
+                }
             }
         }
 
@@ -68,6 +76,11 @@ namespace Age_Of_Nothing.Sprites
                     new GradientStop(color, _hoverBorderRate),
                     new GradientStop(Colors.PaleVioletRed, 1)
                 }));
+        }
+
+        protected void NotifyMove()
+        {
+            PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(null));
         }
     }
 }

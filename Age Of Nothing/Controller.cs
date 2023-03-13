@@ -61,7 +61,11 @@ namespace Age_Of_Nothing
                     foreach (var item in e.NewItems)
                     {
                         var sprite = item as Sprite;
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite.GetVisual, true));
+                        if (sprite.Is<Villager>())
+                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true));
+                        else
+                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite.GetVisual, true));
+
                         if (sprite.Is<FocusableSprite>(out var fs))
                             fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
                     }
@@ -70,7 +74,12 @@ namespace Age_Of_Nothing
                 if (e.OldItems != null)
                 {
                     foreach (var item in e.OldItems)
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Sprite).GetVisual, false));
+                    {
+                        if (item is Villager)
+                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item as Sprite, false));
+                        else
+                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Sprite).GetVisual, false));
+                    }
                 }
 
                 // TODO: we should do this logic into view with a converter
@@ -213,7 +222,7 @@ namespace Age_Of_Nothing
             var emptyResources = new List<Sprite>(5);
             foreach (var unit in _units)
             {
-                var (move, tgt) = unit.CheckForMovement();
+                var tgt = unit.CheckForMovement();
                 if (tgt != null && unit.Is<Villager>(out var villager))
                 {
                     var carry = villager.CheckCarry(tgt);
@@ -237,8 +246,6 @@ namespace Age_Of_Nothing
                         }
                     }
                 }
-                if (move)
-                    PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(unit.RefreshPosition));
             }
 
             emptyResources.ForEach(x => _sprites.Remove(x));
@@ -402,7 +409,12 @@ namespace Age_Of_Nothing
         public void RefreshHover(Rect zone)
         {
             foreach (var sp in _focusables)
-                sp.RefreshVisual(zone.IntersectsWith(sp.Surface));
+            {
+                if (sp.Is<Villager>())
+                    sp.Focused = zone.IntersectsWith(sp.Surface);
+                else
+                    sp.RefreshVisual(zone.IntersectsWith(sp.Surface));
+            }
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)

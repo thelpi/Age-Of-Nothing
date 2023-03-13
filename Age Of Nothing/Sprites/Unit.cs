@@ -37,12 +37,12 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        public (bool move, Sprite tgt) CheckForMovement()
+        public Sprite CheckForMovement()
         {
             lock (_targetCycle)
             {
                 if (_targetPositionNode == null)
-                    return (false, null);
+                    return null;
 
                 var (pt, tgt) = _targetPositionNode.Value;
                 var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, pt.X, pt.Y, Speed);
@@ -59,7 +59,8 @@ namespace Age_Of_Nothing.Sprites
                     tgt = null;
                 }
 
-                return (true, tgt);
+                NotifyMove();
+                return tgt;
             }
         }
 
