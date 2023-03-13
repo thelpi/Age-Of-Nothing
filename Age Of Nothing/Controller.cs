@@ -22,7 +22,8 @@ namespace Age_Of_Nothing
         private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
-        private IEnumerable<FocusableSprite> _resources => _sprites.OfType<Mine>().Cast<FocusableSprite>().Concat(_sprites.OfType<Forest>());
+        private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
+        private IEnumerable<Forest> _forests => _sprites.OfType<Forest>();
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
@@ -102,7 +103,7 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
-            
+
             var forests = Forest.GenerateForestRectangle(new Rect(700, 200, 300, 100), _focusables, 0);
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
@@ -176,8 +177,7 @@ namespace Age_Of_Nothing
         {
             lock (_craftQueue)
             {
-                var focusMarket = _markets.FirstOrDefault(x => x.Focused);
-                if (focusMarket != null)
+                if (_markets.FirstIfNotNull(x => x.Focused, out var focusMarket))
                     _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
             }
         }
@@ -245,7 +245,7 @@ namespace Age_Of_Nothing
             if (patch.Count > 0 && _markets.Any())
             {
                 var fpOk = patch.First();
-                var closestMarket = GetClosestMarket(fpOk.Center);
+                var closestMarket = _markets.GetClosestSprite(fpOk.Center);
                 if (villager.IsCarryingMax(PrimaryResources.Wood))
                     villager.SetCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
                 else
@@ -405,48 +405,55 @@ namespace Age_Of_Nothing
             Point? villagerOverrideClickPosition = null;
             Sprite tgt = null;
             var marketCycle = false;
-            var mine = _resources.FirstOrDefault(x => x.Surface.Contains(clickPosition));
-            if (mine != null)
+            if (_mines.FirstIfNotNull(clickPosition, out var mine))
             {
-                villagerOverrideClickPosition = (mine as ICenteredSprite).Center;
+                villagerOverrideClickPosition = mine.Center;
                 marketCycle = true;
                 tgt = mine;
             }
-            else
+            else if (_forests.FirstIfNotNull(clickPosition, out var forest))
             {
-                var market = _markets.FirstOrDefault(x => x.Surface.Contains(clickPosition));
-                if (market != null)
-                {
-                    villagerOverrideClickPosition = market.Center;
-                    tgt = market;
-                }
+                villagerOverrideClickPosition = forest.Center;
+                marketCycle = true;
+                tgt = forest;
+            }
+            else if (_markets.FirstIfNotNull(clickPosition, out var market))
+            {
+                villagerOverrideClickPosition = market.Center;
+                tgt = market;
             }
 
             foreach (var unit in _units.Where(x => x.Focused))
             {
+                var localTgt = tgt;
                 if (unit.Is<Villager>())
                 {
+                    var localVillagerOverrideClickPosition = villagerOverrideClickPosition;
+
+                    // finds the closest forest sprite in the patch from the villager position
+                    if (localTgt != null && localTgt.Is<Forest>(out var forest))
+                    {
+                        forest = _forestPatchs[forest.ForestPatchIndex].GetClosestSprite(unit.Center);
+                        localTgt = forest;
+                        localVillagerOverrideClickPosition = forest.Center;
+                    }
+
                     if (marketCycle && _markets.Any())
                     {
-                        var tgtPoint = villagerOverrideClickPosition.GetValueOrDefault(clickPosition);
-                        var closestMarket = GetClosestMarket(tgtPoint);
-                        unit.SetCycle((tgtPoint, tgt), (closestMarket.Center, closestMarket));
+                        var tgtPoint = localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition);
+                        var closestMarket = _markets.GetClosestSprite(tgtPoint);
+                        unit.SetCycle((tgtPoint, localTgt), (closestMarket.Center, closestMarket));
                     }
                     else
                     {
-                        unit.SetCycle((villagerOverrideClickPosition.GetValueOrDefault(clickPosition), tgt));
+                        unit.SetCycle((localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition), localTgt));
                     }
                 }
                 else
                 {
-                    unit.SetCycle((clickPosition, tgt));
+                    unit.SetCycle((clickPosition, localTgt));
                 }
             }
-        }
-
-        private Market GetClosestMarket(Point tgtPoint)
-        {
-            return _markets.OrderBy(x => Point.Subtract(tgtPoint, x.Center).LengthSquared).First();
         }
 
         public (int gold, int wood, int rock) GetResources<T>() where T : Sprite
