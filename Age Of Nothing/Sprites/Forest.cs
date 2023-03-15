@@ -9,8 +9,6 @@ namespace Age_Of_Nothing.Sprites
         private const int _size = 30;
         private const int _quantity = 100;
 
-        private static readonly double _scale = _size / (double)_quantity;
-
         public override ResourceTypes ResourceType => ResourceTypes.Wood;
 
         protected override string Info => $"{Quantity}";
@@ -18,7 +16,7 @@ namespace Age_Of_Nothing.Sprites
         public int ForestPatchIndex { get; }
 
         private Forest(Point center, int forestPatchIndex, IEnumerable<FocusableSprite> sprites)
-            : base(_quantity, center, _scale, sprites)
+            : base(_quantity, center, _size, sprites)
         {
             ForestPatchIndex = forestPatchIndex;
         }

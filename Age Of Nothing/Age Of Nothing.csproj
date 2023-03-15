@@ -9,8 +9,10 @@
 
   <ItemGroup>
     <None Remove="Resources\Images\dwelling.png" />
+    <None Remove="Resources\Images\forest.png" />
     <None Remove="Resources\Images\gold.png" />
     <None Remove="Resources\Images\market.png" />
+    <None Remove="Resources\Images\mine.png" />
     <None Remove="Resources\Images\population.png" />
     <None Remove="Resources\Images\rock.png" />
     <None Remove="Resources\Images\wood.png" />
@@ -20,10 +22,16 @@
     <Content Include="Resources\Images\dwelling.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\forest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\gold.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\market.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\mine.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\population.png">

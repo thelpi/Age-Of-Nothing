@@ -122,8 +122,8 @@ namespace Age_Of_Nothing
             _sprites.Add(new Villager(new Point(200, 200), _focusables));
             _sprites.Add(new Villager(new Point(100, 100), _focusables));
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
-            _sprites.Add(new RockMine(100, new Point(400, 120), 1, _focusables));
-            _sprites.Add(new GoldMine(75, new Point(200, 600), 1, _focusables));
+            _sprites.Add(new RockMine(100, new Point(400, 120), _focusables));
+            _sprites.Add(new GoldMine(75, new Point(200, 600), _focusables));
             _sprites.Add(new Market(new Point(600, 500), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));

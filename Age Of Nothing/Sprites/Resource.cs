@@ -14,8 +14,8 @@ namespace Age_Of_Nothing.Sprites
 
         protected override string Info => $"{Quantity}";
 
-        protected Resource(int quantity, Point center, double qtyScale, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(qtyScale * quantity, qtyScale * quantity), () => new Ellipse(), 0.9, sprites, isCraft: false)
+        protected Resource(int quantity, Point center, int size, IEnumerable<FocusableSprite> sprites)
+            : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), 0.9, sprites, isCraft: false)
         {
             Quantity = quantity;
             Center = center;
