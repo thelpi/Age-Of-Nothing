@@ -31,7 +31,7 @@ namespace Age_Of_Nothing.SpritesUi
         private readonly Rectangle _surround;
         private readonly Rectangle _visual;
 
-        public StructureUi(Structure structure)
+        public StructureUi(Structure structure, bool isBlueprint)
             : base(structure)
         {
             InitializeComponent();
@@ -42,7 +42,8 @@ namespace Age_Of_Nothing.SpritesUi
             {
                 Width = Sprite.Surface.Width,
                 Height = Sprite.Surface.Height,
-                Fill = _brushes[(Sprite.GetType(), false)]
+                Fill = _brushes[(Sprite.GetType(), false)],
+                Opacity = isBlueprint ? 0.5 : 1
             };
             MainCanvas.Children.Add(_visual);
 
@@ -58,24 +59,27 @@ namespace Age_Of_Nothing.SpritesUi
             // do not move this line above the _visual definition
             SetControlDimensionsAndPosition();
 
-            MouseEnter += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), true)];
-            MouseLeave += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), false)];
-            MouseLeftButtonDown += (a, b) => Sprite.ToggleFocus();
-
-            Sprite.PropertyChanged += (s, e) =>
+            if (!isBlueprint)
             {
-                Dispatcher.BeginInvoke(new Action(() =>
+                MouseEnter += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), true)];
+                MouseLeave += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), false)];
+                MouseLeftButtonDown += (a, b) => Sprite.ToggleFocus();
+
+                Sprite.PropertyChanged += (s, e) =>
                 {
-                    if (e is SpriteFocusChangedEventArgs)
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        SetControlDimensionsAndPosition();
-                        if (Sprite.Focused)
-                            MainCanvas.Children.Add(_surround);
-                        else
-                            MainCanvas.Children.Remove(_surround);
-                    }
-                }));
-            };
+                        if (e is SpriteFocusChangedEventArgs)
+                        {
+                            SetControlDimensionsAndPosition();
+                            if (Sprite.Focused)
+                                MainCanvas.Children.Add(_surround);
+                            else
+                                MainCanvas.Children.Remove(_surround);
+                        }
+                    }));
+                };
+            }
         }
 
         private void SetControlDimensionsAndPosition()

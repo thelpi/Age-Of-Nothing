@@ -91,13 +91,29 @@ namespace Age_Of_Nothing
                 if (e.NewItems != null)
                 {
                     foreach (var item in e.NewItems)
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, true, true));
+                    {
+                        if (item is Craft craft)
+                        {
+                            if (craft.Target is Market || craft.Target is Dwelling)
+                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
+                            else
+                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, true, true));
+                        }
+                    }
                 }
 
                 if (e.OldItems != null)
                 {
                     foreach (var item in e.OldItems)
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, false, true));
+                    {
+                        if (item is Craft craft)
+                        {
+                            if (craft.Target is Market || craft.Target is Dwelling)
+                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, false, true));
+                            else
+                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, false, true));
+                        }
+                    }
                 }
             };
         }

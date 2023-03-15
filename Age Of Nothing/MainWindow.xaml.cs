@@ -70,7 +70,7 @@ namespace Age_Of_Nothing
                                 if (addEvt.Sprite.Is<Villager>(out var v))
                                     MainCanvas.Children.Add(new VillagerUi(v));
                                 else if (addEvt.Sprite.Is<Structure>(out var s))
-                                    MainCanvas.Children.Add(new StructureUi(s));
+                                    MainCanvas.Children.Add(new StructureUi(s, addEvt.IsBlueprint));
                                 else
                                     throw new NotImplementedException();
                             }

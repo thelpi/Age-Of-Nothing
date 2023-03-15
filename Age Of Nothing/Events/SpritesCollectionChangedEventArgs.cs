@@ -16,20 +16,24 @@ namespace Age_Of_Nothing.Events
 
         public Sprite Sprite { get; }
 
-        public SpritesCollectionChangedEventArgs(Func<UIElement> spriteVisualRecipe, bool add, bool craft = false)
+        public bool IsBlueprint { get; set; }
+
+        public SpritesCollectionChangedEventArgs(Func<UIElement> spriteVisualRecipe, bool add, bool isBlueprint = false)
             : base(add
-                  ? (craft ? CraftsCollectionAddPropertyName : SpritesCollectionAddPropertyName)
-                  : (craft ? CraftsCollectionRemovePropertyName : SpritesCollectionRemovePropertyName))
+                  ? (isBlueprint ? CraftsCollectionAddPropertyName : SpritesCollectionAddPropertyName)
+                  : (isBlueprint ? CraftsCollectionRemovePropertyName : SpritesCollectionRemovePropertyName))
         {
             SpriteVisualRecipe = spriteVisualRecipe;
+            IsBlueprint = isBlueprint;
         }
 
-        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool craft = false)
+        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool isBlueprint = false)
             : base(add
-                  ? (craft ? CraftsCollectionAddPropertyName : SpritesCollectionAddPropertyName)
-                  : (craft ? CraftsCollectionRemovePropertyName : SpritesCollectionRemovePropertyName))
+                  ? (isBlueprint ? CraftsCollectionAddPropertyName : SpritesCollectionAddPropertyName)
+                  : (isBlueprint ? CraftsCollectionRemovePropertyName : SpritesCollectionRemovePropertyName))
         {
             Sprite = sprite;
+            IsBlueprint = isBlueprint;
         }
     }
 }
