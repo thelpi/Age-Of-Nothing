@@ -22,19 +22,12 @@ namespace Age_Of_Nothing.SpritesUi
         private static readonly Brush _defaultBrush = Brushes.SandyBrown;
         private static readonly Brush _defaultBrushHover = Brushes.PeachPuff;
 
-        private Brush _goldBrush;
-        private Brush _woodBrush;
-        private Brush _rockBrush;
-        private Brush _goldBrushHover;
-        private Brush _woodBrushHover;
-        private Brush _rockBrushHover;
-
-        private Brush GoldBrush => _goldBrush ??= GetImageFill(_defaultBrush, "gold");
-        private Brush WoodBrush => _woodBrush ??= GetImageFill(_defaultBrush, "wood");
-        private Brush RockBrush => _rockBrush ??= GetImageFill(_defaultBrush, "rock");
-        private Brush GoldBrushHover => _goldBrushHover ??= GetImageFill(_defaultBrushHover, "gold");
-        private Brush WoodBrushHover => _woodBrushHover ??= GetImageFill(_defaultBrushHover, "wood");
-        private Brush RockBrushHover => _rockBrushHover ??= GetImageFill(_defaultBrushHover, "rock");
+        private readonly Brush _goldBrush = GetImageFill(_defaultBrush, "gold");
+        private readonly Brush _woodBrush = GetImageFill(_defaultBrush, "wood");
+        private readonly Brush _rockBrush = GetImageFill(_defaultBrush, "rock");
+        private readonly Brush _goldBrushHover = GetImageFill(_defaultBrushHover, "gold");
+        private readonly Brush _woodBrushHover = GetImageFill(_defaultBrushHover, "wood");
+        private readonly Brush _rockBrushHover = GetImageFill(_defaultBrushHover, "rock");
 
         private readonly Shape _surround;
         private readonly Shape _visual;
@@ -94,9 +87,9 @@ namespace Age_Of_Nothing.SpritesUi
         {
             return Sprite.IsCarrying() switch
             {
-                PrimaryResources.Gold => IsMouseOver ? GoldBrushHover : GoldBrush,
-                PrimaryResources.Wood => IsMouseOver ? WoodBrushHover : WoodBrush,
-                PrimaryResources.Rock => IsMouseOver ? RockBrushHover : RockBrush,
+                PrimaryResources.Gold => IsMouseOver ? _goldBrushHover : _goldBrush,
+                PrimaryResources.Wood => IsMouseOver ? _woodBrushHover : _woodBrush,
+                PrimaryResources.Rock => IsMouseOver ? _rockBrushHover : _rockBrush,
                 _ => IsMouseOver ? _defaultBrushHover : _defaultBrush
             };
         }
