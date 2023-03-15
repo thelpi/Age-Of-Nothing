@@ -4,17 +4,17 @@ using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Mine : FocusableSprite, ICenteredSprite, IResourceSprite
+    public abstract class Resource : FocusableSprite, ICenteredSprite
     {
         public Point Center { get; }
 
         public int Quantity { get; private set; }
 
-        public abstract PrimaryResources Resource { get; }
+        public abstract ResourceTypes ResourceType { get; }
 
         protected override string Info => $"{Quantity}";
 
-        protected Mine(int quantity, Point center, double qtyScale, IEnumerable<FocusableSprite> sprites)
+        protected Resource(int quantity, Point center, double qtyScale, IEnumerable<FocusableSprite> sprites)
             : base(center.ComputeSurfaceFromMiddlePoint(qtyScale * quantity, qtyScale * quantity), () => new Ellipse(), 0.9, sprites, isCraft: false)
         {
             Quantity = quantity;

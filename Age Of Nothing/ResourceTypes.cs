@@ -1,6 +1,6 @@
 ﻿namespace Age_Of_Nothing
 {
-    public enum PrimaryResources
+    public enum ResourceTypes
     {
         Gold,
         Wood,

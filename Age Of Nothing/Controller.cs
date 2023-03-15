@@ -12,7 +12,7 @@ namespace Age_Of_Nothing
     public class Controller : INotifyPropertyChanged
     {
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
-        private readonly Dictionary<PrimaryResources, int> _resourcesQty;
+        private readonly Dictionary<ResourceTypes, int> _resourcesQty;
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
 
@@ -22,8 +22,7 @@ namespace Age_Of_Nothing
         private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
-        private IEnumerable<Mine> _mines => _sprites.OfType<Mine>();
-        private IEnumerable<Forest> _forests => _sprites.OfType<Forest>();
+        private IEnumerable<Resource> _resources => _sprites.OfType<Resource>();
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
@@ -39,19 +38,19 @@ namespace Age_Of_Nothing
         }
         public int PotentialPopulation => _dwellings.Count() * Dwelling.VillagerCapacity;
         public int Population => _units.Count();
-        public int WoodQuantity => _resourcesQty[PrimaryResources.Wood];
-        public int RockQuantity => _resourcesQty[PrimaryResources.Rock];
-        public int GoldQuantity => _resourcesQty[PrimaryResources.Gold];
+        public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
+        public int RockQuantity => _resourcesQty[ResourceTypes.Rock];
+        public int GoldQuantity => _resourcesQty[ResourceTypes.Gold];
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Controller()
         {
-            _resourcesQty = new Dictionary<PrimaryResources, int>
+            _resourcesQty = new Dictionary<ResourceTypes, int>
             {
-                { PrimaryResources.Gold, 100 },
-                { PrimaryResources.Rock, 100 },
-                { PrimaryResources.Wood, 100 }
+                { ResourceTypes.Gold, 100 },
+                { ResourceTypes.Rock, 100 },
+                { ResourceTypes.Wood, 100 }
             };
 
             _sprites.CollectionChanged += (s, e) =>
@@ -182,13 +181,13 @@ namespace Age_Of_Nothing
         private bool CheckStructureResources<T>() where T : Structure
         {
             var (gold, wood, rock) = GetResources<T>();
-            if (wood <= _resourcesQty[PrimaryResources.Wood]
-                && gold <= _resourcesQty[PrimaryResources.Gold]
-                && rock <= _resourcesQty[PrimaryResources.Rock])
+            if (wood <= _resourcesQty[ResourceTypes.Wood]
+                && gold <= _resourcesQty[ResourceTypes.Gold]
+                && rock <= _resourcesQty[ResourceTypes.Rock])
             {
-                _resourcesQty[PrimaryResources.Wood] -= wood;
-                _resourcesQty[PrimaryResources.Gold] -= gold;
-                _resourcesQty[PrimaryResources.Rock] -= rock;
+                _resourcesQty[ResourceTypes.Wood] -= wood;
+                _resourcesQty[ResourceTypes.Gold] -= gold;
+                _resourcesQty[ResourceTypes.Rock] -= rock;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
@@ -250,7 +249,7 @@ namespace Age_Of_Nothing
                             ManageNextForestPatch(villager, _forestPatchs[f.ForestPatchIndex]);
                     }
 
-                    if (tgt.Is<IResourceSprite>(out var rs) && rs.Quantity == 0)
+                    if (tgt.Is<Resource>(out var rs) && rs.Quantity == 0)
                     {
                         emptyResources.Add(tgt);
                         if (tgt.Is<Forest>(out var f))
@@ -273,7 +272,7 @@ namespace Age_Of_Nothing
             {
                 var fpOk = patch.GetClosestSprite(villager.Center);
                 var closestMarket = _markets.GetClosestSprite(fpOk.Center);
-                if (villager.IsCarryingMax(PrimaryResources.Wood))
+                if (villager.IsCarryingMax(ResourceTypes.Wood))
                     villager.SetCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
                 else
                     villager.SetCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
@@ -382,9 +381,9 @@ namespace Age_Of_Nothing
             if (attrValue == null)
                 return;
 
-            _resourcesQty[PrimaryResources.Gold] += attrValue.Gold;
-            _resourcesQty[PrimaryResources.Wood] += attrValue.Wood;
-            _resourcesQty[PrimaryResources.Rock] += attrValue.Rock;
+            _resourcesQty[ResourceTypes.Gold] += attrValue.Gold;
+            _resourcesQty[ResourceTypes.Wood] += attrValue.Wood;
+            _resourcesQty[ResourceTypes.Rock] += attrValue.Rock;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
@@ -438,17 +437,11 @@ namespace Age_Of_Nothing
             Point? villagerOverrideClickPosition = null;
             Sprite tgt = null;
             var marketCycle = false;
-            if (_mines.FirstIfNotNull(clickPosition, out var mine))
+            if (_resources.FirstIfNotNull(clickPosition, out var rsc))
             {
-                villagerOverrideClickPosition = mine.Center;
+                villagerOverrideClickPosition = rsc.Center;
                 marketCycle = true;
-                tgt = mine;
-            }
-            else if (_forests.FirstIfNotNull(clickPosition, out var forest))
-            {
-                villagerOverrideClickPosition = forest.Center;
-                marketCycle = true;
-                tgt = forest;
+                tgt = rsc;
             }
             else if (_markets.FirstIfNotNull(clickPosition, out var market))
             {

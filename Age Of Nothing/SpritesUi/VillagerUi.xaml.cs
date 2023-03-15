@@ -87,9 +87,9 @@ namespace Age_Of_Nothing.SpritesUi
         {
             return Sprite.IsCarrying() switch
             {
-                PrimaryResources.Gold => IsMouseOver ? _goldBrushHover : _goldBrush,
-                PrimaryResources.Wood => IsMouseOver ? _woodBrushHover : _woodBrush,
-                PrimaryResources.Rock => IsMouseOver ? _rockBrushHover : _rockBrush,
+                ResourceTypes.Gold => IsMouseOver ? _goldBrushHover : _goldBrush,
+                ResourceTypes.Wood => IsMouseOver ? _woodBrushHover : _woodBrush,
+                ResourceTypes.Rock => IsMouseOver ? _rockBrushHover : _rockBrush,
                 _ => IsMouseOver ? _defaultBrushHover : _defaultBrush
             };
         }

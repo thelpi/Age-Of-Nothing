@@ -12,34 +12,34 @@ namespace Age_Of_Nothing.Sprites
         private const double Size = 20;
 
         private const double _speed = 5;
-        private static readonly IReadOnlyDictionary<PrimaryResources, int> _carryCapacity = new Dictionary<PrimaryResources, int>
+        private static readonly IReadOnlyDictionary<ResourceTypes, int> _carryCapacity = new Dictionary<ResourceTypes, int>
         {
-            { PrimaryResources.Gold, 10 },
-            { PrimaryResources.Wood, 10 },
-            { PrimaryResources.Rock, 10 }
+            { ResourceTypes.Gold, 10 },
+            { ResourceTypes.Wood, 10 },
+            { ResourceTypes.Rock, 10 }
         };
 
         public Villager(Point center, IEnumerable<FocusableSprite> sprites)
             : base(center, _speed, Size, sprites)
         { }
 
-        private (PrimaryResources r, int v)? _carrying;
+        private (ResourceTypes r, int v)? _carrying;
 
-        public (PrimaryResources r, int v)? CheckCarry(Sprite tgt)
+        public (ResourceTypes r, int v)? CheckCarry(Sprite tgt)
         {
-            (PrimaryResources r, int v)? carry = null;
+            (ResourceTypes r, int v)? carry = null;
             if (tgt.Is<Market>())
             {
                 carry = _carrying;
                 _carrying = null;
                 NotifyResources();
             }
-            else if (tgt.Is<IResourceSprite>(out var rs))
+            else if (tgt.Is<Resource>(out var rs))
             {
-                var realQty = rs.ReduceQuantity(_carryCapacity[rs.Resource]);
+                var realQty = rs.ReduceQuantity(_carryCapacity[rs.ResourceType]);
                 if (realQty > 0)
                 {
-                    _carrying = (rs.Resource, realQty);
+                    _carrying = (rs.ResourceType, realQty);
                     NotifyResources();
                 }
                 else
@@ -48,14 +48,14 @@ namespace Age_Of_Nothing.Sprites
             return carry;
         }
 
-        public bool IsCarryingMax(PrimaryResources rsc)
+        public bool IsCarryingMax(ResourceTypes rsc)
         {
             return _carrying.HasValue && _carrying.Value.v >= _carryCapacity[rsc];
         }
 
-        public PrimaryResources? IsCarrying()
+        public ResourceTypes? IsCarrying()
         {
-            return _carrying.HasValue ? _carrying.Value.r : default(PrimaryResources?);
+            return _carrying.HasValue ? _carrying.Value.r : default(ResourceTypes?);
         }
     }
 }
