@@ -61,7 +61,7 @@ namespace Age_Of_Nothing
                     foreach (var item in e.NewItems)
                     {
                         var sprite = item as Sprite;
-                        if (sprite.Is<Villager>())
+                        if (sprite.Is<Villager>() || sprite.Is<Market>() || sprite.Is<Dwelling>())
                             PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true));
                         else
                             PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite.GetVisual, true));
@@ -75,7 +75,7 @@ namespace Age_Of_Nothing
                 {
                     foreach (var item in e.OldItems)
                     {
-                        if (item is Villager)
+                        if (item is Villager || item is Market || item is Dwelling)
                             PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item as Sprite, false));
                         else
                             PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Sprite).GetVisual, false));
@@ -410,7 +410,7 @@ namespace Age_Of_Nothing
         {
             foreach (var sp in _focusables)
             {
-                if (sp.Is<Villager>())
+                if (sp.Is<Villager>() || sp.Is<Market>() || sp.Is<Dwelling>())
                     sp.Focused = zone.IntersectsWith(sp.Surface);
                 else
                     sp.RefreshVisual(zone.IntersectsWith(sp.Surface));

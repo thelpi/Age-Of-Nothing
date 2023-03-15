@@ -24,8 +24,8 @@ namespace Age_Of_Nothing.SpritesUi
         private readonly Brush _dwellingBrush = GetImageFill(_defaultBrush, "dwelling");
         private readonly Brush _dwellingBrushHover = GetImageFill(_defaultBrushHover, "dwelling");
 
-        private readonly Shape _surround;
-        private readonly Shape _visual;
+        private readonly Rectangle _surround;
+        private readonly Rectangle _visual;
 
         public DwellingUi(Dwelling dwelling)
             : base(dwelling)
@@ -34,7 +34,7 @@ namespace Age_Of_Nothing.SpritesUi
 
             SetValue(Panel.ZIndexProperty, IndexZ);
 
-            _visual = new Ellipse
+            _visual = new Rectangle
             {
                 Width = Sprite.Surface.Width,
                 Height = Sprite.Surface.Height,
@@ -42,7 +42,7 @@ namespace Age_Of_Nothing.SpritesUi
             };
             MainCanvas.Children.Add(_visual);
 
-            _surround = new Ellipse
+            _surround = new Rectangle
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = FocusStroke,

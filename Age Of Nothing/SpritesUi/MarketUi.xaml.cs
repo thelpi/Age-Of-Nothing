@@ -24,8 +24,8 @@ namespace Age_Of_Nothing.SpritesUi
         private readonly Brush _marketBrush = GetImageFill(_defaultBrush, "market");
         private readonly Brush _marketBrushHover = GetImageFill(_defaultBrushHover, "market");
 
-        private readonly Shape _surround;
-        private readonly Shape _visual;
+        private readonly Rectangle _surround;
+        private readonly Rectangle _visual;
 
         public MarketUi(Market market)
             : base(market)
@@ -34,7 +34,7 @@ namespace Age_Of_Nothing.SpritesUi
 
             SetValue(Panel.ZIndexProperty, IndexZ);
 
-            _visual = new Ellipse
+            _visual = new Rectangle
             {
                 Width = Sprite.Surface.Width,
                 Height = Sprite.Surface.Height,
@@ -42,7 +42,7 @@ namespace Age_Of_Nothing.SpritesUi
             };
             MainCanvas.Children.Add(_visual);
 
-            _surround = new Ellipse
+            _surround = new Rectangle
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = FocusStroke,
