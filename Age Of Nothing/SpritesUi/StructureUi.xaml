@@ -1,8 +1,6 @@
-﻿<local:BaseSpriteUi x:TypeArguments="sprites:Market" x:Class="Age_Of_Nothing.SpritesUi.MarketUi"
+﻿<local:BaseSpriteUi x:TypeArguments="sprites:Structure" x:Class="Age_Of_Nothing.SpritesUi.StructureUi"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Age_Of_Nothing.SpritesUi"
              xmlns:sprites="clr-namespace:Age_Of_Nothing.Sprites">
     <Canvas Name="MainCanvas" />

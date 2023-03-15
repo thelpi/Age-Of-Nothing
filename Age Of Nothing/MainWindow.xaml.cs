@@ -67,12 +67,10 @@ namespace Age_Of_Nothing
                             if (addEvt.Sprite != null)
                             {
                                 // TODO: makes this generic
-                                if (addEvt.Sprite is Villager v)
+                                if (addEvt.Sprite.Is<Villager>(out var v))
                                     MainCanvas.Children.Add(new VillagerUi(v));
-                                else if (addEvt.Sprite is Market m)
-                                    MainCanvas.Children.Add(new MarketUi(m));
-                                else if (addEvt.Sprite is Dwelling d)
-                                    MainCanvas.Children.Add(new DwellingUi(d));
+                                else if (addEvt.Sprite.Is<Structure>(out var s))
+                                    MainCanvas.Children.Add(new StructureUi(s));
                                 else
                                     throw new NotImplementedException();
                             }
@@ -85,12 +83,10 @@ namespace Age_Of_Nothing
                             if (rmvEvt.Sprite != null)
                             {
                                 // TODO: makes this generic
-                                if (rmvEvt.Sprite is Villager v)
+                                if (rmvEvt.Sprite.Is<Villager>(out var v))
                                     MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(v));
-                                else if (rmvEvt.Sprite is Market m)
-                                    MainCanvas.Children.Remove(FindCanvasElement<MarketUi, Market>(m));
-                                else if (rmvEvt.Sprite is Dwelling d)
-                                    MainCanvas.Children.Remove(FindCanvasElement<DwellingUi, Dwelling>(d));
+                                else if (rmvEvt.Sprite.Is<Structure>(out var s))
+                                    MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(s));
                                 else
                                     throw new NotImplementedException();
                             }

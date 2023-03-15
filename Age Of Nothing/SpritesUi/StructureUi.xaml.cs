@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -8,27 +9,30 @@ using Age_Of_Nothing.Sprites;
 namespace Age_Of_Nothing.SpritesUi
 {
     /// <summary>
-    /// Logique d'interaction pour MarketUi.xaml
+    /// Logique d'interaction pour DwellingUi.xaml
     /// </summary>
-    public partial class MarketUi : BaseSpriteUi<Market>
+    public partial class StructureUi : BaseSpriteUi<Structure>
     {
         private const int IndexZ = 1;
-        private const double FocusStroke = 1;
-        private const double SpaceBetween = 1;
+        private const double FocusStroke = 2;
+        private const double SpaceBetween = 2;
 
         private static double StrokeAndSpace => FocusStroke + SpaceBetween;
         private static double TotalStrokeSize => StrokeAndSpace * 2;
 
-        private static readonly Brush _defaultBrush = Brushes.Purple;
-        private static readonly Brush _defaultBrushHover = Brushes.MediumPurple;
-        private readonly Brush _marketBrush = GetImageFill(_defaultBrush, "market");
-        private readonly Brush _marketBrushHover = GetImageFill(_defaultBrushHover, "market");
+        private static IReadOnlyDictionary<(Type, bool), Brush> _brushes = new Dictionary<(Type, bool), Brush>
+        {
+            { (typeof(Market), false), GetImageFill(Brushes.Purple, "market") },
+            { (typeof(Market), true), GetImageFill(Brushes.MediumPurple, "market") },
+            { (typeof(Dwelling), false), GetImageFill(Brushes.Sienna, "dwelling") },
+            { (typeof(Dwelling), true), GetImageFill(Brushes.Peru, "dwelling") }
+        };
 
         private readonly Rectangle _surround;
         private readonly Rectangle _visual;
 
-        public MarketUi(Market market)
-            : base(market)
+        public StructureUi(Structure structure)
+            : base(structure)
         {
             InitializeComponent();
 
@@ -38,7 +42,7 @@ namespace Age_Of_Nothing.SpritesUi
             {
                 Width = Sprite.Surface.Width,
                 Height = Sprite.Surface.Height,
-                Fill = _marketBrush
+                Fill = _brushes[(Sprite.GetType(), false)]
             };
             MainCanvas.Children.Add(_visual);
 
@@ -54,8 +58,8 @@ namespace Age_Of_Nothing.SpritesUi
             // do not move this line above the _visual definition
             SetControlDimensionsAndPosition();
 
-            MouseEnter += (a, b) => _visual.Fill = _marketBrushHover;
-            MouseLeave += (a, b) => _visual.Fill = _marketBrush;
+            MouseEnter += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), true)];
+            MouseLeave += (a, b) => _visual.Fill = _brushes[(Sprite.GetType(), false)];
             MouseLeftButtonDown += (a, b) => Sprite.ToggleFocus();
 
             Sprite.PropertyChanged += (s, e) =>
