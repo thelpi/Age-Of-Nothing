@@ -64,39 +64,17 @@ namespace Age_Of_Nothing
                         case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
                             var et1 = e as SpritesCollectionChangedEventArgs;
                             if (et1.Sprite != null)
-                            {
-                                var ui1 = new VillagerUi(et1.Sprite as Villager);
-                                MainCanvas.Children.Add(ui1);
-                            }
-                            else
-                            {
+                                MainCanvas.Children.Add(new VillagerUi(et1.Sprite as Villager));
+                            else // will be removed when every sprite will have their UI equivalent
                                 MainCanvas.Children.Add(et1.SpriteVisualRecipe());
-                            }
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
                             var et2 = e as SpritesCollectionChangedEventArgs;
                             if (et2.Sprite != null)
-                            {
-                                UIElement founded = null;
-                                foreach (var child in MainCanvas.Children)
-                                {
-                                    if (child is VillagerUi)
-                                    {
-                                        var sp = (child as VillagerUi).Tag as Villager;
-                                        if (sp == et2.Sprite)
-                                        {
-                                            founded = child as UIElement;
-                                            break;
-                                        }
-                                    }
-                                }
-                                MainCanvas.Children.Remove(founded);
-                            }
-                            else
-                            {
+                                MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(et2.Sprite as Villager));
+                            else // will be removed when every sprite will have their UI equivalent
                                 MainCanvas.Children.Remove(et2.SpriteVisualRecipe());
-                            }
                             break;
                     }
                 }));
@@ -108,6 +86,13 @@ namespace Age_Of_Nothing
             DataContext = _controller;
 
             _controller.Initialize();
+        }
+
+        private UIElement FindCanvasElement<T, T2>(T2 sprite)
+            where T : BaseSpriteUi<T2>
+            where T2 : Sprite
+        {
+            return MainCanvas.Children.OfType<T>().FirstOrDefault(x => x.Sprite == sprite);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)

@@ -85,7 +85,9 @@ namespace Age_Of_Nothing.Sprites
 
         protected void NotifyResources()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ResourcesChanged"));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(ResourcesChanged));
         }
+
+        public const string ResourcesChanged = "ResourcesChanged";
     }
 }
