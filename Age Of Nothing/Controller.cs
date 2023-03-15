@@ -57,14 +57,9 @@ namespace Age_Of_Nothing
             {
                 if (e.NewItems != null)
                 {
-                    foreach (var item in e.NewItems)
+                    foreach (var sprite in e.NewItems.OfType<Sprite>())
                     {
-                        var sprite = item as Sprite;
-                        if (sprite.Is<Villager>() || sprite.Is<Market>() || sprite.Is<Dwelling>())
-                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true));
-                        else
-                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite.GetVisual, true));
-
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true, false));
                         if (sprite.Is<FocusableSprite>(out var fs))
                             fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
                     }
@@ -72,13 +67,8 @@ namespace Age_Of_Nothing
 
                 if (e.OldItems != null)
                 {
-                    foreach (var item in e.OldItems)
-                    {
-                        if (item is Villager || item is Market || item is Dwelling)
-                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item as Sprite, false));
-                        else
-                            PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Sprite).GetVisual, false));
-                    }
+                    foreach (var item in e.OldItems.OfType<Sprite>())
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item, false, false));
                 }
 
                 // TODO: we should do this logic into view with a converter
@@ -89,30 +79,14 @@ namespace Age_Of_Nothing
             {
                 if (e.NewItems != null)
                 {
-                    foreach (var item in e.NewItems)
-                    {
-                        if (item is Craft craft)
-                        {
-                            if (craft.Target is Market || craft.Target is Dwelling)
-                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
-                            else
-                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, true, true));
-                        }
-                    }
+                    foreach (var craft in e.NewItems.OfType<Craft>())
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
                 }
 
                 if (e.OldItems != null)
                 {
-                    foreach (var item in e.OldItems)
-                    {
-                        if (item is Craft craft)
-                        {
-                            if (craft.Target is Market || craft.Target is Dwelling)
-                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, false, true));
-                            else
-                                PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs((item as Craft).Target.GetShadowVisual, false, true));
-                        }
-                    }
+                    foreach (var craft in e.OldItems.OfType<Craft>())
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, false, true));
                 }
             };
         }
@@ -392,7 +366,7 @@ namespace Age_Of_Nothing
         public void ClearFocus()
         {
             foreach (var sp in _focusables)
-                sp.ChangeFocus(false, false);
+                sp.Focused = false;
         }
 
         public void FocusOnZone(Rect zone)
@@ -402,7 +376,7 @@ namespace Age_Of_Nothing
             {
                 if (zone.Contains(unit.Center))
                 {
-                    unit.ChangeFocus(true, false);
+                    unit.Focused = true;
                     hasUnitSelected = true;
                 }
             }
@@ -414,7 +388,7 @@ namespace Age_Of_Nothing
                 {
                     if (zone.IntersectsWith(x.Surface))
                     {
-                        x.ChangeFocus(true, false);
+                        x.Focused = true;
                         break;
                     }
                 }
@@ -424,12 +398,7 @@ namespace Age_Of_Nothing
         public void RefreshHover(Rect zone)
         {
             foreach (var sp in _focusables)
-            {
-                if (sp.Is<Villager>() || sp.Is<Market>() || sp.Is<Dwelling>())
-                    sp.Focused = zone.IntersectsWith(sp.Surface);
-                else
-                    sp.RefreshVisual(zone.IntersectsWith(sp.Surface));
-            }
+                sp.Focused = zone.IntersectsWith(sp.Surface);
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)

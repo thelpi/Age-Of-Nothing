@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -20,10 +19,6 @@ namespace Age_Of_Nothing.Sprites
         {
             ForestPatchIndex = forestPatchIndex;
         }
-
-        protected override Color DefaultFill => Colors.Green;
-
-        protected override Color HoverFill => Colors.ForestGreen;
 
         public static IEnumerable<Forest> GenerateForestRectangle(Rect rect, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
         {

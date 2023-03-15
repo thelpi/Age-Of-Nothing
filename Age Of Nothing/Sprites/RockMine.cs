@@ -13,9 +13,5 @@ namespace Age_Of_Nothing.Sprites
         { }
 
         public override ResourceTypes ResourceType => ResourceTypes.Rock;
-
-        protected override Color DefaultFill => Colors.Silver;
-
-        protected override Color HoverFill => Colors.Gainsboro;
     }
 }

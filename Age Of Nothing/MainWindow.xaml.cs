@@ -64,34 +64,28 @@ namespace Age_Of_Nothing
                         case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
                             var addEvt = e as SpritesCollectionChangedEventArgs;
-                            if (addEvt.Sprite != null)
-                            {
-                                // TODO: makes this generic
-                                if (addEvt.Sprite.Is<Villager>(out var v))
-                                    MainCanvas.Children.Add(new VillagerUi(v));
-                                else if (addEvt.Sprite.Is<Structure>(out var s))
-                                    MainCanvas.Children.Add(new StructureUi(s, addEvt.IsBlueprint));
-                                else
-                                    throw new NotImplementedException();
-                            }
-                            else // will be removed when every sprite will have their UI equivalent
-                                MainCanvas.Children.Add(addEvt.SpriteVisualRecipe());
+                            // TODO: makes this generic
+                            if (addEvt.Sprite.Is<Villager>(out var addV))
+                                MainCanvas.Children.Add(new VillagerUi(addV));
+                            else if (addEvt.Sprite.Is<Structure>(out var addS))
+                                MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
+                            else if (addEvt.Sprite.Is<Resource>(out var addR))
+                                MainCanvas.Children.Add(new ResourceUi(addR));
+                            else
+                                throw new NotImplementedException();
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
                             var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                            if (rmvEvt.Sprite != null)
-                            {
-                                // TODO: makes this generic
-                                if (rmvEvt.Sprite.Is<Villager>(out var v))
-                                    MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(v));
-                                else if (rmvEvt.Sprite.Is<Structure>(out var s))
-                                    MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(s));
-                                else
-                                    throw new NotImplementedException();
-                            }
-                            else // will be removed when every sprite will have their UI equivalent
-                                MainCanvas.Children.Remove(rmvEvt.SpriteVisualRecipe());
+                            // TODO: makes this generic
+                            if (rmvEvt.Sprite.Is<Villager>(out var rmvV))
+                                MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(rmvV));
+                            else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))
+                                MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
+                            else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
+                                MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
+                            else
+                                throw new NotImplementedException();
                             break;
                     }
                 }));

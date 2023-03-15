@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -14,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
         private bool _loop;
 
         protected Unit(Point center, double speed, double size, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), 0.75, sprites, 2, true)
+            : base(center.ComputeSurfaceFromMiddlePoint(size, size), sprites, true)
         {
             Speed = speed;
             _center = center;
@@ -22,10 +20,6 @@ namespace Age_Of_Nothing.Sprites
 
         // pixels by frame
         public double Speed { get; }
-
-        protected override Color DefaultFill => Colors.SandyBrown;
-
-        protected override Color HoverFill => Colors.PeachPuff;
 
         public Point Center
         {

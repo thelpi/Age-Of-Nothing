@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Shapes;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -15,7 +14,7 @@ namespace Age_Of_Nothing.Sprites
         protected override string Info => $"{Quantity}";
 
         protected Resource(int quantity, Point center, int size, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size, size), () => new Ellipse(), 0.9, sprites, isCraft: false)
+            : base(center.ComputeSurfaceFromMiddlePoint(size, size), sprites, isCraft: false)
         {
             Quantity = quantity;
             Center = center;

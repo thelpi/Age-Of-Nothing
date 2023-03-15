@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -13,9 +12,5 @@ namespace Age_Of_Nothing.Sprites
         { }
 
         public override ResourceTypes ResourceType => ResourceTypes.Gold;
-
-        protected override Color DefaultFill => Colors.Gold;
-
-        protected override Color HoverFill => Colors.LightGoldenrodYellow;
     }
 }

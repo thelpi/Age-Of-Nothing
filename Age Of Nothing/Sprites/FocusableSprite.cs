@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
 
 namespace Age_Of_Nothing.Sprites
@@ -12,18 +9,15 @@ namespace Age_Of_Nothing.Sprites
     {
         protected IEnumerable<FocusableSprite> Sprites { get; }
 
-        private readonly double _hoverBorderRate;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool IsCraft { get; }
 
-        protected FocusableSprite(Rect surface, Func<Shape> shaper, double hoverBorderRate, IEnumerable<FocusableSprite> sprites, int zIndex = 1, bool canMove = false, bool isCraft = true)
-            : base(surface, shaper, zIndex, canMove)
+        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove = false, bool isCraft = true)
+            : base(surface, canMove)
         {
             IsCraft = isCraft;
             Sprites = sprites;
-            _hoverBorderRate = hoverBorderRate;
             _mouseLeftButtonDownHandler = (a, b) =>
             {
                 ToggleFocus();
@@ -32,11 +26,11 @@ namespace Age_Of_Nothing.Sprites
 
         public void ToggleFocus()
         {
-            ChangeFocus(!Focused, true);
+            Focused = !Focused;
             foreach (var x in Sprites)
             {
                 if (x != this)
-                    x.ChangeFocus(false, false);
+                    x.Focused = false;
             }
         }
 
@@ -52,30 +46,6 @@ namespace Age_Of_Nothing.Sprites
                     PropertyChanged?.Invoke(this, new SpriteFocusChangedEventArgs());
                 }
             }
-        }
-
-        public override void RefreshVisual(bool hover)
-        {
-            if (Focused)
-                RefreshVisual(hover ? GetFocusBrush(HoverFill) : GetFocusBrush(DefaultFill));
-            else
-                base.RefreshVisual(hover);
-        }
-
-        public void ChangeFocus(bool focus, bool hover)
-        {
-            Focused = focus;
-            RefreshVisual(hover);
-        }
-
-        private Brush GetFocusBrush(Color color)
-        {
-            return new RadialGradientBrush(
-                new GradientStopCollection(new List<GradientStop>
-                {
-                    new GradientStop(color, _hoverBorderRate),
-                    new GradientStop(Colors.PaleVioletRed, 1)
-                }));
         }
 
         protected void NotifyMove()
