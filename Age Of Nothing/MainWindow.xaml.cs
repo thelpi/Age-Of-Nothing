@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -62,19 +63,39 @@ namespace Age_Of_Nothing
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
-                            var et1 = e as SpritesCollectionChangedEventArgs;
-                            if (et1.Sprite != null)
-                                MainCanvas.Children.Add(new VillagerUi(et1.Sprite as Villager));
+                            var addEvt = e as SpritesCollectionChangedEventArgs;
+                            if (addEvt.Sprite != null)
+                            {
+                                // TODO: makes this generic
+                                if (addEvt.Sprite is Villager v)
+                                    MainCanvas.Children.Add(new VillagerUi(v));
+                                else if (addEvt.Sprite is Market m)
+                                    MainCanvas.Children.Add(new MarketUi(m));
+                                else if (addEvt.Sprite is Dwelling d)
+                                    MainCanvas.Children.Add(new DwellingUi(d));
+                                else
+                                    throw new NotImplementedException();
+                            }
                             else // will be removed when every sprite will have their UI equivalent
-                                MainCanvas.Children.Add(et1.SpriteVisualRecipe());
+                                MainCanvas.Children.Add(addEvt.SpriteVisualRecipe());
                             break;
                         case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
                         case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
-                            var et2 = e as SpritesCollectionChangedEventArgs;
-                            if (et2.Sprite != null)
-                                MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(et2.Sprite as Villager));
+                            var rmvEvt = e as SpritesCollectionChangedEventArgs;
+                            if (rmvEvt.Sprite != null)
+                            {
+                                // TODO: makes this generic
+                                if (rmvEvt.Sprite is Villager v)
+                                    MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(v));
+                                else if (rmvEvt.Sprite is Market m)
+                                    MainCanvas.Children.Remove(FindCanvasElement<MarketUi, Market>(m));
+                                else if (rmvEvt.Sprite is Dwelling d)
+                                    MainCanvas.Children.Remove(FindCanvasElement<DwellingUi, Dwelling>(d));
+                                else
+                                    throw new NotImplementedException();
+                            }
                             else // will be removed when every sprite will have their UI equivalent
-                                MainCanvas.Children.Remove(et2.SpriteVisualRecipe());
+                                MainCanvas.Children.Remove(rmvEvt.SpriteVisualRecipe());
                             break;
                     }
                 }));
