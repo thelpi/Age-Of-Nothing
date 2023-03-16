@@ -102,7 +102,7 @@ namespace Age_Of_Nothing
             _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
             _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
 
-            var forests = Forest.GenerateForestRectangle(new Rect(700, 200, 300, 100), _focusables, 0);
+            var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), _focusables, 0);
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
@@ -140,7 +140,7 @@ namespace Age_Of_Nothing
                             var sprite = ctor(surface.TopLeft, _focusables);
                             _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, GetCraftTime<T>()));
                             foreach (var unit in villagerFocused)
-                                unit.SetCycle((center, sprite));
+                                unit.SetPathCycle((center, sprite));
                         }
                     }
                 }
@@ -184,7 +184,7 @@ namespace Age_Of_Nothing
         {
             lock (_sprites)
             {
-                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.IsCraft);
+                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.CanBeCrafted);
                 if (sprite != null)
                     _sprites.Remove(sprite);
             }
@@ -203,7 +203,6 @@ namespace Age_Of_Nothing
                     ManageCraftsInProgress();
                 }
             }
-            System.Diagnostics.Debug.WriteLine((System.DateTime.Now - dat).TotalMilliseconds);
         }
 
         private void ManageUnitsMovements()
@@ -219,7 +218,7 @@ namespace Age_Of_Nothing
                     {
                         _resourcesQty[carry.Value.r] += carry.Value.v;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
-                        if (villager.FocusedOn<Forest>() is var f && f != null)
+                        if (villager.GetNextSpriteOnPath<Forest>() is var f && f != null)
                             ManageNextForestPatch(villager, _forestPatchs[f.ForestPatchIndex]);
                     }
 
@@ -246,10 +245,10 @@ namespace Age_Of_Nothing
             {
                 var fpOk = patch.GetClosestSprite(villager.Center);
                 var closestMarket = _markets.GetClosestSprite(fpOk.Center);
-                if (villager.IsCarryingMax(ResourceTypes.Wood))
-                    villager.SetCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
+                if (villager.IsMaxCarrying(ResourceTypes.Wood))
+                    villager.SetPathCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
                 else
-                    villager.SetCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
+                    villager.SetPathCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
             }
         }
 
@@ -330,7 +329,7 @@ namespace Age_Of_Nothing
                     if (SurfaceIsEngaged(craft.Target.Surface))
                         cancelledCrafts.Add(craft);
                     var unfocused = craft.Sources
-                        .Where(x => x.Is<Villager>(out var villager) && !villager.FocusedOn(craft.Target))
+                        .Where(x => x.Is<Villager>(out var villager) && !villager.IsSpriteOnPath(craft.Target))
                         .ToList();
                     foreach (var ms in unfocused)
                     {
@@ -398,7 +397,7 @@ namespace Age_Of_Nothing
         public void RefreshHover(Rect zone)
         {
             foreach (var sp in _focusables)
-                sp.Focused = zone.IntersectsWith(sp.Surface);
+                sp.ForceHover(zone.IntersectsWith(sp.Surface));
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
@@ -437,16 +436,16 @@ namespace Age_Of_Nothing
                     {
                         var tgtPoint = localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition);
                         var closestMarket = _markets.GetClosestSprite(tgtPoint);
-                        unit.SetCycle((tgtPoint, localTgt), (closestMarket.Center, closestMarket));
+                        unit.SetPathCycle((tgtPoint, localTgt), (closestMarket.Center, closestMarket));
                     }
                     else
                     {
-                        unit.SetCycle((localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition), localTgt));
+                        unit.SetPathCycle((localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition), localTgt));
                     }
                 }
                 else
                 {
-                    unit.SetCycle((clickPosition, localTgt));
+                    unit.SetPathCycle((clickPosition, localTgt));
                 }
             }
         }

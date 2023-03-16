@@ -92,5 +92,15 @@ namespace Age_Of_Nothing
         {
             return center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="surface"></param>
+        /// <returns></returns>
+        public static Point GetCenter(this Rect surface)
+        {
+            return new Point(surface.X + surface.Width / 2, surface.Y + surface.Height / 2);
+        }
     }
 }

@@ -5,7 +5,7 @@ using Age_Of_Nothing.Sprites.Attributes;
 namespace Age_Of_Nothing.Sprites
 {
     [Size(Size)]
-    public class Market : Structure, ICenteredSprite
+    public class Market : Structure
     {
         private const int Size = 128;
 

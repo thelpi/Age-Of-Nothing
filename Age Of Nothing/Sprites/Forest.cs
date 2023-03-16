@@ -10,8 +10,6 @@ namespace Age_Of_Nothing.Sprites
 
         public override ResourceTypes ResourceType => ResourceTypes.Wood;
 
-        protected override string Info => $"{Quantity}";
-
         public int ForestPatchIndex { get; }
 
         private Forest(Point center, int forestPatchIndex, IEnumerable<FocusableSprite> sprites)
@@ -20,11 +18,18 @@ namespace Age_Of_Nothing.Sprites
             ForestPatchIndex = forestPatchIndex;
         }
 
-        public static IEnumerable<Forest> GenerateForestRectangle(Rect rect, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
+        /// <summary>
+        /// Sets a collection of forest sprites to creates a bigger rectangle of forest (a "patch")
+        /// </summary>
+        /// <param name="patchSurface">The patch surface</param>
+        /// <param name="sprites">Every focusable sprite</param>
+        /// <param name="forestPatchIndex">The forest patch index</param>
+        /// <returns></returns>
+        public static IEnumerable<Forest> GenerateForestPatch(Rect patchSurface, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
         {
-            for (var i = rect.X; i < rect.BottomRight.X; i += _size)
+            for (var i = patchSurface.X; i < patchSurface.BottomRight.X; i += _size)
             {
-                for (var j = rect.Y; j < rect.BottomRight.Y; j += _size)
+                for (var j = patchSurface.Y; j < patchSurface.BottomRight.Y; j += _size)
                 {
                     yield return new Forest(new Point(i + _size / (double)2, j + _size / (double)2), forestPatchIndex, sprites);
                 }

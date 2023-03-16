@@ -7,17 +7,13 @@ namespace Age_Of_Nothing.Events
     {
         public const string SpritesCollectionAddPropertyName = "SpritesCollectionAdd";
         public const string SpritesCollectionRemovePropertyName = "SpritesCollectionRemove";
-        public const string CraftsCollectionAddPropertyName = "CraftsCollectionAdd";
-        public const string CraftsCollectionRemovePropertyName = "CraftsCollectionRemove";
 
         public Sprite Sprite { get; }
 
         public bool IsBlueprint { get; set; }
 
-        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool isBlueprint = false)
-            : base(add
-                  ? (isBlueprint ? CraftsCollectionAddPropertyName : SpritesCollectionAddPropertyName)
-                  : (isBlueprint ? CraftsCollectionRemovePropertyName : SpritesCollectionRemovePropertyName))
+        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool isBlueprint)
+            : base(add ? SpritesCollectionAddPropertyName : SpritesCollectionRemovePropertyName)
         {
             Sprite = sprite;
             IsBlueprint = isBlueprint;

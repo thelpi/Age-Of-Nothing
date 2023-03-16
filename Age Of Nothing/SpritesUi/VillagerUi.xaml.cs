@@ -65,32 +65,40 @@ namespace Age_Of_Nothing.SpritesUi
 
             Sprite.PropertyChanged += (s, e) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
+                Action action = null;
+                if (e.PropertyName == nameof(Sprite.Focused))
                 {
-                    if (e is SpriteFocusChangedEventArgs)
+                    action = () =>
                     {
                         SetControlDimensionsAndPosition();
                         if (Sprite.Focused)
                             MainCanvas.Children.Add(_surround);
                         else
                             MainCanvas.Children.Remove(_surround);
-                    }
-                    else if (e is SpritePositionChangedEventArgs)
-                        SetControlDimensionsAndPosition();
-                    else if (e.PropertyName == FocusableSprite.ResourcesChanged)
-                        _visual.Fill = GetFill();
-                }));
+                    };
+                }
+                else if (e.PropertyName == nameof(Sprite.Center))
+                    action = SetControlDimensionsAndPosition;
+                else if (e.PropertyName == nameof(Sprite.Carry))
+                    action = () => _visual.Fill = GetFill();
+                else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                    action = () => _visual.Fill = GetFill(true);
+                else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                    action = () => _visual.Fill = GetFill();
+
+                if (action != null)
+                    Dispatcher.BeginInvoke(action);
             };
         }
 
-        private Brush GetFill()
+        private Brush GetFill(bool forceHover = false)
         {
-            return Sprite.IsCarrying() switch
+            return Sprite.Carry?.r switch
             {
-                ResourceTypes.Gold => IsMouseOver ? _goldBrushHover : _goldBrush,
-                ResourceTypes.Wood => IsMouseOver ? _woodBrushHover : _woodBrush,
-                ResourceTypes.Rock => IsMouseOver ? _rockBrushHover : _rockBrush,
-                _ => IsMouseOver ? _defaultBrushHover : _defaultBrush
+                ResourceTypes.Gold => IsMouseOver || forceHover ? _goldBrushHover : _goldBrush,
+                ResourceTypes.Wood => IsMouseOver || forceHover ? _woodBrushHover : _woodBrush,
+                ResourceTypes.Rock => IsMouseOver || forceHover ? _rockBrushHover : _rockBrush,
+                _ => IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush
             };
         }
 

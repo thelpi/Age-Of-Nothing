@@ -13,7 +13,7 @@ namespace Age_Of_Nothing
         }
 
         public static T GetClosestSprite<T>(this IEnumerable<T> collection, Point position)
-            where T : Sprites.ICenteredSprite
+            where T : Sprites.Sprite
         {
             return collection.OrderBy(x => Point.Subtract(position, x.Center).LengthSquared).First();
         }

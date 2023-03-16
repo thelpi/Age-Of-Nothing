@@ -3,23 +3,39 @@ using System.Windows;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Resource : FocusableSprite, ICenteredSprite
+    public abstract class Resource : FocusableSprite
     {
-        public Point Center { get; }
+        private int _quantity;
 
-        public int Quantity { get; private set; }
+        public int Quantity
+        {
+            get => _quantity;
+            private set
+            {
+                if (_quantity != value)
+                {
+                    _quantity = value;
+                    OnPropertyChanged(nameof(Quantity));
+                }
+            }
+        }
 
         public abstract ResourceTypes ResourceType { get; }
 
-        protected override string Info => $"{Quantity}";
-
         protected Resource(int quantity, Point center, int size, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size, size), sprites, isCraft: false)
+            : base(center.ComputeSurfaceFromMiddlePoint(size, size), sprites, false, false)
         {
-            Quantity = quantity;
-            Center = center;
+            _quantity = quantity;
         }
 
+        /// <summary>
+        /// Reduces the quantity available for the resource; mnimal is 0
+        /// </summary>
+        /// <param name="qtyLost"></param>
+        /// <returns>
+        /// Same as <paramref name="qtyLost"/> except if 0 is reached
+        /// (in that case it's what remained)
+        /// </returns>
         public int ReduceQuantity(int qtyLost)
         {
             if (qtyLost > Quantity)

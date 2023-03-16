@@ -1,28 +1,43 @@
-﻿using System.Windows;
-using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class Sprite
+    public abstract class Sprite : INotifyPropertyChanged
     {
+        private Point _center;
+
         public Rect Surface { get; private set; }
         public bool CanMove { get; }
-        protected virtual string Info { get; }
+        public Point Center
+        {
+            get => _center;
+            private set
+            {
+                if (_center != value)
+                {
+                    _center = value;
+                    OnPropertyChanged(nameof(Center));
+                }
+            }
+        }
 
-        protected MouseButtonEventHandler _mouseLeftButtonDownHandler;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Sprite(Rect surface, bool canMove = false)
+        protected Sprite(Rect surface, bool canMove)
         {
             Surface = surface;
             CanMove = canMove;
+            _center = Surface.GetCenter();
         }
 
-        protected bool Move(Point topLeftPoint)
+        protected bool Move(Point middlePoint)
         {
             if (!CanMove)
                 return false;
 
-            Surface = new Rect(topLeftPoint, Surface.Size);
+            Surface = middlePoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
+            Center = middlePoint;
             return true;
         }
 
@@ -36,6 +51,11 @@ namespace Age_Of_Nothing.Sprites
             var isType = typeof(T).IsAssignableFrom(GetType());
             data = isType ? this as T : default;
             return isType;
+        }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

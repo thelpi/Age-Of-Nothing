@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    [Size(Size)]
+    [Size(_size)]
     [CraftTime(120)]
     public class Villager : Unit
     {
-        private const double Size = 20;
-
+        private const double _size = 20;
         private const double _speed = 5;
+
         private static readonly IReadOnlyDictionary<ResourceTypes, int> _carryCapacity = new Dictionary<ResourceTypes, int>
         {
             { ResourceTypes.Gold, 10 },
@@ -19,43 +18,63 @@ namespace Age_Of_Nothing.Sprites
             { ResourceTypes.Rock, 10 }
         };
 
+        private (ResourceTypes r, int v)? _carry;
+
+        public (ResourceTypes r, int v)? Carry
+        {
+            get => _carry;
+            set
+            {
+                if (_carry != value)
+                {
+                    _carry = value;
+                    OnPropertyChanged(nameof(Carry));
+                }
+            }
+        }
+
         public Villager(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, _speed, Size, sprites)
+            : base(center, _speed, _size, sprites)
         { }
 
-        private (ResourceTypes r, int v)? _carrying;
-
-        public (ResourceTypes r, int v)? CheckCarry(Sprite tgt)
+        /// <summary>
+        /// Check what to do with the carry for this frame
+        /// </summary>
+        /// <param name="onTo">The sprite the villager is on.</param>
+        /// <returns>If villager on the market, the carry to unload.</returns>
+        public (ResourceTypes r, int v)? CheckCarry(Sprite onTo)
         {
-            (ResourceTypes r, int v)? carry = null;
-            if (tgt.Is<Market>())
+            (ResourceTypes r, int v)? carryToDump = null;
+
+            if (onTo.Is<Market>())
             {
-                carry = _carrying;
-                _carrying = null;
-                NotifyResources();
+                carryToDump = _carry;
+                Carry = null;
             }
-            else if (tgt.Is<Resource>(out var rs))
+            else if (onTo.Is<Resource>(out var rs))
             {
                 var realQty = rs.ReduceQuantity(_carryCapacity[rs.ResourceType]);
                 if (realQty > 0)
-                {
-                    _carrying = (rs.ResourceType, realQty);
-                    NotifyResources();
-                }
+                    Carry = (rs.ResourceType, realQty);
                 else
-                    SetCycle();
+                {
+                    // the villager is on the resource, but it's empty
+                    // path need to be recompute
+                    SetPathCycle();
+                }
             }
-            return carry;
+
+            return carryToDump;
         }
 
-        public bool IsCarryingMax(ResourceTypes rsc)
+        /// <summary>
+        /// Gets if the villager carry the maximal capacity for the resource.
+        /// </summary>
+        /// <param name="rsc"></param>
+        /// <returns></returns>
+        public bool IsMaxCarrying(ResourceTypes rsc)
         {
-            return _carrying.HasValue && _carrying.Value.v >= _carryCapacity[rsc];
-        }
-
-        public ResourceTypes? IsCarrying()
-        {
-            return _carrying.HasValue ? _carrying.Value.r : default(ResourceTypes?);
+            return _carry.HasValue && _carry.Value.v >= _carryCapacity[rsc];
         }
     }
 }

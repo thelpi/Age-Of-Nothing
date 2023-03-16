@@ -1,40 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows;
-using Age_Of_Nothing.Events;
 
 namespace Age_Of_Nothing.Sprites
 {
-    public abstract class FocusableSprite : Sprite, INotifyPropertyChanged
+    public abstract class FocusableSprite : Sprite
     {
+        private bool _focused;
+
         protected IEnumerable<FocusableSprite> Sprites { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public bool CanBeCrafted { get; }
 
-        public bool IsCraft { get; }
-
-        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove = false, bool isCraft = true)
-            : base(surface, canMove)
-        {
-            IsCraft = isCraft;
-            Sprites = sprites;
-            _mouseLeftButtonDownHandler = (a, b) =>
-            {
-                ToggleFocus();
-            };
-        }
-
-        public void ToggleFocus()
-        {
-            Focused = !Focused;
-            foreach (var x in Sprites)
-            {
-                if (x != this)
-                    x.Focused = false;
-            }
-        }
-
-        private bool _focused;
         public bool Focused
         {
             get => _focused;
@@ -43,21 +19,43 @@ namespace Age_Of_Nothing.Sprites
                 if (_focused != value)
                 {
                     _focused = value;
-                    PropertyChanged?.Invoke(this, new SpriteFocusChangedEventArgs());
+                    OnPropertyChanged(nameof(Focused));
                 }
             }
         }
 
-        protected void NotifyMove()
+        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove, bool canBeCrafted)
+            : base(surface, canMove)
         {
-            PropertyChanged?.Invoke(this, new SpritePositionChangedEventArgs(null));
+            CanBeCrafted = canBeCrafted;
+            Sprites = sprites;
         }
 
-        protected void NotifyResources()
+        /// <summary>
+        /// Enable / Disable the focus and disable focus on other sprites if this one is focused.
+        /// </summary>
+        public void ToggleFocus()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(ResourcesChanged));
+            Focused = !Focused;
+            if (Focused)
+            {
+                foreach (var x in Sprites)
+                {
+                    if (x != this)
+                        x.Focused = false;
+                }
+            }
         }
 
-        public const string ResourcesChanged = "ResourcesChanged";
+        /// <summary>
+        /// Simulates the sprite is hovered
+        /// </summary>
+        public void ForceHover(bool forceHover)
+        {
+            OnPropertyChanged(forceHover ? HoverPropertyName : UnhoverPropertyName);
+        }
+
+        public const string HoverPropertyName = "Hover";
+        public const string UnhoverPropertyName = "Unhover";
     }
 }

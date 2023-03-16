@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing.SpritesUi
@@ -66,17 +65,25 @@ namespace Age_Of_Nothing.SpritesUi
 
             Sprite.PropertyChanged += (s, e) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
+                Action action = null;
+                if (e.PropertyName == nameof(Sprite.Focused))
                 {
-                    if (e is SpriteFocusChangedEventArgs)
+                    action = () =>
                     {
                         SetControlDimensionsAndPosition();
                         if (Sprite.Focused)
                             MainCanvas.Children.Add(_surround);
                         else
                             MainCanvas.Children.Remove(_surround);
-                    }
-                }));
+                    };
+                }
+                else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                    action = () => _visual.Fill = _brushes[(Sprite.GetType(), true)];
+                else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                    action = () => _visual.Fill = _brushes[(Sprite.GetType(), false)];
+
+                if (action != null)
+                    Dispatcher.BeginInvoke(action);
             };
         }
 

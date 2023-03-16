@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -53,42 +52,46 @@ namespace Age_Of_Nothing
             _controller = new Controller();
             _controller.PropertyChanged += (s, e) =>
             {
-                Dispatcher.BeginInvoke(new Action(() =>
+                Action action = null;
+                if (e.PropertyName == nameof(FocusableSprite.Focused))
                 {
-                    switch (e.PropertyName)
+                    action = () =>
                     {
-                        case SpriteFocusChangedEventArgs.SpriteFocusPropertyName:
-                            CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
-                            CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
-                            break;
-                        case SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName:
-                        case SpritesCollectionChangedEventArgs.CraftsCollectionAddPropertyName:
-                            var addEvt = e as SpritesCollectionChangedEventArgs;
-                            // TODO: makes this generic
-                            if (addEvt.Sprite.Is<Villager>(out var addV))
-                                MainCanvas.Children.Add(new VillagerUi(addV));
-                            else if (addEvt.Sprite.Is<Structure>(out var addS))
-                                MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
-                            else if (addEvt.Sprite.Is<Resource>(out var addR))
-                                MainCanvas.Children.Add(new ResourceUi(addR));
-                            else
-                                throw new NotImplementedException();
-                            break;
-                        case SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName:
-                        case SpritesCollectionChangedEventArgs.CraftsCollectionRemovePropertyName:
-                            var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                            // TODO: makes this generic
-                            if (rmvEvt.Sprite.Is<Villager>(out var rmvV))
-                                MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(rmvV));
-                            else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))
-                                MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
-                            else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
-                                MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
-                            else
-                                throw new NotImplementedException();
-                            break;
-                    }
-                }));
+                        CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
+                        CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
+                    };
+                }
+                else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName)
+                {
+                    action = () =>
+                    {
+                        var addEvt = e as SpritesCollectionChangedEventArgs;
+                        // TODO: makes this generic
+                        if (addEvt.Sprite.Is<Villager>(out var addV))
+                            MainCanvas.Children.Add(new VillagerUi(addV));
+                        else if (addEvt.Sprite.Is<Structure>(out var addS))
+                            MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
+                        else if (addEvt.Sprite.Is<Resource>(out var addR))
+                            MainCanvas.Children.Add(new ResourceUi(addR));
+                    };
+                }
+                else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName)
+                {
+                    action = () =>
+                    {
+                        var rmvEvt = e as SpritesCollectionChangedEventArgs;
+                        // TODO: makes this generic
+                        if (rmvEvt.Sprite.Is<Villager>(out var rmvV))
+                            MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(rmvV));
+                        else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))
+                            MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
+                        else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
+                            MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
+                    };
+                }
+
+                if (action != null)
+                    Dispatcher.BeginInvoke(action);
             };
 
             MainCanvas.Children.Add(_selectionRectGu);
