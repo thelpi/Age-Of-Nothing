@@ -1,4 +1,4 @@
-﻿<local:BaseSpriteUi x:TypeArguments="sprites:Villager" x:Class="Age_Of_Nothing.SpritesUi.VillagerUi"
+﻿<local:BaseSpriteUi x:TypeArguments="sprites:Unit" x:Class="Age_Of_Nothing.SpritesUi.UnitUi"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Age_Of_Nothing.SpritesUi"

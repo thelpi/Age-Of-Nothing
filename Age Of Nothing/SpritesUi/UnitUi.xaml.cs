@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing.SpritesUi
@@ -10,7 +9,7 @@ namespace Age_Of_Nothing.SpritesUi
     /// <summary>
     /// Logique d'interaction pour VillagerUi.xaml
     /// </summary>
-    public partial class VillagerUi : BaseSpriteUi<Villager>
+    public partial class UnitUi : BaseSpriteUi<Unit>
     {
         private const int IndexZ = 2;
         private const double FocusStroke = 1;
@@ -32,8 +31,8 @@ namespace Age_Of_Nothing.SpritesUi
         private readonly Shape _surround;
         private readonly Shape _visual;
 
-        public VillagerUi(Villager villager)
-            : base(villager)
+        public UnitUi(Unit unit)
+            : base(unit)
         {
             InitializeComponent();
 
@@ -79,7 +78,7 @@ namespace Age_Of_Nothing.SpritesUi
                 }
                 else if (e.PropertyName == nameof(Sprite.Center))
                     action = SetControlDimensionsAndPosition;
-                else if (e.PropertyName == nameof(Sprite.Carry))
+                else if (e.PropertyName == nameof(Villager.Carry))
                     action = () => _visual.Fill = GetFill();
                 else if (e.PropertyName == FocusableSprite.HoverPropertyName)
                     action = () => _visual.Fill = GetFill(true);
@@ -93,7 +92,10 @@ namespace Age_Of_Nothing.SpritesUi
 
         private Brush GetFill(bool forceHover = false)
         {
-            return Sprite.Carry?.r switch
+            if (!Sprite.Is<Villager>(out var villager))
+                return IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush;
+
+            return villager.Carry?.r switch
             {
                 ResourceTypes.Gold => IsMouseOver || forceHover ? _goldBrushHover : _goldBrush,
                 ResourceTypes.Wood => IsMouseOver || forceHover ? _woodBrushHover : _woodBrush,

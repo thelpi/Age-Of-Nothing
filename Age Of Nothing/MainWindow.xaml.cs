@@ -67,8 +67,8 @@ namespace Age_Of_Nothing
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
                         // TODO: makes this generic
-                        if (addEvt.Sprite.Is<Villager>(out var addV) && !addEvt.IsBlueprint)
-                            MainCanvas.Children.Add(new VillagerUi(addV));
+                        if (addEvt.Sprite.Is<Unit>(out var addU) && !addEvt.IsBlueprint)
+                            MainCanvas.Children.Add(new UnitUi(addU));
                         else if (addEvt.Sprite.Is<Structure>(out var addS))
                             MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
                         else if (addEvt.Sprite.Is<Resource>(out var addR))
@@ -81,8 +81,8 @@ namespace Age_Of_Nothing
                     {
                         var rmvEvt = e as SpritesCollectionChangedEventArgs;
                         // TODO: makes this generic
-                        if (rmvEvt.Sprite.Is<Villager>(out var rmvV) && !rmvEvt.IsBlueprint)
-                            MainCanvas.Children.Remove(FindCanvasElement<VillagerUi, Villager>(rmvV));
+                        if (rmvEvt.Sprite.Is<Unit>(out var rmvU) && !rmvEvt.IsBlueprint)
+                            MainCanvas.Children.Remove(FindCanvasElement<UnitUi, Unit>(rmvU));
                         else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))
                             MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
                         else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
