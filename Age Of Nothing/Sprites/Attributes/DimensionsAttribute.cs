@@ -4,15 +4,15 @@ using System.Windows;
 namespace Age_Of_Nothing.Sprites.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class SizeAttribute : Attribute
+    public class DimensionsAttribute : Attribute
     {
         public Size Size { get; }
 
-        public SizeAttribute(double size)
+        public DimensionsAttribute(double size)
             : this(size, size)
         { }
 
-        public SizeAttribute(double width, double height)
+        public DimensionsAttribute(double width, double height)
         {
             Size = new Size(width, height);
         }

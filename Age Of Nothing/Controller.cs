@@ -22,10 +22,10 @@ namespace Age_Of_Nothing
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
-        private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
+        private IEnumerable<Structure> _structures => _sprites.OfType<Structure>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
 
-        public int PotentialPopulation => _dwellings.Count() * Dwelling.VillagerCapacity;
+        public int PotentialPopulation => _structures.Sum(x => x.GetUnitsStorage());
         public int Population => _units.Count();
         public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
         public int RockQuantity => _resourcesQty[ResourceTypes.Rock];
@@ -117,7 +117,10 @@ namespace Age_Of_Nothing
             lock (_craftQueue)
             {
                 if (_markets.FirstIfNotNull(x => x.Focused, out var focusMarket))
-                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
+                {
+                    var v = new Villager(focusMarket.Center, _focusables);
+                    _craftQueue.Add(new Craft(focusMarket, v, v.GetCraftTime()));
+                }
             }
         }
 
@@ -185,7 +188,7 @@ namespace Age_Of_Nothing
 
         public Size GetSpriteSize<T>() where T : Sprite
         {
-            return typeof(T).GetAttribute<SizeAttribute>().Size;
+            return typeof(T).GetAttribute<DimensionsAttribute>().Size;
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
@@ -208,10 +211,10 @@ namespace Age_Of_Nothing
                     var villagerFocused = _villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
                     {
-                        if (CheckStructureResources<T>())
+                        var sprite = ctor(surface.TopLeft, _focusables);
+                        if (CheckStructureResources(sprite))
                         {
-                            var sprite = ctor(surface.TopLeft, _focusables);
-                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, GetCraftTime<T>()));
+                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, sprite.GetCraftTime()));
                             foreach (var unit in villagerFocused)
                                 unit.SetPathCycle((center, sprite));
                         }
@@ -225,9 +228,9 @@ namespace Age_Of_Nothing
             return _nonUnits.Any(x => x.Surface.IntersectsWith(surface));
         }
 
-        private bool CheckStructureResources<T>() where T : Structure
+        private bool CheckStructureResources(Sprite sprite)
         {
-            var (gold, wood, rock) = GetResources<T>();
+            var (gold, wood, rock) = sprite.GetResourcesCost();
             if (wood <= _resourcesQty[ResourceTypes.Wood]
                 && gold <= _resourcesQty[ResourceTypes.Gold]
                 && rock <= _resourcesQty[ResourceTypes.Rock])
@@ -271,18 +274,23 @@ namespace Age_Of_Nothing
 
                 if (tgt.Is<Resource>(out var rs) && rs.Quantity == 0)
                 {
-                    emptyResourceSprite = tgt;
-                    if (tgt.Is<Forest>(out var f))
-                    {
-                        var patch = _forestPatchs[f.ForestPatchIndex];
-                        if (patch.Contains(f))
-                            patch.Remove(f);
-                        villager.ComputeCycleOnForestPatch(patch);
-                    }
+                    ManageEmptyResourceSprite(rs, villager);
+                    emptyResourceSprite = rs;
                 }
             }
 
             return emptyResourceSprite;
+        }
+
+        private void ManageEmptyResourceSprite(Resource tgt, Villager villager)
+        {
+            if (tgt.Is<Forest>(out var f))
+            {
+                var patch = _forestPatchs[f.ForestPatchIndex];
+                if (patch.Contains(f))
+                    patch.Remove(f);
+                villager.ComputeCycleOnForestPatch(patch);
+            }
         }
 
         private void ManageCraftsInProgress()
@@ -322,7 +330,7 @@ namespace Age_Of_Nothing
 
         private void RefundResources(System.Type type)
         {
-            var attrValue = type.GetAttribute<ResourcesAttribute>();
+            var attrValue = type.GetAttribute<ResourcesCostAttribute>();
             if (attrValue == null)
                 return;
 
@@ -340,17 +348,6 @@ namespace Age_Of_Nothing
                     : minusValue;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{rt}Quantity"));
             }
-        }
-
-        private (int gold, int wood, int rock) GetResources<T>() where T : Sprite
-        {
-            var r = typeof(T).GetAttribute<ResourcesAttribute>();
-            return (r.Gold, r.Wood, r.Rock);
-        }
-
-        private int GetCraftTime<T>() where T : Sprite
-        {
-            return typeof(T).GetAttribute<CraftTimeAttribute>().CraftTime;
         }
     }
 }

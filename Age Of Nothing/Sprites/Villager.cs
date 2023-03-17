@@ -5,7 +5,7 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    [Size(_size)]
+    [Dimensions(_size)]
     [CraftTime(120)]
     public class Villager : Unit
     {

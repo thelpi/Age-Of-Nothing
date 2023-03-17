@@ -5,11 +5,11 @@ namespace Age_Of_Nothing.Sprites.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class CraftTimeAttribute : Attribute
     {
-        public int CraftTime { get; }
+        public int FramesCount { get; }
 
-        public CraftTimeAttribute(int craftTime)
+        public CraftTimeAttribute(int framesCount)
         {
-            CraftTime = craftTime;
+            FramesCount = framesCount;
         }
     }
 }

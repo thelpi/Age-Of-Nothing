@@ -4,7 +4,8 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    [Size(Size)]
+    [Dimensions(Size)]
+    [UnitsStorage(5)]
     public class Market : Structure
     {
         private const int Size = 128;

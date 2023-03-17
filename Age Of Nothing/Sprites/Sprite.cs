@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -56,6 +57,17 @@ namespace Age_Of_Nothing.Sprites
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public (int gold, int wood, int rock) GetResourcesCost()
+        {
+            var r = GetType().GetAttribute<ResourcesCostAttribute>();
+            return r == null ? (0, 0, 0) : (r.Gold, r.Wood, r.Rock);
+        }
+
+        public int GetCraftTime()
+        {
+            return GetType().GetAttribute<CraftTimeAttribute>()?.FramesCount ?? 0;
         }
     }
 }
