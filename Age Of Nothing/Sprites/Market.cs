@@ -6,6 +6,7 @@ namespace Age_Of_Nothing.Sprites
 {
     [Dimensions(128)]
     [UnitsStorage(5)]
+    [LifePoints(1000)]
     public class Market : Structure
     {
         public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)

@@ -8,6 +8,7 @@ namespace Age_Of_Nothing.Sprites
     [CraftTime(200)]
     [ResourcesCost(0, 50, 10)]
     [UnitsStorage(5)]
+    [LifePoints(200)]
     public class Dwelling : Structure
     {
         public Dwelling(Point topleft, IEnumerable<FocusableSprite> sprites)

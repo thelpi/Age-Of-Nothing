@@ -8,6 +8,7 @@ namespace Age_Of_Nothing.Sprites
     [Dimensions(20)]
     [CraftTime(120)]
     [Speed(5)]
+    [LifePoints(20)]
     public class Villager : Unit
     {
         private static readonly IReadOnlyDictionary<ResourceTypes, int> _carryCapacity = new Dictionary<ResourceTypes, int>
