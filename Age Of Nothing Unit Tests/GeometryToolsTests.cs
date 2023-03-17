@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Age_Of_Nothing_Unit_Tests
 {
-    public class UnitTest1
+    public class GeometryToolsTests
     {
         [Theory]
         [InlineData(10, 10, 14, 13)]
