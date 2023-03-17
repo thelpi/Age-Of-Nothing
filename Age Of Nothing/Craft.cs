@@ -115,7 +115,9 @@ namespace Age_Of_Nothing
             {
                 // if the max pop. is reached, we keep the craft pending
                 if (HasFinished(frames))
+                {
                     finish = popAvailable;
+                }
                 // to start the craft, any of the sources should not have another craft already started
                 else if (!Started && !craftQueue.Any(x => x.IsStartedWithCommonSource(this)))
                 {
@@ -126,7 +128,9 @@ namespace Age_Of_Nothing
             else if (Target.Is<Structure>(out var tgtStruct))
             {
                 if (HasFinished(frames))
+                {
                     finish = true;
+                }
                 else
                 {
                     var availableSources = Sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);

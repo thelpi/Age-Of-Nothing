@@ -4,14 +4,12 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    [Dimensions(Size)]
+    [Dimensions(128)]
     [UnitsStorage(5)]
     public class Market : Structure
     {
-        private const int Size = 128;
-
         public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)
-            : base(new Rect(topLeft, new Point(topLeft.X + Size, topLeft.Y + Size)), sprites)
+            : base(new Rect(topLeft, new Point(topLeft.X + GetSpriteSize<Market>().Width, topLeft.Y + GetSpriteSize<Market>().Height)), sprites)
         { }
     }
 }

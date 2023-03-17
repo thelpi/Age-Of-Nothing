@@ -54,7 +54,7 @@ namespace Age_Of_Nothing.SpritesUi
                 Height = Sprite.Surface.Height + TotalStrokeSize,
                 Fill = Brushes.Transparent
             };
-            
+
             // do not move this line above the _visual definition
             SetControlDimensionsAndPosition();
 
@@ -77,13 +77,21 @@ namespace Age_Of_Nothing.SpritesUi
                     };
                 }
                 else if (e.PropertyName == nameof(Sprite.Center))
+                {
                     action = SetControlDimensionsAndPosition;
+                }
                 else if (e.PropertyName == nameof(Villager.Carry))
+                {
                     action = () => _visual.Fill = GetFill();
+                }
                 else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                {
                     action = () => _visual.Fill = GetFill(true);
+                }
                 else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                {
                     action = () => _visual.Fill = GetFill();
+                }
 
                 if (action != null)
                     Dispatcher.BeginInvoke(action);

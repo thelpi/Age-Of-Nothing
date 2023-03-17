@@ -19,7 +19,7 @@ namespace Age_Of_Nothing.SpritesUi
         private static double StrokeAndSpace => FocusStroke + SpaceBetween;
         private static double TotalStrokeSize => StrokeAndSpace * 2;
 
-        private static IReadOnlyDictionary<(Type, bool), Brush> _brushes = new Dictionary<(Type, bool), Brush>
+        private static readonly IReadOnlyDictionary<(Type, bool), Brush> _brushes = new Dictionary<(Type, bool), Brush>
         {
             { (typeof(GoldMine), false), GetImageFill(Brushes.Gold, "mine") },
             { (typeof(GoldMine), true), GetImageFill(Brushes.LightGoldenrodYellow, "mine") },
@@ -78,9 +78,13 @@ namespace Age_Of_Nothing.SpritesUi
                     };
                 }
                 else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                {
                     action = () => _visual.Fill = _brushes[(Sprite.GetType(), true)];
+                }
                 else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                {
                     action = () => _visual.Fill = _brushes[(Sprite.GetType(), false)];
+                }
 
                 if (action != null)
                     Dispatcher.BeginInvoke(action);

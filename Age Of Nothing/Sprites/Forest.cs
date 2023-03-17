@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
+    [Dimensions(30)]
     public class Forest : Resource
     {
-        private const int _size = 30;
         private const int _quantity = 100;
 
         public override ResourceTypes ResourceType => ResourceTypes.Wood;
@@ -13,7 +14,7 @@ namespace Age_Of_Nothing.Sprites
         public int ForestPatchIndex { get; }
 
         private Forest(Point center, int forestPatchIndex, IEnumerable<FocusableSprite> sprites)
-            : base(_quantity, center, _size, sprites)
+            : base(_quantity, center, GetSpriteSize<Forest>(), sprites)
         {
             ForestPatchIndex = forestPatchIndex;
         }
@@ -27,11 +28,12 @@ namespace Age_Of_Nothing.Sprites
         /// <returns></returns>
         public static IEnumerable<Forest> GenerateForestPatch(Rect patchSurface, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
         {
-            for (var i = patchSurface.X; i < patchSurface.BottomRight.X; i += _size)
+            var size = GetSpriteSize<Forest>();
+            for (var i = patchSurface.X; i < patchSurface.BottomRight.X; i += size.Width)
             {
-                for (var j = patchSurface.Y; j < patchSurface.BottomRight.Y; j += _size)
+                for (var j = patchSurface.Y; j < patchSurface.BottomRight.Y; j += size.Height)
                 {
-                    yield return new Forest(new Point(i + _size / (double)2, j + _size / (double)2), forestPatchIndex, sprites);
+                    yield return new Forest(new Point(i + size.Width / 2, j + size.Height / 2), forestPatchIndex, sprites);
                 }
             }
         }

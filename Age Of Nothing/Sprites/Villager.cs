@@ -54,7 +54,9 @@ namespace Age_Of_Nothing.Sprites
             {
                 var realQty = rs.ReduceQuantity(_carryCapacity[rs.ResourceType]);
                 if (realQty > 0)
+                {
                     Carry = (rs.ResourceType, realQty);
+                }
                 else
                 {
                     // the villager is on the resource, but it's empty
