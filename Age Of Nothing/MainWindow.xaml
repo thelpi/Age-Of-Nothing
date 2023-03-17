@@ -30,6 +30,9 @@
         <Expander ExpandDirection="Left" DockPanel.Dock="Right" IsExpanded="True">
             <StackPanel Margin="5" Orientation="Vertical">
                 <Button Name="CreateVillagerButton" Content="Create villager" Width="100" Click="CreateVillagerButton_Click" IsEnabled="False" />
+                <Button Margin="0, 5, 0, 0" Name="CreateSwordsmanButton" Content="Create swordsman" Width="100" Click="CreateSwordsmanButton_Click"  IsEnabled="False" />
+                <Button Margin="0, 5, 0, 0" Name="CreateArcherButton" Content="Create archer" Width="100" Click="CreateArcherButton_Click"  IsEnabled="False" />
+                <Button Margin="0, 5, 0, 0" Name="CreateKnightButton" Content="Create knight" Width="100" Click="CreateKnightButton_Click"  IsEnabled="False" />
                 <Button Margin="0, 20, 0, 0" Name="CreateDwellingButton" Content="Create dwelling" Width="100" Click="CreateDwellingButton_Click" IsEnabled="False" />
                 <Button Margin="0, 5, 0, 0" Name="CreateMarketButton" Content="Create market" Width="100" Click="CreateMarketButton_Click"  IsEnabled="False" />
                 <Button Margin="0, 5, 0, 0" Name="CreateBarracksButton" Content="Create barracks" Width="100" Click="CreateBarracksButton_Click"  IsEnabled="False" />

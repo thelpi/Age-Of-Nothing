@@ -61,6 +61,9 @@ namespace Age_Of_Nothing
                         CreateMarketButton.IsEnabled = _controller.HasVillagerFocus;
                         CreateBarracksButton.IsEnabled = _controller.HasVillagerFocus;
                         CreateVillagerButton.IsEnabled = _controller.HasMarketFocus;
+                        CreateSwordsmanButton.IsEnabled = _controller.HasBarracksFocus;
+                        CreateArcherButton.IsEnabled = _controller.HasBarracksFocus;
+                        CreateKnightButton.IsEnabled = _controller.HasBarracksFocus;
                     };
                 }
                 else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName)
@@ -194,6 +197,24 @@ namespace Age_Of_Nothing
         {
             ResetStructureShadow();
             _controller.AddVillagerCreationToStack();
+        }
+
+        private void CreateSwordsmanButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetStructureShadow();
+            _controller.AddSwordsmanCreationToStack();
+        }
+
+        private void CreateArcherButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetStructureShadow();
+            _controller.AddArcherCreationToStack();
+        }
+
+        private void CreateKnightButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetStructureShadow();
+            _controller.AddKnightCreationToStack();
         }
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)

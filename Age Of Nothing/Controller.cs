@@ -109,6 +109,8 @@ namespace Age_Of_Nothing
 
         public bool HasMarketFocus => _markets.Any(x => x.Focused);
 
+        public bool HasBarracksFocus => _structures.Any(x => x.Is<Barracks>() && x.Focused);
+
         public void BuildDwelling(Point center)
         {
             BuildStructure(center, (a, b) => new Dwelling(a, b));
@@ -132,6 +134,42 @@ namespace Age_Of_Nothing
                 {
                     var v = new Villager(focusMarket.Center, _focusables);
                     _craftQueue.Add(new Craft(focusMarket, v, v.GetCraftTime()));
+                }
+            }
+        }
+
+        public void AddSwordsmanCreationToStack()
+        {
+            lock (_craftQueue)
+            {
+                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
+                {
+                    var s = new Swordsman(focusBarracks.Center, _focusables);
+                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
+                }
+            }
+        }
+
+        public void AddArcherCreationToStack()
+        {
+            lock (_craftQueue)
+            {
+                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
+                {
+                    var s = new Archer(focusBarracks.Center, _focusables);
+                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
+                }
+            }
+        }
+
+        public void AddKnightCreationToStack()
+        {
+            lock (_craftQueue)
+            {
+                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
+                {
+                    var s = new Knight(focusBarracks.Center, _focusables);
+                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
                 }
             }
         }

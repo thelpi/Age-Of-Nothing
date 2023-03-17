@@ -9,18 +9,24 @@
 
   <ItemGroup>
     <None Remove="Resources\Images\barracks.png" />
+    <None Remove="Resources\Images\bow.png" />
     <None Remove="Resources\Images\dwelling.png" />
     <None Remove="Resources\Images\forest.png" />
     <None Remove="Resources\Images\gold.png" />
+    <None Remove="Resources\Images\horse.png" />
     <None Remove="Resources\Images\market.png" />
     <None Remove="Resources\Images\mine.png" />
     <None Remove="Resources\Images\population.png" />
     <None Remove="Resources\Images\rock.png" />
+    <None Remove="Resources\Images\sword.png" />
     <None Remove="Resources\Images\wood.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\Images\barracks.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\bow.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\dwelling.png">
@@ -30,6 +36,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\gold.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\horse.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\market.png">
@@ -42,6 +51,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\rock.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\sword.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\wood.png">

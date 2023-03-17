@@ -20,6 +20,8 @@ namespace Age_Of_Nothing.SpritesUi
 
         private static readonly Brush _defaultBrush = Brushes.SandyBrown;
         private static readonly Brush _defaultBrushHover = Brushes.PeachPuff;
+        private static readonly Brush _defaultMilitaryBrush = Brushes.Blue;
+        private static readonly Brush _defaultMilitaryBrushHover = Brushes.MediumSlateBlue;
 
         private readonly Brush _goldBrush = GetImageFill(_defaultBrush, "gold");
         private readonly Brush _woodBrush = GetImageFill(_defaultBrush, "wood");
@@ -27,6 +29,13 @@ namespace Age_Of_Nothing.SpritesUi
         private readonly Brush _goldBrushHover = GetImageFill(_defaultBrushHover, "gold");
         private readonly Brush _woodBrushHover = GetImageFill(_defaultBrushHover, "wood");
         private readonly Brush _rockBrushHover = GetImageFill(_defaultBrushHover, "rock");
+
+        private readonly Brush _swordsmanBrush = GetImageFill(_defaultMilitaryBrush, "sword");
+        private readonly Brush _swordsmanBrushHover = GetImageFill(_defaultMilitaryBrushHover, "sword");
+        private readonly Brush _archerBrush = GetImageFill(_defaultMilitaryBrush, "bow");
+        private readonly Brush _archerBrushHover = GetImageFill(_defaultMilitaryBrushHover, "bow");
+        private readonly Brush _knightBrush = GetImageFill(_defaultMilitaryBrush, "horse");
+        private readonly Brush _knightBrushHover = GetImageFill(_defaultMilitaryBrushHover, "horse");
 
         private readonly Shape _surround;
         private readonly Shape _visual;
@@ -42,7 +51,7 @@ namespace Age_Of_Nothing.SpritesUi
             {
                 Width = Sprite.Surface.Width,
                 Height = Sprite.Surface.Height,
-                Fill = _defaultBrush
+                Fill = GetFill()
             };
             MainCanvas.Children.Add(_visual);
 
@@ -100,16 +109,24 @@ namespace Age_Of_Nothing.SpritesUi
 
         private Brush GetFill(bool forceHover = false)
         {
-            if (!Sprite.Is<Villager>(out var villager))
-                return IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush;
-
-            return villager.Carry?.r switch
+            if (Sprite.Is<Villager>(out var villager))
             {
-                ResourceTypes.Gold => IsMouseOver || forceHover ? _goldBrushHover : _goldBrush,
-                ResourceTypes.Wood => IsMouseOver || forceHover ? _woodBrushHover : _woodBrush,
-                ResourceTypes.Rock => IsMouseOver || forceHover ? _rockBrushHover : _rockBrush,
-                _ => IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush
-            };
+                return villager.Carry?.r switch
+                {
+                    ResourceTypes.Gold => IsMouseOver || forceHover ? _goldBrushHover : _goldBrush,
+                    ResourceTypes.Wood => IsMouseOver || forceHover ? _woodBrushHover : _woodBrush,
+                    ResourceTypes.Rock => IsMouseOver || forceHover ? _rockBrushHover : _rockBrush,
+                    _ => IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush
+                };
+            }
+            else if (Sprite.Is<Archer>())
+                return IsMouseOver || forceHover ? _archerBrushHover : _archerBrush;
+            else if (Sprite.Is<Knight>())
+                return IsMouseOver || forceHover ? _knightBrushHover : _knightBrush;
+            else if (Sprite.Is<Swordsman>())
+                return IsMouseOver || forceHover ? _swordsmanBrushHover : _swordsmanBrush;
+
+            return IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush;
         }
 
         private void SetControlDimensionsAndPosition()
