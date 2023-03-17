@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
@@ -75,6 +76,36 @@ namespace Age_Of_Nothing.Sprites
         public bool IsMaxCarrying(ResourceTypes rsc)
         {
             return _carry.HasValue && _carry.Value.v >= _carryCapacity[rsc];
+        }
+
+        /// <inheritdoc />
+        public override void ComputeCycle(Point originalPoint, Sprite target)
+        {
+            if (target == null)
+            {
+                SetPathCycle((originalPoint, null));
+            }
+            else
+            {
+                if (target.Is<Forest>(out var forest))
+                {
+                    // finds the closest forest sprite in the patch from the villager position
+                    target = Sprites
+                        .OfType<Forest>()
+                        .Where(x => x.ForestPatchIndex == forest.ForestPatchIndex)
+                        .GetClosestSprite(Center);
+                }
+
+                if (target.Is<Resource>() && Sprites.OfType<Market>().Any())
+                {
+                    var closestMarket = Sprites.OfType<Market>().GetClosestSprite(target.Center);
+                    SetPathCycle((target.Center, target), (closestMarket.Center, closestMarket));
+                }
+                else
+                {
+                    SetPathCycle((target.Center, target));
+                }
+            }
         }
     }
 }

@@ -104,5 +104,15 @@ namespace Age_Of_Nothing.Sprites
             // not necessarely the next from the start
             return _pathCycle.FirstOrDefault(tc => tc.target.Is<T>()).target as T;
         }
+
+        /// <summary>
+        /// Computes the path cycle from the specified point and target related to point (if any)
+        /// </summary>
+        /// <param name="originalPoint"></param>
+        /// <param name="target"></param>
+        public virtual void ComputeCycle(Point originalPoint, Sprite target)
+        {
+            SetPathCycle((originalPoint, target));
+        }
     }
 }

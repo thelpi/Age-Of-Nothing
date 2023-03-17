@@ -407,51 +407,19 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
-            Point? villagerOverrideClickPosition = null;
-            Sprite tgt = null;
-            var marketCycle = false;
-            if (_resources.FirstIfNotNull(clickPosition, out var rsc))
-            {
-                villagerOverrideClickPosition = rsc.Center;
-                marketCycle = true;
-                tgt = rsc;
-            }
-            else if (_markets.FirstIfNotNull(clickPosition, out var market))
-            {
-                villagerOverrideClickPosition = market.Center;
-                tgt = market;
-            }
-
             foreach (var unit in _units.Where(x => x.Focused))
             {
-                var localTgt = tgt;
-                if (unit.Is<Villager>())
-                {
-                    var localVillagerOverrideClickPosition = villagerOverrideClickPosition;
+                // TODO: At some point, this should be a list
+                // as we can have units and resources
+                // or units and structures
+                // on the same point
+                Sprite target = null;
+                if (_resources.FirstIfNotNull(clickPosition, out var rsc))
+                    target = rsc;
+                else if (_markets.FirstIfNotNull(clickPosition, out var market))
+                    target = market;
 
-                    // finds the closest forest sprite in the patch from the villager position
-                    if (localTgt != null && localTgt.Is<Forest>(out var forest))
-                    {
-                        forest = _forestPatchs[forest.ForestPatchIndex].GetClosestSprite(unit.Center);
-                        localTgt = forest;
-                        localVillagerOverrideClickPosition = forest.Center;
-                    }
-
-                    if (marketCycle && _markets.Any())
-                    {
-                        var tgtPoint = localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition);
-                        var closestMarket = _markets.GetClosestSprite(tgtPoint);
-                        unit.SetPathCycle((tgtPoint, localTgt), (closestMarket.Center, closestMarket));
-                    }
-                    else
-                    {
-                        unit.SetPathCycle((localVillagerOverrideClickPosition.GetValueOrDefault(clickPosition), localTgt));
-                    }
-                }
-                else
-                {
-                    unit.SetPathCycle((clickPosition, localTgt));
-                }
+                unit.ComputeCycle(clickPosition, target);
             }
         }
 
