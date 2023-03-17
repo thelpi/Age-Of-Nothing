@@ -89,7 +89,10 @@ namespace Age_Of_Nothing
                             MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
                     };
                 }
-
+                else if (e.PropertyName == nameof(_controller.Population))
+                {
+                    action = () => PopulationValueText.Text = $"{_controller.Population} / {_controller.PotentialPopulation}";
+                }
                 if (action != null)
                     Dispatcher.BeginInvoke(action);
             };

@@ -16,7 +16,6 @@ namespace Age_Of_Nothing
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
 
-        private string _populationInformation;
         private int _frames;
 
         private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
@@ -26,15 +25,6 @@ namespace Age_Of_Nothing
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
 
-        public string PopulationInformation
-        {
-            get => _populationInformation;
-            private set
-            {
-                _populationInformation = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PopulationInformation)));
-            }
-        }
         public int PotentialPopulation => _dwellings.Count() * Dwelling.VillagerCapacity;
         public int Population => _units.Count();
         public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
@@ -70,8 +60,8 @@ namespace Age_Of_Nothing
                         PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item, false, false));
                 }
 
-                // TODO: we should do this logic into view with a converter
-                PopulationInformation = $"{Population} / {PotentialPopulation}";
+                // in case of dwellings or units count has changed
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Population)));
             };
 
             _craftQueue.CollectionChanged += (s, e) =>
