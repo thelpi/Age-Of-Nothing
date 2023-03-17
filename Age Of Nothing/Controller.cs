@@ -144,7 +144,6 @@ namespace Age_Of_Nothing
 
         public void NewFrameCheck()
         {
-            var dat = System.DateTime.Now;
             _frames++;
             lock (_sprites)
             {
@@ -198,6 +197,14 @@ namespace Age_Of_Nothing
         public Size GetSpriteSize<T>() where T : Sprite
         {
             return typeof(T).GetAttribute<SizeAttribute>().Size;
+        }
+
+        public void SetTargetPositionsOnFocused(Point clickPosition)
+        {
+            var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
+
+            foreach (var unit in _units.Where(x => x.Focused))
+                unit.ComputeCycle(clickPosition, targets);
         }
 
         private void BuildStructure<T>(Point center, System.Func<Point, IEnumerable<FocusableSprite>, T> ctor)
@@ -403,14 +410,6 @@ namespace Age_Of_Nothing
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
-        }
-
-        public void SetTargetPositionsOnFocused(Point clickPosition)
-        {
-            var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
-
-            foreach (var unit in _units.Where(x => x.Focused))
-                unit.ComputeCycle(clickPosition, targets);
         }
 
         private (int gold, int wood, int rock) GetResources<T>() where T : Sprite
