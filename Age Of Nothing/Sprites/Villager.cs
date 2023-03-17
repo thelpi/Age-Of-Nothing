@@ -79,8 +79,12 @@ namespace Age_Of_Nothing.Sprites
         }
 
         /// <inheritdoc />
-        public override void ComputeCycle(Point originalPoint, Sprite target)
+        public override void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets)
         {
+            // For now, the choice is to only care about structure and resource target
+            // AKA no attack from villager on other units
+
+            var target = targets.FirstOrDefault(x => x.Is<Resource>() || x.Is<Structure>());
             if (target == null)
             {
                 SetPathCycle((originalPoint, null));

@@ -407,20 +407,10 @@ namespace Age_Of_Nothing
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
-            foreach (var unit in _units.Where(x => x.Focused))
-            {
-                // TODO: At some point, this should be a list
-                // as we can have units and resources
-                // or units and structures
-                // on the same point
-                Sprite target = null;
-                if (_resources.FirstIfNotNull(clickPosition, out var rsc))
-                    target = rsc;
-                else if (_markets.FirstIfNotNull(clickPosition, out var market))
-                    target = market;
+            var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
 
-                unit.ComputeCycle(clickPosition, target);
-            }
+            foreach (var unit in _units.Where(x => x.Focused))
+                unit.ComputeCycle(clickPosition, targets);
         }
 
         private (int gold, int wood, int rock) GetResources<T>() where T : Sprite

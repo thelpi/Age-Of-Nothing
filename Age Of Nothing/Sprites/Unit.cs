@@ -106,13 +106,13 @@ namespace Age_Of_Nothing.Sprites
         }
 
         /// <summary>
-        /// Computes the path cycle from the specified point and target related to point (if any)
+        /// Computes the path cycle from the specified point and targets related to point (if any)
         /// </summary>
         /// <param name="originalPoint"></param>
-        /// <param name="target"></param>
-        public virtual void ComputeCycle(Point originalPoint, Sprite target)
+        /// <param name="targets"></param>
+        public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets)
         {
-            SetPathCycle((originalPoint, target));
+            SetPathCycle((originalPoint, null));
         }
     }
 }
