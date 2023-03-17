@@ -70,5 +70,41 @@ namespace Age_Of_Nothing
         {
             return craft != this && Sources.Any(_ => craft.Sources.Contains(_)) && Started;
         }
+
+        public bool CheckForCancellation(IReadOnlyCollection<Sprite> sprites)
+        {
+            // Reasons for cancellation:
+            // - there is no source remaining to complete the craft
+            // - the surface for the structure is already occupied by another structure
+            // - villagers lost focus on structure to craft
+            // TODO: we should keep the craft pending in the last case
+            var cancel = false;
+
+            var lost = Sources
+                .Where(x => !sprites.Contains(x))
+                .ToList();
+
+            foreach (var ms in lost)
+            {
+                if (RemoveSource(ms))
+                    cancel = true;
+            }
+
+            if (Target.Is<Structure>())
+            {
+                if (sprites.Where(x => !x.Is<Unit>()).Any(x => x.Surface.IntersectsWith(Target.Surface)))
+                    cancel = true;
+                var unfocused = Sources
+                    .Where(x => x.Is<Villager>(out var villager) && !villager.IsSpriteOnPath(Target))
+                    .ToList();
+                foreach (var ms in unfocused)
+                {
+                    if (RemoveSource(ms))
+                        cancel = true;
+                }
+            }
+
+            return cancel;
+        }
     }
 }

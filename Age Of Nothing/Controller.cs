@@ -358,39 +358,13 @@ namespace Age_Of_Nothing
         {
             var cancelledCrafts = new List<Craft>(10);
 
-            // Reasons for cancellation:
-            // - there is no source remaining to complete the craft
-            // - the surface for the structure is already occupied by another structure
-            // - villagers lost focus on structure to craft
-            // TODO: we should keep the craft pending in the last case
             foreach (var craft in _craftQueue)
             {
-                var lost = craft.Sources
-                    .Where(x => !_sprites.Contains(x))
-                    .ToList();
-                foreach (var ms in lost)
-                {
-                    if (craft.RemoveSource(ms))
-                        cancelledCrafts.Add(craft);
-                }
-
-                if (craft.Target.Is<Structure>())
-                {
-                    if (SurfaceIsEngaged(craft.Target.Surface))
-                        cancelledCrafts.Add(craft);
-                    var unfocused = craft.Sources
-                        .Where(x => x.Is<Villager>(out var villager) && !villager.IsSpriteOnPath(craft.Target))
-                        .ToList();
-                    foreach (var ms in unfocused)
-                    {
-                        if (craft.RemoveSource(ms))
-                            cancelledCrafts.Add(craft);
-                    }
-                }
+                if (craft.CheckForCancellation(_sprites))
+                    cancelledCrafts.Add(craft);
             }
 
-            // "Distinct" because the craft can have several reasons for cancellation at the same time
-            foreach (var craft in cancelledCrafts.Distinct())
+            foreach (var craft in cancelledCrafts)
             {
                 if (!craft.Started)
                     RefundResources(craft.Target.GetType());
