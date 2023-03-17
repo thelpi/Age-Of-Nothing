@@ -123,6 +123,83 @@ namespace Age_Of_Nothing
             BuildStructure(center, (a, b) => new Dwelling(a, b));
         }
 
+        public void AddVillagerCreationToStack()
+        {
+            lock (_craftQueue)
+            {
+                if (_markets.FirstIfNotNull(x => x.Focused, out var focusMarket))
+                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
+            }
+        }
+
+        public void CheckForDeletion()
+        {
+            lock (_sprites)
+            {
+                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.CanBeCrafted);
+                if (sprite != null)
+                    _sprites.Remove(sprite);
+            }
+        }
+
+        public void NewFrameCheck()
+        {
+            var dat = System.DateTime.Now;
+            _frames++;
+            lock (_sprites)
+            {
+                ManageUnitsMovements();
+                lock (_craftQueue)
+                {
+                    ManageCraftsToCancel();
+                    ManageCraftsInProgress();
+                }
+            }
+        }
+
+        public void ClearFocus()
+        {
+            foreach (var sp in _focusables)
+                sp.Focused = false;
+        }
+
+        public void FocusOnZone(Rect zone)
+        {
+            var hasUnitSelected = false;
+            foreach (var unit in _units)
+            {
+                if (zone.Contains(unit.Center))
+                {
+                    unit.Focused = true;
+                    hasUnitSelected = true;
+                }
+            }
+
+            if (!hasUnitSelected)
+            {
+                // take the first focus
+                foreach (var x in _focusables.Where(x => !(x is Unit)))
+                {
+                    if (zone.IntersectsWith(x.Surface))
+                    {
+                        x.Focused = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void RefreshHover(Rect zone)
+        {
+            foreach (var sp in _focusables)
+                sp.ForceHover(zone.IntersectsWith(sp.Surface));
+        }
+
+        public Size GetSpriteSize<T>() where T : Sprite
+        {
+            return typeof(T).GetAttribute<SizeAttribute>().Size;
+        }
+
         private void BuildStructure<T>(Point center, System.Func<Point, IEnumerable<FocusableSprite>, T> ctor)
             where T : Structure
         {
@@ -169,40 +246,6 @@ namespace Age_Of_Nothing
             }
 
             return false;
-        }
-
-        public void AddVillagerCreationToStack()
-        {
-            lock (_craftQueue)
-            {
-                if (_markets.FirstIfNotNull(x => x.Focused, out var focusMarket))
-                    _craftQueue.Add(new Craft(focusMarket, new Villager(focusMarket.Center, _focusables), GetCraftTime<Villager>()));
-            }
-        }
-
-        public void CheckForDeletion()
-        {
-            lock (_sprites)
-            {
-                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.CanBeCrafted);
-                if (sprite != null)
-                    _sprites.Remove(sprite);
-            }
-        }
-
-        public void NewFrameCheck()
-        {
-            var dat = System.DateTime.Now;
-            _frames++;
-            lock (_sprites)
-            {
-                ManageUnitsMovements();
-                lock (_craftQueue)
-                {
-                    ManageCraftsToCancel();
-                    ManageCraftsInProgress();
-                }
-            }
         }
 
         private void ManageUnitsMovements()
@@ -350,7 +393,7 @@ namespace Age_Of_Nothing
 
         private void RefundResources(System.Type type)
         {
-            var attrValue = GetAttribute<ResourcesAttribute>(type);
+            var attrValue = type.GetAttribute<ResourcesAttribute>();
             if (attrValue == null)
                 return;
 
@@ -360,44 +403,6 @@ namespace Age_Of_Nothing
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
-        }
-
-        public void ClearFocus()
-        {
-            foreach (var sp in _focusables)
-                sp.Focused = false;
-        }
-
-        public void FocusOnZone(Rect zone)
-        {
-            var hasUnitSelected = false;
-            foreach (var unit in _units)
-            {
-                if (zone.Contains(unit.Center))
-                {
-                    unit.Focused = true;
-                    hasUnitSelected = true;
-                }
-            }
-
-            if (!hasUnitSelected)
-            {
-                // take the first focus
-                foreach (var x in _focusables.Where(x => !(x is Unit)))
-                {
-                    if (zone.IntersectsWith(x.Surface))
-                    {
-                        x.Focused = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void RefreshHover(Rect zone)
-        {
-            foreach (var sp in _focusables)
-                sp.ForceHover(zone.IntersectsWith(sp.Surface));
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
@@ -450,26 +455,15 @@ namespace Age_Of_Nothing
             }
         }
 
-        public (int gold, int wood, int rock) GetResources<T>() where T : Sprite
+        private (int gold, int wood, int rock) GetResources<T>() where T : Sprite
         {
-            var r = GetAttribute<ResourcesAttribute>(typeof(T));
+            var r = typeof(T).GetAttribute<ResourcesAttribute>();
             return (r.Gold, r.Wood, r.Rock);
         }
 
-        public Size GetSpriteSize<T>() where T : Sprite
+        private int GetCraftTime<T>() where T : Sprite
         {
-            return GetAttribute<SizeAttribute>(typeof(T)).Size;
-        }
-
-        public int GetCraftTime<T>() where T : Sprite
-        {
-            return GetAttribute<CraftTimeAttribute>(typeof(T)).CraftTime;
-        }
-
-        private static TAttr GetAttribute<TAttr>(System.Type targetType)
-            where TAttr : System.Attribute
-        {
-            return System.Attribute.GetCustomAttribute(targetType, typeof(TAttr)) as TAttr;
+            return typeof(T).GetAttribute<CraftTimeAttribute>().CraftTime;
         }
     }
 }

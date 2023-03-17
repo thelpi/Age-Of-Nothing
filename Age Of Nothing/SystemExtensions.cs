@@ -13,5 +13,11 @@ namespace Age_Of_Nothing
             item = collection.FirstOrDefault(predicate);
             return item != null;
         }
+
+        public static TAttr GetAttribute<TAttr>(this Type targetType)
+            where TAttr : Attribute
+        {
+            return Attribute.GetCustomAttribute(targetType, typeof(TAttr)) as TAttr;
+        }
     }
 }
