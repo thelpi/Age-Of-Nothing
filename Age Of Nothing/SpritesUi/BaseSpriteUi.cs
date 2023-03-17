@@ -42,11 +42,19 @@ namespace Age_Of_Nothing.SpritesUi
             };
             oGrid.Children.Add(oRectangle);
 
+            var border = new Border
+            {
+                BorderThickness = new System.Windows.Thickness(0),
+                Padding = new System.Windows.Thickness(20)
+            };
+
             var img = new Image
             {
                 Source = new BitmapImage(new Uri($@"Resources/Images/{imageName}.png", UriKind.Relative))
             };
-            oGrid.Children.Add(img);
+            border.Child = img;
+
+            oGrid.Children.Add(border);
 
             return new VisualBrush
             {
