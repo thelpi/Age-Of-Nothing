@@ -9,8 +9,6 @@ namespace Age_Of_Nothing.Sprites
 
         protected IEnumerable<FocusableSprite> Sprites { get; }
 
-        public bool CanBeCrafted { get; }
-
         public bool Focused
         {
             get => _focused;
@@ -24,10 +22,9 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove, bool canBeCrafted)
-            : base(surface, canMove)
+        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove, int lifePoints = -1)
+            : base(surface, canMove, lifePoints)
         {
-            CanBeCrafted = canBeCrafted;
             Sprites = sprites;
         }
 

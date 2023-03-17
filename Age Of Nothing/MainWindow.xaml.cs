@@ -57,8 +57,8 @@ namespace Age_Of_Nothing
                 {
                     action = () =>
                     {
-                        CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus();
-                        CreateVillagerButton.IsEnabled = _controller.HasMarketFocus();
+                        CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus;
+                        CreateVillagerButton.IsEnabled = _controller.HasMarketFocus;
                     };
                 }
                 else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName)

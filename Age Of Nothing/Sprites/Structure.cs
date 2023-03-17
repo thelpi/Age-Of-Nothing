@@ -6,8 +6,8 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class Structure : FocusableSprite
     {
-        protected Structure(Rect rect, IEnumerable<FocusableSprite> sprites)
-            : base(rect, sprites, false, true)
+        protected Structure(Rect rect, IEnumerable<FocusableSprite> sprites, int lifePoints)
+            : base(rect, sprites, false, lifePoints)
         { }
 
         public int GetUnitsStorage()

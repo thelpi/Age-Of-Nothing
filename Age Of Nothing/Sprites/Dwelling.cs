@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
     public class Dwelling : Structure
     {
         public Dwelling(Point topleft, IEnumerable<FocusableSprite> sprites)
-            : base(new Rect(topleft, new Point(topleft.X + GetSpriteSize<Dwelling>().Width, topleft.Y + GetSpriteSize<Dwelling>().Height)), sprites)
+            : base(new Rect(topleft, new Point(topleft.X + GetSpriteSize<Dwelling>().Width, topleft.Y + GetSpriteSize<Dwelling>().Height)), sprites, GetLifePoints<Dwelling>())
         { }
     }
 }

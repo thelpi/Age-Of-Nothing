@@ -34,7 +34,7 @@ namespace Age_Of_Nothing.Sprites
         }
 
         public Villager(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, GetSpriteSize<Villager>(), sprites)
+            : base(center, GetSpriteSize<Villager>(), sprites, GetLifePoints<Villager>())
         { }
 
         /// <summary>

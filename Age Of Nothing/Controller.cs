@@ -49,8 +49,16 @@ namespace Age_Of_Nothing
                     foreach (var sprite in e.NewItems.OfType<Sprite>())
                     {
                         PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true, false));
-                        if (sprite.Is<FocusableSprite>(out var fs))
-                            fs.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
+                        sprite.PropertyChanged += (s, e) =>
+                        {
+                            if (e.PropertyName == nameof(sprite.LifePoints))
+                            {
+                                if (sprite.LifePoints == 0)
+                                    _sprites.Remove(sprite);
+                            }
+                            // To be clear: when a sprite trigger a property changed, the controller propagates the same event
+                            PropertyChanged?.Invoke(this, e);
+                        };
                     }
                 }
 
@@ -97,15 +105,9 @@ namespace Age_Of_Nothing
                 _sprites.Add(forest);
         }
 
-        public bool HasVillagerFocus()
-        {
-            return _villagers.Any(x => x.Focused);
-        }
+        public bool HasVillagerFocus => _villagers.Any(x => x.Focused);
 
-        public bool HasMarketFocus()
-        {
-            return _markets.Any(x => x.Focused);
-        }
+        public bool HasMarketFocus => _markets.Any(x => x.Focused);
 
         public void BuildDwelling(Point center)
         {
@@ -128,9 +130,9 @@ namespace Age_Of_Nothing
         {
             lock (_sprites)
             {
-                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.CanBeCrafted);
+                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.HasLifePoints);
                 if (sprite != null)
-                    _sprites.Remove(sprite);
+                    sprite.TakeDamage(int.MaxValue);
             }
         }
 
