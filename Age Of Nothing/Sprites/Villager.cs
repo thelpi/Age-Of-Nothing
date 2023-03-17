@@ -111,5 +111,18 @@ namespace Age_Of_Nothing.Sprites
                 }
             }
         }
+
+        public void ComputeCycleOnForestPatch(List<Forest> patch)
+        {
+            if (patch.Count > 0 && Sprites.Any(x => x.Is<Market>()))
+            {
+                var fpOk = patch.GetClosestSprite(Center);
+                var closestMarket = Sprites.OfType<Market>().GetClosestSprite(fpOk.Center);
+                if (IsMaxCarrying(ResourceTypes.Wood))
+                    SetPathCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
+                else
+                    SetPathCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
+            }
+        }
     }
 }

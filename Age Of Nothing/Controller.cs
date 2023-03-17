@@ -22,7 +22,6 @@ namespace Age_Of_Nothing
         private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
         private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
-        private IEnumerable<Resource> _resources => _sprites.OfType<Resource>();
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Dwelling> _dwellings => _sprites.OfType<Dwelling>();
         private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
@@ -243,12 +242,9 @@ namespace Age_Of_Nothing
                 && gold <= _resourcesQty[ResourceTypes.Gold]
                 && rock <= _resourcesQty[ResourceTypes.Rock])
             {
-                _resourcesQty[ResourceTypes.Wood] -= wood;
-                _resourcesQty[ResourceTypes.Gold] -= gold;
-                _resourcesQty[ResourceTypes.Rock] -= rock;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
+                UpdateQuantity(ResourceTypes.Wood, -wood);
+                UpdateQuantity(ResourceTypes.Gold, -gold);
+                UpdateQuantity(ResourceTypes.Rock, -rock);
                 return true;
             }
 
@@ -260,46 +256,43 @@ namespace Age_Of_Nothing
             var emptyResources = new List<Sprite>(5);
             foreach (var unit in _units)
             {
-                var tgt = unit.CheckForMovement();
-                if (tgt != null && unit.Is<Villager>(out var villager))
-                {
-                    var carry = villager.CheckCarry(tgt);
-                    if (carry.HasValue)
-                    {
-                        _resourcesQty[carry.Value.r] += carry.Value.v;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{carry.Value.r}Quantity"));
-                        if (villager.GetNextSpriteOnPath<Forest>() is var f && f != null)
-                            ManageNextForestPatch(villager, _forestPatchs[f.ForestPatchIndex]);
-                    }
-
-                    if (tgt.Is<Resource>(out var rs) && rs.Quantity == 0)
-                    {
-                        emptyResources.Add(tgt);
-                        if (tgt.Is<Forest>(out var f))
-                        {
-                            var patch = _forestPatchs[f.ForestPatchIndex];
-                            if (patch.Contains(f))
-                                patch.Remove(f);
-                            ManageNextForestPatch(villager, patch);
-                        }
-                    }
-                }
+                var emptyResourceSprite = ManageUnitMovement(unit);
+                if (emptyResourceSprite != null)
+                    emptyResources.Add(emptyResourceSprite);
             }
 
             emptyResources.ForEach(x => _sprites.Remove(x));
         }
 
-        private void ManageNextForestPatch(Villager villager, List<Forest> patch)
+        private Sprite ManageUnitMovement(Unit unit)
         {
-            if (patch.Count > 0 && _markets.Any())
+            Sprite emptyResourceSprite = null;
+
+            var tgt = unit.CheckForMovement();
+            if (tgt != null && unit.Is<Villager>(out var villager))
             {
-                var fpOk = patch.GetClosestSprite(villager.Center);
-                var closestMarket = _markets.GetClosestSprite(fpOk.Center);
-                if (villager.IsMaxCarrying(ResourceTypes.Wood))
-                    villager.SetPathCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
-                else
-                    villager.SetPathCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
+                var carry = villager.CheckCarry(tgt);
+                if (carry.HasValue)
+                {
+                    UpdateQuantity(carry.Value.r, carry.Value.v);
+                    if (villager.GetNextSpriteOnPath<Forest>() is var f && f != null)
+                        villager.ComputeCycleOnForestPatch(_forestPatchs[f.ForestPatchIndex]);
+                }
+
+                if (tgt.Is<Resource>(out var rs) && rs.Quantity == 0)
+                {
+                    emptyResourceSprite = tgt;
+                    if (tgt.Is<Forest>(out var f))
+                    {
+                        var patch = _forestPatchs[f.ForestPatchIndex];
+                        if (patch.Contains(f))
+                            patch.Remove(f);
+                        villager.ComputeCycleOnForestPatch(patch);
+                    }
+                }
             }
+
+            return emptyResourceSprite;
         }
 
         private void ManageCraftsInProgress()
@@ -343,12 +336,20 @@ namespace Age_Of_Nothing
             if (attrValue == null)
                 return;
 
-            _resourcesQty[ResourceTypes.Gold] += attrValue.Gold;
-            _resourcesQty[ResourceTypes.Wood] += attrValue.Wood;
-            _resourcesQty[ResourceTypes.Rock] += attrValue.Rock;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WoodQuantity)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RockQuantity)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GoldQuantity)));
+            UpdateQuantity(ResourceTypes.Gold, attrValue.Gold);
+            UpdateQuantity(ResourceTypes.Wood, attrValue.Wood);
+            UpdateQuantity(ResourceTypes.Rock, attrValue.Rock);
+        }
+
+        private void UpdateQuantity(ResourceTypes rt, int minusValue)
+        {
+            if (minusValue != 0)
+            {
+                _resourcesQty[rt] += _resourcesQty[rt] < minusValue
+                    ? _resourcesQty[rt]
+                    : minusValue;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{rt}Quantity"));
+            }
         }
 
         private (int gold, int wood, int rock) GetResources<T>() where T : Sprite
