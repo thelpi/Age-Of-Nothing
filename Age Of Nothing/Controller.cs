@@ -37,9 +37,9 @@ namespace Age_Of_Nothing
         {
             _resourcesQty = new Dictionary<ResourceTypes, int>
             {
-                { ResourceTypes.Gold, 100 },
-                { ResourceTypes.Rock, 100 },
-                { ResourceTypes.Wood, 100 }
+                { ResourceTypes.Gold, 10000 },
+                { ResourceTypes.Rock, 10000 },
+                { ResourceTypes.Wood, 10000 }
             };
 
             _sprites.CollectionChanged += (s, e) =>
@@ -112,6 +112,16 @@ namespace Age_Of_Nothing
         public void BuildDwelling(Point center)
         {
             BuildStructure(center, (a, b) => new Dwelling(a, b));
+        }
+
+        public void BuildMarket(Point center)
+        {
+            BuildStructure(center, (a, b) => new Market(a, b));
+        }
+
+        public void BuildBarracks(Point center)
+        {
+            BuildStructure(center, (a, b) => new Barracks(a, b));
         }
 
         public void AddVillagerCreationToStack()

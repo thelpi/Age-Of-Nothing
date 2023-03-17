@@ -27,7 +27,7 @@ namespace Age_Of_Nothing
         private readonly Rectangle _structureShadowGu;
         private readonly Controller _controller;
 
-        private Size? _structureShadowSize;
+        private (Size size, Type target)? _structureShadowSize;
         private Point? _selectionPoint;
         private volatile bool _refreshing = false;
 
@@ -58,6 +58,8 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         CreateDwellingButton.IsEnabled = _controller.HasVillagerFocus;
+                        CreateMarketButton.IsEnabled = _controller.HasVillagerFocus;
+                        CreateBarracksButton.IsEnabled = _controller.HasVillagerFocus;
                         CreateVillagerButton.IsEnabled = _controller.HasMarketFocus;
                     };
                 }
@@ -150,7 +152,12 @@ namespace Age_Of_Nothing
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
             if (_structureShadowSize.HasValue)
             {
-                _controller.BuildDwelling(e.GetPosition(MainCanvas));
+                if (_structureShadowSize.Value.target == typeof(Dwelling))
+                    _controller.BuildDwelling(e.GetPosition(MainCanvas));
+                else if (_structureShadowSize.Value.target == typeof(Market))
+                    _controller.BuildMarket(e.GetPosition(MainCanvas));
+                else if (_structureShadowSize.Value.target == typeof(Barracks))
+                    _controller.BuildBarracks(e.GetPosition(MainCanvas));
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
@@ -176,10 +183,10 @@ namespace Age_Of_Nothing
             if (_structureShadowSize.HasValue)
             {
                 var pos = e.GetPosition(MainCanvas);
-                _structureShadowGu.Width = _structureShadowSize.Value.Width;
-                _structureShadowGu.Height = _structureShadowSize.Value.Height;
-                _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (_structureShadowSize.Value.Width / 2));
-                _structureShadowGu.SetValue(Canvas.TopProperty, pos.Y - (_structureShadowSize.Value.Height / 2));
+                _structureShadowGu.Width = _structureShadowSize.Value.size.Width;
+                _structureShadowGu.Height = _structureShadowSize.Value.size.Height;
+                _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (_structureShadowSize.Value.size.Width / 2));
+                _structureShadowGu.SetValue(Canvas.TopProperty, pos.Y - (_structureShadowSize.Value.size.Height / 2));
             }
         }
 
@@ -191,7 +198,17 @@ namespace Age_Of_Nothing
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = Sprite.GetSpriteSize<Dwelling>();
+            _structureShadowSize = (Sprite.GetSpriteSize<Dwelling>(), typeof(Dwelling));
+        }
+
+        private void CreateMarketButton_Click(object sender, RoutedEventArgs e)
+        {
+            _structureShadowSize = (Sprite.GetSpriteSize<Market>(), typeof(Market));
+        }
+
+        private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
+        {
+            _structureShadowSize = (Sprite.GetSpriteSize<Barracks>(), typeof(Barracks));
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

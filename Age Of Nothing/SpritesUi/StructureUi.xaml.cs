@@ -24,7 +24,9 @@ namespace Age_Of_Nothing.SpritesUi
             { (typeof(Market), false), GetImageFill(Brushes.Purple, "market") },
             { (typeof(Market), true), GetImageFill(Brushes.MediumPurple, "market") },
             { (typeof(Dwelling), false), GetImageFill(Brushes.Sienna, "dwelling") },
-            { (typeof(Dwelling), true), GetImageFill(Brushes.Peru, "dwelling") }
+            { (typeof(Dwelling), true), GetImageFill(Brushes.Peru, "dwelling") },
+            { (typeof(Barracks), false), GetImageFill(Brushes.Crimson, "barracks") },
+            { (typeof(Barracks), true), GetImageFill(Brushes.Salmon, "barracks") }
         };
 
         private readonly Rectangle _surround;
