@@ -186,11 +186,6 @@ namespace Age_Of_Nothing
                 sp.ForceHover(zone.IntersectsWith(sp.Surface));
         }
 
-        public Size GetSpriteSize<T>() where T : Sprite
-        {
-            return typeof(T).GetAttribute<DimensionsAttribute>().Size;
-        }
-
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
             var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
@@ -204,7 +199,7 @@ namespace Age_Of_Nothing
         {
             lock (_craftQueue)
             {
-                var surface = center.ComputeSurfaceFromMiddlePoint(GetSpriteSize<T>());
+                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize<T>());
                 // TODO: surface should be inside the game area entirely
                 if (!SurfaceIsEngaged(surface))
                 {

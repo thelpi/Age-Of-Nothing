@@ -191,7 +191,7 @@ namespace Age_Of_Nothing
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = _controller.GetSpriteSize<Dwelling>();
+            _structureShadowSize = Sprite.GetSpriteSize<Dwelling>();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

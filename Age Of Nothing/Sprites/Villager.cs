@@ -5,13 +5,11 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
-    [Dimensions(_size)]
+    [Dimensions(20)]
     [CraftTime(120)]
+    [Speed(5)]
     public class Villager : Unit
     {
-        private const double _size = 20;
-        private const double _speed = 5;
-
         private static readonly IReadOnlyDictionary<ResourceTypes, int> _carryCapacity = new Dictionary<ResourceTypes, int>
         {
             { ResourceTypes.Gold, 10 },
@@ -35,7 +33,7 @@ namespace Age_Of_Nothing.Sprites
         }
 
         public Villager(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, _speed, _size, sprites)
+            : base(center, GetSpriteSize<Villager>(), sprites)
         { }
 
         /// <summary>

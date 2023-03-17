@@ -69,5 +69,20 @@ namespace Age_Of_Nothing.Sprites
         {
             return GetType().GetAttribute<CraftTimeAttribute>()?.FramesCount ?? 0;
         }
+
+        public Size GetSpriteSize()
+        {
+            return GetSpriteSize(GetType());
+        }
+
+        public static Size GetSpriteSize<T>() where T : Sprite
+        {
+            return GetSpriteSize(typeof(T));
+        }
+
+        private static Size GetSpriteSize(System.Type t)
+        {
+            return t.GetAttribute<DimensionsAttribute>().Size;
+        }
     }
 }

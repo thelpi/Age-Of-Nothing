@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites
 {
@@ -10,14 +11,9 @@ namespace Age_Of_Nothing.Sprites
         private LinkedListNode<(Point point, Sprite target)> _currentPathTarget;
         private bool _isPathLoop;
 
-        protected Unit(Point center, double speed, double size, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size, size), sprites, true, true)
-        {
-            Speed = speed;
-        }
-
-        // pixels by frame
-        public double Speed { get; }
+        protected Unit(Point center, Size size, IEnumerable<FocusableSprite> sprites)
+            : base(center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height), sprites, true, true)
+        { }
 
         /// <summary>
         /// Check if the unit has to move in this frame
@@ -34,7 +30,7 @@ namespace Age_Of_Nothing.Sprites
                 // compte the point on the distance to reach the targer
                 // (in straight line)
                 var (point, target) = _currentPathTarget.Value;
-                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, point.X, point.Y, Speed);
+                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, point.X, point.Y, GetSpeed());
 
                 Move(new Point(x2, y2));
                 if (point == Center)
@@ -113,6 +109,11 @@ namespace Age_Of_Nothing.Sprites
         public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets)
         {
             SetPathCycle((originalPoint, null));
+        }
+
+        public double GetSpeed()
+        {
+            return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
     }
 }
