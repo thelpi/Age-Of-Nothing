@@ -106,5 +106,44 @@ namespace Age_Of_Nothing
 
             return cancel;
         }
+
+        public bool CheckForCompletion(int frames, bool popAvailable, IReadOnlyCollection<Craft> craftQueue)
+        {
+            var finish = false;
+
+            if (Target.Is<Unit>())
+            {
+                // if the max pop. is reached, we keep the craft pending
+                if (HasFinished(frames))
+                    finish = popAvailable;
+                // to start the craft, any of the sources should not have another craft already started
+                else if (!Started && !craftQueue.Any(x => x.IsStartedWithCommonSource(this)))
+                {
+                    if (popAvailable)
+                        SetStartingFrame(frames);
+                }
+            }
+            else if (Target.Is<Structure>(out var tgtStruct))
+            {
+                if (HasFinished(frames))
+                    finish = true;
+                else
+                {
+                    var availableSources = Sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
+                    if (!Started)
+                    {
+                        if (availableSources > 0)
+                            SetStartingFrame(frames, availableSources);
+                    }
+                    else
+                    {
+                        if (availableSources != CurrentSources)
+                            UpdateSources(frames, availableSources);
+                    }
+                }
+            }
+
+            return finish;
+        }
     }
 }

@@ -307,45 +307,10 @@ namespace Age_Of_Nothing
             var finishedCrafts = new List<Craft>(10);
             foreach (var craft in _craftQueue)
             {
-                if (craft.Target.Is<Unit>())
+                if (craft.CheckForCompletion(_frames, Population < PotentialPopulation, _craftQueue))
                 {
-                    if (craft.HasFinished(_frames))
-                    {
-                        // if the max pop. is reached, we keep the craft pending
-                        if (Population < PotentialPopulation)
-                        {
-                            _sprites.Add(craft.Target);
-                            finishedCrafts.Add(craft);
-                        }
-                    }
-                    // to start the craft, any of the sources should not have another craft already started
-                    else if (!craft.Started && !_craftQueue.Any(x => x.IsStartedWithCommonSource(craft)))
-                    {
-                        if (Population < PotentialPopulation)
-                            craft.SetStartingFrame(_frames);
-                    }
-                }
-                else if (craft.Target.Is<Structure>(out var tgtStruct))
-                {
-                    if (craft.HasFinished(_frames))
-                    {
-                        _sprites.Add(craft.Target);
-                        finishedCrafts.Add(craft);
-                    }
-                    else
-                    {
-                        var availableSources = craft.Sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
-                        if (!craft.Started)
-                        {
-                            if (availableSources > 0)
-                                craft.SetStartingFrame(_frames, availableSources);
-                        }
-                        else
-                        {
-                            if (availableSources != craft.CurrentSources)
-                                craft.UpdateSources(_frames, availableSources);
-                        }
-                    }
+                    _sprites.Add(craft.Target);
+                    finishedCrafts.Add(craft);
                 }
             }
 
