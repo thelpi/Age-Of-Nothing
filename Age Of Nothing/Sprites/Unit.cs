@@ -30,7 +30,7 @@ namespace Age_Of_Nothing.Sprites
                 // compte the point on the distance to reach the targer
                 // (in straight line)
                 var (point, target) = _currentPathTarget.Value;
-                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, point.X, point.Y, GetSpeed());
+                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, point.X, point.Y, GetDefaultSpeed());
 
                 Move(new Point(x2, y2));
                 if (point == Center)
@@ -111,7 +111,7 @@ namespace Age_Of_Nothing.Sprites
             SetPathCycle((originalPoint, null));
         }
 
-        public double GetSpeed()
+        private double GetDefaultSpeed()
         {
             return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
