@@ -84,6 +84,35 @@ namespace Age_Of_Nothing
                             MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
                         else if (addEvt.Sprite.Is<Resource>(out var addR))
                             MainCanvas.Children.Add(new ResourceUi(addR));
+
+                        if (addEvt.IsBlueprint)
+                        {
+                            var panel = new StackPanel
+                            {
+                                Orientation = Orientation.Vertical,
+                                Margin = new Thickness(0, 5, 0, 0),
+                                Tag = addEvt.Sprite
+                            };
+
+                            var lbl = new Label
+                            {
+                                Content = addEvt.Sprite.GetType().Name
+                            };
+                            panel.Children.Add(lbl);
+
+                            var pgb = new ProgressBar
+                            {
+                                Width = 100,
+                                Height = 23,
+                                Margin = new Thickness(0, 2, 0, 0),
+                                Minimum = 0,
+                                Maximum = 100,
+                                Value = 0
+                            };
+                            panel.Children.Add(pgb);
+
+                            CraftQueuePanel.Children.Add(panel);
+                        }
                     };
                 }
                 else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionRemovePropertyName)
@@ -98,11 +127,24 @@ namespace Age_Of_Nothing
                             MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
                         else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
                             MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
+
+                        if (rmvEvt.IsBlueprint)
+                            CraftQueuePanel.Children.Remove(GetCraftSpriteVisualItem(rmvEvt.Sprite));
                     };
                 }
                 else if (e.PropertyName == nameof(_controller.Population))
                 {
                     action = () => PopulationValueText.Text = $"{_controller.Population} / {_controller.PotentialPopulation}";
+                }
+                else if (e.PropertyName == nameof(Craft.Progression))
+                {
+                    action = () =>
+                    {
+                        var craft = s as Craft;
+                        var panel = GetCraftSpriteVisualItem(craft.Target);
+                        var pgb = (panel as StackPanel).Children[1] as ProgressBar;
+                        pgb.Value = craft.Progression;
+                    };
                 }
                 if (action != null)
                     Dispatcher.BeginInvoke(action);
@@ -259,6 +301,12 @@ namespace Age_Of_Nothing
             _controller.NewFrameCheck();
 
             _refreshing = false;
+        }
+
+        private FrameworkElement GetCraftSpriteVisualItem(Sprite sprite)
+        {
+            return CraftQueuePanel.Children.OfType<FrameworkElement>()
+                .FirstOrDefault(x => x.Tag == sprite);
         }
     }
 }

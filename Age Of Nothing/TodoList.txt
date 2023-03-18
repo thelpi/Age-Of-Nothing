@@ -1,7 +1,4 @@
-﻿Construction :
-afficher le timer pendant la construction dans le menu
-
-Chateau
+﻿Chateau
 Murs
 Technologies
 Délai récolte ressource

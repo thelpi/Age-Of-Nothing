@@ -12,23 +12,23 @@ namespace Age_Of_Nothing
     {
         private readonly List<Sprite> _sources;
         private readonly Type _sourceType;
+        // The number of frames required to perform the craft for a single source.
+        private readonly int _unitaryFramesToPerform;
 
         private int _startingFrame;
         private int _currentSources;
-        // The number of frames required to perform the craft for a single source.
-        private int _unitaryFramesToPerform;
         // The total number of frames to craft; might change mid-term depending on source count
         private int _totalFramesCount;
-        private int _progression;
+        private double _progression;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Sprite Target { get; }
         public bool Started { get; private set; }
 
-        public int Progression
+        public double Progression
         {
-            get => _progression;
+            get => Math.Round(_progression * 100);
             private set
             {
                 if (_progression != value)
@@ -61,6 +61,7 @@ namespace Age_Of_Nothing
             Target = target;
             _unitaryFramesToPerform = target.GetCraftTime();
             _sourceType = sources.First().GetType();
+            _progression = 0;
         }
 
         public void AddSource(Sprite sprite)
@@ -150,8 +151,8 @@ namespace Age_Of_Nothing
                 }
             }
 
-            var elapsed = frames - _startingFrame;
-            Progression = (int)Math.Round((decimal)elapsed / (_totalFramesCount + elapsed));
+            if (Started)
+                Progression = (frames - _startingFrame) / (double)_totalFramesCount;
 
             return finish;
         }

@@ -78,7 +78,7 @@ namespace Age_Of_Nothing
                     {
                         PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
                         // propagate the event
-                        craft.PropertyChanged += (_, eSub) => PropertyChanged?.Invoke(this, eSub);
+                        craft.PropertyChanged += (_, eSub) => PropertyChanged?.Invoke(craft, eSub);
                     }
                 }
 
