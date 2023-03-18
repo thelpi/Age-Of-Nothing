@@ -9,19 +9,18 @@ namespace Age_Of_Nothing
 {
     public class Craft
     {
-        private int _startingFrame;
         private readonly List<Sprite> _sources;
+        private readonly Type _sourceType;
 
-        // Assumes all sources are the same
-        public IReadOnlyList<Sprite> Sources => _sources;
-        public Sprite Target { get; }
-        // The total number of frames to craft; might change mid-term depending on source count
-        public int TotalFramesCount { get; private set; }
+        private int _startingFrame;
+        private int _currentSources;
         // The number of frames required to perform the craft for a single source.
-        public int UnitaryFramesToPerform { get; }
-        public bool Started { get; private set; }
+        private int _unitaryFramesToPerform;
+        // The total number of frames to craft; might change mid-term depending on source count
+        private int TotalFramesCount;
 
-        public int CurrentSources { get; private set; }
+        public Sprite Target { get; }
+        public bool Started { get; private set; }
 
         public Craft(Sprite source, Sprite target)
             : this(new List<Sprite> { source }, target)
@@ -29,54 +28,33 @@ namespace Age_Of_Nothing
 
         public Craft(List<Sprite> sources, Sprite target)
         {
+            if (sources.Count == 0)
+                throw new ArgumentException("Soruces collection is empty.", nameof(sources));
+
+            if (sources.Select(x => x.GetType()).Distinct().Count() > 1)
+                throw new ArgumentException("Each item of the source collection has to be of the same type.", nameof(sources));
+
+            if (target.GetCraftTime() <= 0)
+                throw new ArgumentException("The target is not craftable.", nameof(target));
+
+            if (target.Is<Unit>() && sources.Count > 1)
+                throw new InvalidOperationException("Units can only be crafted by a single source.");
+
             _sources = sources;
             Target = target;
-            UnitaryFramesToPerform = target.GetCraftTime();
+            _unitaryFramesToPerform = target.GetCraftTime();
+            _sourceType = sources.First().GetType();
         }
 
-        public bool HasFinished(int currentFrame)
+        public void AddSource(Sprite sprite)
         {
-            return Started && currentFrame - _startingFrame >= TotalFramesCount;
-        }
+            if (sprite.GetType() != _sourceType)
+                throw new ArgumentException("The sprite should be of the same type as existing sources.", nameof(sprite));
 
-        public void SetStartingFrame(int currentFrame, int availableSourcesCount = 1)
-        {
-            if (!Started)
-            {
-                CurrentSources = availableSourcesCount;
-                _startingFrame = currentFrame;
-                TotalFramesCount = ComputeRemainingFramesToPerform(UnitaryFramesToPerform);
-                Started = true;
-            }
-        }
+            if (!Target.Is<Structure>())
+                throw new InvalidOperationException("Adding source is only allowed for structure.");
 
-        public void UpdateSources(int currentFrame, int availableSourcesCount)
-        {
-            CurrentSources = availableSourcesCount;
-            var framesElapsed = Started ? currentFrame - _startingFrame : 0;
-            TotalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(UnitaryFramesToPerform - framesElapsed);
-        }
-
-        public bool RemoveSource(Sprite sprite)
-        {
-            _sources.Remove(sprite);
-            return _sources.Count == 0;
-        }
-
-        private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
-        {
-            return (int)Math.Round(unitaryFramesToPerformRemaining / (double)CurrentSources);
-        }
-
-        public bool IsStartedWithCommonSource(Craft craft)
-        {
-            return craft != this && Sources.Any(_ => craft.Sources.Contains(_)) && Started;
-        }
-
-        public void AddSource(Sprite unit)
-        {
-            // assume the new source is the same as exiting ones
-            _sources.Add(unit);
+            _sources.Add(sprite);
         }
 
         public bool CheckForCancellation(IReadOnlyCollection<Sprite> sprites)
@@ -88,7 +66,7 @@ namespace Age_Of_Nothing
             // TODO: we should keep the craft pending in the last case
             var cancel = false;
 
-            var lost = Sources
+            var lost = _sources
                 .Where(x => !sprites.Contains(x))
                 .ToList();
 
@@ -102,7 +80,7 @@ namespace Age_Of_Nothing
             {
                 if (sprites.Where(x => !x.Is<Unit>()).Any(x => x.Surface.IntersectsWith(Target.Surface)))
                     cancel = true;
-                var unfocused = Sources
+                var unfocused = _sources
                     .Where(x => x.Is<Villager>(out var villager) && !villager.IsSpriteOnPath(Target))
                     .ToList();
                 foreach (var ms in unfocused)
@@ -141,7 +119,7 @@ namespace Age_Of_Nothing
                 }
                 else
                 {
-                    var availableSources = Sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
+                    var availableSources = _sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
                     if (!Started)
                     {
                         if (availableSources > 0)
@@ -149,13 +127,52 @@ namespace Age_Of_Nothing
                     }
                     else
                     {
-                        if (availableSources != CurrentSources)
+                        if (availableSources != _currentSources)
                             UpdateSources(frames, availableSources);
                     }
                 }
             }
 
             return finish;
+        }
+
+        private void SetStartingFrame(int currentFrame, int availableSourcesCount = 1)
+        {
+            if (!Started)
+            {
+                _currentSources = availableSourcesCount;
+                _startingFrame = currentFrame;
+                TotalFramesCount = ComputeRemainingFramesToPerform(_unitaryFramesToPerform);
+                Started = true;
+            }
+        }
+
+        private void UpdateSources(int currentFrame, int availableSourcesCount)
+        {
+            _currentSources = availableSourcesCount;
+            var framesElapsed = Started ? currentFrame - _startingFrame : 0;
+            TotalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - framesElapsed);
+        }
+
+        private bool IsStartedWithCommonSource(Craft craft)
+        {
+            return craft != this && _sources.Any(_ => craft._sources.Contains(_)) && Started;
+        }
+
+        private bool HasFinished(int currentFrame)
+        {
+            return Started && currentFrame - _startingFrame >= TotalFramesCount;
+        }
+
+        private bool RemoveSource(Sprite sprite)
+        {
+            _sources.Remove(sprite);
+            return _sources.Count == 0;
+        }
+
+        private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
+        {
+            return (int)Math.Round(unitaryFramesToPerformRemaining / (double)_currentSources);
         }
     }
 }
