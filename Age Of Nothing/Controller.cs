@@ -38,12 +38,9 @@ namespace Age_Of_Nothing
 
         public Controller()
         {
-            _resourcesQty = new Dictionary<ResourceTypes, int>
-            {
-                { ResourceTypes.Gold, 10000 },
-                { ResourceTypes.Rock, 10000 },
-                { ResourceTypes.Wood, 10000 }
-            };
+            _resourcesQty = System.Enum.GetValues(typeof(ResourceTypes))
+                .Cast<ResourceTypes>()
+                .ToDictionary(x => x, x => 0);
 
             _sprites.CollectionChanged += (s, e) =>
             {
@@ -93,6 +90,10 @@ namespace Age_Of_Nothing
 
         public void Initialize()
         {
+            _resourcesQty[ResourceTypes.Gold] = 10000;
+            _resourcesQty[ResourceTypes.Rock] = 10000;
+            _resourcesQty[ResourceTypes.Wood] = 10000;
+
             _sprites.Add(new Villager(new Point(200, 200), _focusables));
             _sprites.Add(new Villager(new Point(100, 100), _focusables));
             _sprites.Add(new Villager(new Point(300, 300), _focusables));
