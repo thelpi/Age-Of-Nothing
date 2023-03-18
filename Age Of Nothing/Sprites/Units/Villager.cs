@@ -11,6 +11,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftTime(120)]
     [Speed(5)]
     [LifePoints(20)]
+    [CraftIn(typeof(Market))]
     public class Villager : Unit
     {
         private static readonly IReadOnlyDictionary<ResourceTypes, int> _carryCapacity = new Dictionary<ResourceTypes, int>

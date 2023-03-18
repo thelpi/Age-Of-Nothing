@@ -115,5 +115,12 @@ namespace Age_Of_Nothing.Sprites.Units
         {
             return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
+
+        public static T Instanciate<T>(Point center, IEnumerable<FocusableSprite> sprites) where T : Unit
+        {
+            return (T)typeof(T)
+                .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<FocusableSprite>) })
+                .Invoke(new object[] { center, sprites });
+        }
     }
 }

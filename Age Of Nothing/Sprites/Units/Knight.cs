@@ -9,6 +9,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [Speed(8)]
     [LifePoints(80)]
     [ResourcesCost(50, 0, 0)]
+    [CraftIn(typeof(Structures.Barracks))]
     public class Knight : Unit
     {
         public Knight(Point center, IEnumerable<FocusableSprite> sprites)

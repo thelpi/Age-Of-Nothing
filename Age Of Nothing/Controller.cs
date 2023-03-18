@@ -129,51 +129,12 @@ namespace Age_Of_Nothing
             BuildStructure(center, (a, b) => new Barracks(a, b));
         }
 
-        public void AddVillagerCreationToStack()
+        public void AddUnitToStack<T>() where T : Unit
         {
             lock (_craftQueue)
             {
-                if (_markets.FirstIfNotNull(x => x.Focused, out var focusMarket))
-                {
-                    var v = new Villager(focusMarket.Center, _focusables);
-                    _craftQueue.Add(new Craft(focusMarket, v, v.GetCraftTime()));
-                }
-            }
-        }
-
-        public void AddSwordsmanCreationToStack()
-        {
-            lock (_craftQueue)
-            {
-                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
-                {
-                    var s = new Swordsman(focusBarracks.Center, _focusables);
-                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
-                }
-            }
-        }
-
-        public void AddArcherCreationToStack()
-        {
-            lock (_craftQueue)
-            {
-                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
-                {
-                    var s = new Archer(focusBarracks.Center, _focusables);
-                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
-                }
-            }
-        }
-
-        public void AddKnightCreationToStack()
-        {
-            lock (_craftQueue)
-            {
-                if (_structures.FirstIfNotNull(x => x.Is<Barracks>() && x.Focused, out var focusBarracks))
-                {
-                    var s = new Knight(focusBarracks.Center, _focusables);
-                    _craftQueue.Add(new Craft(focusBarracks, s, s.GetCraftTime()));
-                }
+                if (_structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
+                    _craftQueue.Add(new Craft(focusedStructure, Unit.Instanciate<T>(focusedStructure.Center, _focusables)));
             }
         }
 
@@ -262,7 +223,7 @@ namespace Age_Of_Nothing
                         var sprite = ctor(surface.TopLeft, _focusables);
                         if (CheckStructureResources(sprite))
                         {
-                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, sprite.GetCraftTime()));
+                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));
                             foreach (var unit in villagerFocused)
                                 unit.SetPathCycle((center, sprite));
                         }

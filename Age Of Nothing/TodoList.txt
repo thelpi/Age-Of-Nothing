@@ -7,3 +7,5 @@ Technologies
 Délai récolte ressource
 
 Ajouter un villageois à une construction en cours
+
+Initialize controller with static dataset

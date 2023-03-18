@@ -9,6 +9,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [Speed(5)]
     [LifePoints(40)]
     [ResourcesCost(20, 10, 0)]
+    [CraftIn(typeof(Structures.Barracks))]
     public class Archer : Unit
     {
         public Archer(Point center, IEnumerable<FocusableSprite> sprites)

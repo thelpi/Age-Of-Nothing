@@ -199,25 +199,25 @@ namespace Age_Of_Nothing
         private void CreateVillagerButton_Click(object sender, RoutedEventArgs e)
         {
             ResetStructureShadow();
-            _controller.AddVillagerCreationToStack();
+            _controller.AddUnitToStack<Villager>();
         }
 
         private void CreateSwordsmanButton_Click(object sender, RoutedEventArgs e)
         {
             ResetStructureShadow();
-            _controller.AddSwordsmanCreationToStack();
+            _controller.AddUnitToStack<Swordsman>();
         }
 
         private void CreateArcherButton_Click(object sender, RoutedEventArgs e)
         {
             ResetStructureShadow();
-            _controller.AddArcherCreationToStack();
+            _controller.AddUnitToStack<Archer>();
         }
 
         private void CreateKnightButton_Click(object sender, RoutedEventArgs e)
         {
             ResetStructureShadow();
-            _controller.AddKnightCreationToStack();
+            _controller.AddUnitToStack<Knight>();
         }
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)

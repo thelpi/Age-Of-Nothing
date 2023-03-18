@@ -23,15 +23,15 @@ namespace Age_Of_Nothing
 
         public int CurrentSources { get; private set; }
 
-        public Craft(Sprite source, FocusableSprite target, int framesToPerform)
-            : this(new List<Sprite> { source }, target, framesToPerform)
+        public Craft(Sprite source, FocusableSprite target)
+            : this(new List<Sprite> { source }, target)
         { }
 
-        public Craft(List<Sprite> sources, FocusableSprite target, int singleCompleteFramesCount)
+        public Craft(List<Sprite> sources, FocusableSprite target)
         {
             _sources = sources;
             Target = target;
-            UnitaryFramesToPerform = singleCompleteFramesCount;
+            UnitaryFramesToPerform = target.GetCraftTime();
         }
 
         public bool HasFinished(int currentFrame)

@@ -9,6 +9,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [Speed(5)]
     [LifePoints(40)]
     [ResourcesCost(10, 0, 0)]
+    [CraftIn(typeof(Structures.Barracks))]
     public class Swordsman : Unit
     {
         public Swordsman(Point center, IEnumerable<FocusableSprite> sprites)
