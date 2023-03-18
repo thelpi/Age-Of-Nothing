@@ -219,17 +219,17 @@ namespace Age_Of_Nothing
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Dwelling)), typeof(Dwelling));
+            SetStructureShadowSize<Dwelling>();
         }
 
         private void CreateMarketButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Market)), typeof(Market));
+            SetStructureShadowSize<Market>();
         }
 
         private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Barracks)), typeof(Barracks));
+            SetStructureShadowSize<Barracks>();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -240,6 +240,11 @@ namespace Age_Of_Nothing
         }
 
         #endregion Events
+
+        private void SetStructureShadowSize<T>() where T : Structure
+        {
+            _structureShadowSize = (Sprite.GetSpriteSize(typeof(T)), typeof(T));
+        }
 
         private void ResetSelectionRectangle()
         {
