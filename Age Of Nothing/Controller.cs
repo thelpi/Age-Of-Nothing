@@ -114,21 +114,6 @@ namespace Age_Of_Nothing
 
         public bool HasBarracksFocus => _structures.Any(x => x.Is<Barracks>() && x.Focused);
 
-        public void BuildDwelling(Point center)
-        {
-            BuildStructure(center, (a, b) => new Dwelling(a, b));
-        }
-
-        public void BuildMarket(Point center)
-        {
-            BuildStructure(center, (a, b) => new Market(a, b));
-        }
-
-        public void BuildBarracks(Point center)
-        {
-            BuildStructure(center, (a, b) => new Barracks(a, b));
-        }
-
         public void AddUnitToStack<T>() where T : Unit
         {
             lock (_craftQueue)
@@ -208,19 +193,23 @@ namespace Age_Of_Nothing
                 unit.ComputeCycle(clickPosition, targets);
         }
 
-        private void BuildStructure<T>(Point center, System.Func<Point, IEnumerable<FocusableSprite>, T> ctor)
-            where T : Structure
+        public void BuildStructure(System.Type type, Point center)
         {
+            if (type.IsAbstract || !type.IsSubclassOf(typeof(Structure)))
+                throw new System.ArgumentException($"The type should be concrete and inherits from {nameof(Structure)}", nameof(type));
+
             lock (_craftQueue)
             {
-                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(typeof(T)));
+                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
                 // TODO: surface should be inside the game area entirely
                 if (!SurfaceIsEngaged(surface))
                 {
                     var villagerFocused = _villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
                     {
-                        var sprite = ctor(surface.TopLeft, _focusables);
+                        var sprite = (FocusableSprite)type
+                            .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<FocusableSprite>) })
+                            .Invoke(new object[] { surface.TopLeft, _focusables });
                         if (CheckStructureResources(sprite))
                         {
                             _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));

@@ -113,23 +113,6 @@ namespace Age_Of_Nothing
             _controller.Initialize();
         }
 
-        private UIElement FindCanvasElement<T, T2>(T2 sprite)
-            where T : BaseSpriteUi<T2>
-            where T2 : Sprite
-        {
-            return MainCanvas.Children.OfType<T>().FirstOrDefault(x => x.Sprite == sprite);
-        }
-
-        private void Refresh(object sender, ElapsedEventArgs e)
-        {
-            if (_refreshing) return;
-            _refreshing = true;
-
-            _controller.NewFrameCheck();
-
-            _refreshing = false;
-        }
-
         #region Events
 
         private void MainCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -158,12 +141,7 @@ namespace Age_Of_Nothing
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
             if (_structureShadowSize.HasValue)
             {
-                if (_structureShadowSize.Value.target == typeof(Dwelling))
-                    _controller.BuildDwelling(e.GetPosition(MainCanvas));
-                else if (_structureShadowSize.Value.target == typeof(Market))
-                    _controller.BuildMarket(e.GetPosition(MainCanvas));
-                else if (_structureShadowSize.Value.target == typeof(Barracks))
-                    _controller.BuildBarracks(e.GetPosition(MainCanvas));
+                _controller.BuildStructure(_structureShadowSize.Value.target, e.GetPosition(MainCanvas));
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
@@ -261,6 +239,23 @@ namespace Age_Of_Nothing
             _structureShadowSize = null;
             _structureShadowGu.Width = 0;
             _structureShadowGu.Height = 0;
+        }
+
+        private UIElement FindCanvasElement<T, T2>(T2 sprite)
+            where T : BaseSpriteUi<T2>
+            where T2 : Sprite
+        {
+            return MainCanvas.Children.OfType<T>().FirstOrDefault(x => x.Sprite == sprite);
+        }
+
+        private void Refresh(object sender, ElapsedEventArgs e)
+        {
+            if (_refreshing) return;
+            _refreshing = true;
+
+            _controller.NewFrameCheck();
+
+            _refreshing = false;
         }
     }
 }
