@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
+using Age_Of_Nothing.Sprites.Resources;
+using Age_Of_Nothing.Sprites.Structures;
 
-namespace Age_Of_Nothing.Sprites
+namespace Age_Of_Nothing.Sprites.Units
 {
     [Dimensions(20)]
     [CraftTime(120)]

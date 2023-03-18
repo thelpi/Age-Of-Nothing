@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 
-namespace Age_Of_Nothing.Sprites
+namespace Age_Of_Nothing.Sprites.Resources
 {
     public abstract class Resource : FocusableSprite
     {

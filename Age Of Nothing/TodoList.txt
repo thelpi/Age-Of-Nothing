@@ -3,4 +3,7 @@ afficher le timer pendant la construction dans le menu
 
 Chateau
 Murs
-Technlogy tree
+Technologies
+Délai récolte ressource
+
+Ajouter un villageois à une construction en cours

@@ -2,7 +2,7 @@
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
-namespace Age_Of_Nothing.Sprites
+namespace Age_Of_Nothing.Sprites.Structures
 {
     [CraftTime(400)]
     [ResourcesCost(10, 200, 50)]

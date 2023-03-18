@@ -8,6 +8,9 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
+using Age_Of_Nothing.Sprites.Resources;
+using Age_Of_Nothing.Sprites.Structures;
+using Age_Of_Nothing.Sprites.Units;
 using Age_Of_Nothing.SpritesUi;
 
 namespace Age_Of_Nothing
