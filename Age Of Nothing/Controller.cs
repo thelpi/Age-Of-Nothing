@@ -75,7 +75,11 @@ namespace Age_Of_Nothing
                 if (e.NewItems != null)
                 {
                     foreach (var craft in e.NewItems.OfType<Craft>())
+                    {
                         PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
+                        // propagate the event
+                        craft.PropertyChanged += (_, eSub) => PropertyChanged?.Invoke(this, eSub);
+                    }
                 }
 
                 if (e.OldItems != null)

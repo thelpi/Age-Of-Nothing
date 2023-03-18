@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Age_Of_Nothing.Sprites;
 using Age_Of_Nothing.Sprites.Structures;
@@ -7,7 +8,7 @@ using Age_Of_Nothing.Sprites.Units;
 
 namespace Age_Of_Nothing
 {
-    public class Craft
+    public class Craft : INotifyPropertyChanged
     {
         private readonly List<Sprite> _sources;
         private readonly Type _sourceType;
@@ -17,10 +18,26 @@ namespace Age_Of_Nothing
         // The number of frames required to perform the craft for a single source.
         private int _unitaryFramesToPerform;
         // The total number of frames to craft; might change mid-term depending on source count
-        private int TotalFramesCount;
+        private int _totalFramesCount;
+        private int _progression;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Sprite Target { get; }
         public bool Started { get; private set; }
+
+        public int Progression
+        {
+            get => _progression;
+            private set
+            {
+                if (_progression != value)
+                {
+                    _progression = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progression)));
+                }
+            }
+        }
 
         public Craft(Sprite source, Sprite target)
             : this(new List<Sprite> { source }, target)
@@ -133,6 +150,9 @@ namespace Age_Of_Nothing
                 }
             }
 
+            var elapsed = frames - _startingFrame;
+            Progression = (int)Math.Round((decimal)elapsed / (_totalFramesCount + elapsed));
+
             return finish;
         }
 
@@ -142,7 +162,7 @@ namespace Age_Of_Nothing
             {
                 _currentSources = availableSourcesCount;
                 _startingFrame = currentFrame;
-                TotalFramesCount = ComputeRemainingFramesToPerform(_unitaryFramesToPerform);
+                _totalFramesCount = ComputeRemainingFramesToPerform(_unitaryFramesToPerform);
                 Started = true;
             }
         }
@@ -151,7 +171,7 @@ namespace Age_Of_Nothing
         {
             _currentSources = availableSourcesCount;
             var framesElapsed = Started ? currentFrame - _startingFrame : 0;
-            TotalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - framesElapsed);
+            _totalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - framesElapsed);
         }
 
         private bool IsStartedWithCommonSource(Craft craft)
@@ -161,7 +181,7 @@ namespace Age_Of_Nothing
 
         private bool HasFinished(int currentFrame)
         {
-            return Started && currentFrame - _startingFrame >= TotalFramesCount;
+            return Started && currentFrame - _startingFrame >= _totalFramesCount;
         }
 
         private bool RemoveSource(Sprite sprite)
