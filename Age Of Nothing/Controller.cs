@@ -186,9 +186,8 @@ namespace Age_Of_Nothing
         public void SetTargetPositionsOnFocused(Point clickPosition)
         {
             var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
-
             foreach (var unit in Units.Where(x => x.Focused))
-                unit.ComputeCycle(clickPosition, targets);
+                unit.ComputeCycle(clickPosition, targets, _craftQueue);
         }
 
         public void BuildStructure(System.Type type, Point center)

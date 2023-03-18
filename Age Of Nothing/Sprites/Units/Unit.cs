@@ -106,7 +106,8 @@ namespace Age_Of_Nothing.Sprites.Units
         /// </summary>
         /// <param name="originalPoint"></param>
         /// <param name="targets"></param>
-        public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets)
+        /// <param name="inProgressCrafts"></param>
+        public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets, IEnumerable<Craft> inProgressCrafts)
         {
             SetPathCycle((originalPoint, null));
         }

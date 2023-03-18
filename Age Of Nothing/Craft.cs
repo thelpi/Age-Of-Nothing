@@ -73,6 +73,12 @@ namespace Age_Of_Nothing
             return craft != this && Sources.Any(_ => craft.Sources.Contains(_)) && Started;
         }
 
+        public void AddSource(Sprite unit)
+        {
+            // assume the new source is the same as exiting ones
+            _sources.Add(unit);
+        }
+
         public bool CheckForCancellation(IReadOnlyCollection<Sprite> sprites)
         {
             // Reasons for cancellation:
