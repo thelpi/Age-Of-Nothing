@@ -31,9 +31,6 @@ namespace Age_Of_Nothing
         public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
         public int RockQuantity => _resourcesQty[ResourceTypes.Rock];
         public int GoldQuantity => _resourcesQty[ResourceTypes.Gold];
-        public bool HasVillagerFocus => Villagers.Any(x => x.Focused);
-        public bool HasMarketFocus => Markets.Any(x => x.Focused);
-        public bool HasBarracksFocus => Structures.Any(x => x.Is<Barracks>() && x.Focused);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -108,6 +105,11 @@ namespace Age_Of_Nothing
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
+        }
+
+        public bool HasFocus<T>() where T : Sprite
+        {
+            return _sprites.Any(x => x.Focused && x.Is<T>());
         }
 
         public void AddUnitToStack<T>() where T : Unit
