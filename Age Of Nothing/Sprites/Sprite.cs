@@ -40,12 +40,12 @@ namespace Age_Of_Nothing.Sprites
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Sprite(Rect surface, bool canMove, int lifePoints = -1)
+        protected Sprite(Rect surface, bool canMove)
         {
             Surface = surface;
             CanMove = canMove;
             _center = Surface.GetCenter();
-            _lifePoints = lifePoints;
+            _lifePoints = GetDefaultLifePoints(GetType());
         }
 
         public void TakeDamage(int damagePoints)
@@ -102,17 +102,12 @@ namespace Age_Of_Nothing.Sprites
             return GetSpriteSize(typeof(T));
         }
 
-        public static int GetLifePoints<T>() where T : Sprite
-        {
-            return GetLifePoints(typeof(T));
-        }
-
         private static Size GetSpriteSize(System.Type t)
         {
             return t.GetAttribute<DimensionsAttribute>()?.Size ?? Size.Empty;
         }
 
-        private static int GetLifePoints(System.Type t)
+        private static int GetDefaultLifePoints(System.Type t)
         {
             return t.GetAttribute<LifePointsAttribute>()?.LifePoints ?? -1;
         }

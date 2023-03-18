@@ -1,2 +1,6 @@
 ﻿Construction :
 afficher le timer pendant la construction dans le menu
+
+Chateau
+Murs
+Technlogy tree

@@ -22,8 +22,8 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove, int lifePoints = -1)
-            : base(surface, canMove, lifePoints)
+        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove)
+            : base(surface, canMove)
         {
             Sprites = sprites;
         }

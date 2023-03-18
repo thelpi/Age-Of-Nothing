@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
     public class Market : Structure
     {
         public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)
-            : base(new Rect(topLeft, new Point(topLeft.X + GetSpriteSize<Market>().Width, topLeft.Y + GetSpriteSize<Market>().Height)), sprites, GetLifePoints<Market>())
+            : base(new Rect(topLeft, new Point(topLeft.X + GetSpriteSize<Market>().Width, topLeft.Y + GetSpriteSize<Market>().Height)), sprites)
         { }
     }
 }

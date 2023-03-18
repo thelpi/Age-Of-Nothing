@@ -11,8 +11,8 @@ namespace Age_Of_Nothing.Sprites
         private LinkedListNode<(Point point, Sprite target)> _currentPathTarget;
         private bool _isPathLoop;
 
-        protected Unit(Point center, Size size, IEnumerable<FocusableSprite> sprites, int lifePoints)
-            : base(center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height), sprites, true, lifePoints)
+        protected Unit(Point center, Size size, IEnumerable<FocusableSprite> sprites)
+            : base(center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height), sprites, true)
         { }
 
         /// <summary>

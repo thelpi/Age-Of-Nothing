@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
     public class Archer : Unit
     {
         public Archer(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, GetSpriteSize<Archer>(), sprites, GetLifePoints<Archer>())
+            : base(center, GetSpriteSize<Archer>(), sprites)
         { }
     }
 }

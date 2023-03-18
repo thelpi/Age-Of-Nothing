@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
     public class Knight : Unit
     {
         public Knight(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, GetSpriteSize<Knight>(), sprites, GetLifePoints<Knight>())
+            : base(center, GetSpriteSize<Knight>(), sprites)
         { }
     }
 }
