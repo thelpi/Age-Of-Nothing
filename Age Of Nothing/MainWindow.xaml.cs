@@ -74,7 +74,7 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
-                        // TODO: makes this generic
+                        // We wont fix this if only 3 subtypes
                         if (addEvt.Sprite.Is<Unit>(out var addU) && !addEvt.IsBlueprint)
                             MainCanvas.Children.Add(new UnitUi(addU));
                         else if (addEvt.Sprite.Is<Structure>(out var addS))
@@ -88,7 +88,7 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                        // TODO: makes this generic
+                        // We wont fix this if only 3 subtypes
                         if (rmvEvt.Sprite.Is<Unit>(out var rmvU) && !rmvEvt.IsBlueprint)
                             MainCanvas.Children.Remove(FindCanvasElement<UnitUi, Unit>(rmvU));
                         else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))

@@ -21,17 +21,19 @@ namespace Age_Of_Nothing
 
         private int _frames;
 
-        private IEnumerable<Sprite> _nonUnits => _sprites.Except(_units);
-        private IEnumerable<Unit> _units => _sprites.OfType<Unit>();
-        private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
-        private IEnumerable<Market> _markets => _sprites.OfType<Market>();
-        private IEnumerable<Structure> _structures => _sprites.OfType<Structure>();
-
-        public int PotentialPopulation => _structures.Sum(x => x.GetUnitsStorage());
-        public int Population => _units.Count();
+        private IEnumerable<Sprite> NonUnits => _sprites.Except(Units);
+        private IEnumerable<Unit> Units => _sprites.OfType<Unit>();
+        private IEnumerable<Villager> Villagers => _sprites.OfType<Villager>();
+        private IEnumerable<Market> Markets => _sprites.OfType<Market>();
+        private IEnumerable<Structure> Structures => _sprites.OfType<Structure>();
+        public int PotentialPopulation => Structures.Sum(x => x.GetUnitsStorage());
+        public int Population => Units.Count();
         public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
         public int RockQuantity => _resourcesQty[ResourceTypes.Rock];
         public int GoldQuantity => _resourcesQty[ResourceTypes.Gold];
+        public bool HasVillagerFocus => Villagers.Any(x => x.Focused);
+        public bool HasMarketFocus => Markets.Any(x => x.Focused);
+        public bool HasBarracksFocus => Structures.Any(x => x.Is<Barracks>() && x.Focused);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -108,17 +110,11 @@ namespace Age_Of_Nothing
                 _sprites.Add(forest);
         }
 
-        public bool HasVillagerFocus => _villagers.Any(x => x.Focused);
-
-        public bool HasMarketFocus => _markets.Any(x => x.Focused);
-
-        public bool HasBarracksFocus => _structures.Any(x => x.Is<Barracks>() && x.Focused);
-
         public void AddUnitToStack<T>() where T : Unit
         {
             lock (_craftQueue)
             {
-                if (_structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
+                if (Structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
                     _craftQueue.Add(new Craft(focusedStructure, Unit.Instanciate<T>(focusedStructure.Center, _sprites)));
             }
         }
@@ -156,7 +152,7 @@ namespace Age_Of_Nothing
         public void FocusOnZone(Rect zone)
         {
             var hasUnitSelected = false;
-            foreach (var unit in _units)
+            foreach (var unit in Units)
             {
                 if (zone.Contains(unit.Center))
                 {
@@ -189,7 +185,7 @@ namespace Age_Of_Nothing
         {
             var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
 
-            foreach (var unit in _units.Where(x => x.Focused))
+            foreach (var unit in Units.Where(x => x.Focused))
                 unit.ComputeCycle(clickPosition, targets);
         }
 
@@ -204,7 +200,7 @@ namespace Age_Of_Nothing
                 // TODO: surface should be inside the game area entirely
                 if (!SurfaceIsEngaged(surface))
                 {
-                    var villagerFocused = _villagers.Where(x => x.Focused);
+                    var villagerFocused = Villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
                     {
                         var sprite = (Sprite)type
@@ -223,7 +219,7 @@ namespace Age_Of_Nothing
 
         private bool SurfaceIsEngaged(Rect surface)
         {
-            return _nonUnits.Any(x => x.Surface.IntersectsWith(surface));
+            return NonUnits.Any(x => x.Surface.IntersectsWith(surface));
         }
 
         private bool CheckStructureResources(Sprite sprite)
@@ -245,7 +241,7 @@ namespace Age_Of_Nothing
         private void ManageUnitsMovements()
         {
             var emptyResources = new List<Sprite>(5);
-            foreach (var unit in _units)
+            foreach (var unit in Units)
             {
                 var emptyResourceSprite = ManageUnitMovement(unit);
                 if (emptyResourceSprite != null)
