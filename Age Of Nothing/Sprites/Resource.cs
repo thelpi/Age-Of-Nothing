@@ -22,8 +22,8 @@ namespace Age_Of_Nothing.Sprites
 
         public abstract ResourceTypes ResourceType { get; }
 
-        protected Resource(int quantity, Point center, Size size, IEnumerable<FocusableSprite> sprites)
-            : base(center.ComputeSurfaceFromMiddlePoint(size.Width, size.Height), sprites, false)
+        protected Resource(Point center, int quantity, IEnumerable<FocusableSprite> sprites)
+            : base(center, true, sprites, false)
         {
             _quantity = quantity;
         }

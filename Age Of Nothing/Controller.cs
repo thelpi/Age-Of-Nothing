@@ -249,7 +249,7 @@ namespace Age_Of_Nothing
         {
             lock (_craftQueue)
             {
-                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize<T>());
+                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(typeof(T)));
                 // TODO: surface should be inside the game area entirely
                 if (!SurfaceIsEngaged(surface))
                 {

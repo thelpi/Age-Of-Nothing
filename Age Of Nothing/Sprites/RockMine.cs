@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites
         public override ResourceTypes ResourceType => ResourceTypes.Rock;
 
         public RockMine(int quantity, Point position, IEnumerable<FocusableSprite> sprites)
-            : base(quantity, position, GetSpriteSize<RockMine>(), sprites)
+            : base(position, quantity, sprites)
         { }
     }
 }

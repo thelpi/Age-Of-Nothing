@@ -11,7 +11,7 @@ namespace Age_Of_Nothing.Sprites
     public class Barracks : Structure
     {
         public Barracks(Point topleft, IEnumerable<FocusableSprite> sprites)
-            : base(new Rect(topleft, new Point(topleft.X + GetSpriteSize<Barracks>().Width, topleft.Y + GetSpriteSize<Barracks>().Height)), sprites)
+            : base(topleft, sprites)
         { }
     }
 }

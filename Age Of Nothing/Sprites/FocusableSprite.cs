@@ -22,8 +22,8 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
-        protected FocusableSprite(Rect surface, IEnumerable<FocusableSprite> sprites, bool canMove)
-            : base(surface, canMove)
+        protected FocusableSprite(Point basePoint, bool isCenter, IEnumerable<FocusableSprite> sprites, bool canMove)
+            : base(basePoint, isCenter, canMove)
         {
             Sprites = sprites;
         }

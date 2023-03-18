@@ -219,17 +219,17 @@ namespace Age_Of_Nothing
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize<Dwelling>(), typeof(Dwelling));
+            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Dwelling)), typeof(Dwelling));
         }
 
         private void CreateMarketButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize<Market>(), typeof(Market));
+            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Market)), typeof(Market));
         }
 
         private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
         {
-            _structureShadowSize = (Sprite.GetSpriteSize<Barracks>(), typeof(Barracks));
+            _structureShadowSize = (Sprite.GetSpriteSize(typeof(Barracks)), typeof(Barracks));
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

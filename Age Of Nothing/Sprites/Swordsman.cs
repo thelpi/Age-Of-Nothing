@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites
     public class Swordsman : Unit
     {
         public Swordsman(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, GetSpriteSize<Swordsman>(), sprites)
+            : base(center, sprites)
         { }
     }
 }

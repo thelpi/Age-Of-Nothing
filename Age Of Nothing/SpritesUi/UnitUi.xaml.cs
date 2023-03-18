@@ -120,11 +120,17 @@ namespace Age_Of_Nothing.SpritesUi
                 };
             }
             else if (Sprite.Is<Archer>())
+            {
                 return IsMouseOver || forceHover ? _archerBrushHover : _archerBrush;
+            }
             else if (Sprite.Is<Knight>())
+            {
                 return IsMouseOver || forceHover ? _knightBrushHover : _knightBrush;
+            }
             else if (Sprite.Is<Swordsman>())
+            {
                 return IsMouseOver || forceHover ? _swordsmanBrushHover : _swordsmanBrush;
+            }
 
             return IsMouseOver || forceHover ? _defaultBrushHover : _defaultBrush;
         }
