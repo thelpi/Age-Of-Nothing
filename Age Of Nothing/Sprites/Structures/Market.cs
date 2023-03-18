@@ -11,7 +11,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(1000)]
     public class Market : Structure
     {
-        public Market(Point topLeft, IEnumerable<FocusableSprite> sprites)
+        public Market(Point topLeft, IEnumerable<Sprite> sprites)
             : base(topLeft, sprites)
         { }
     }

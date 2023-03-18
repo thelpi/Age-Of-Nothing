@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Archer : Unit
     {
-        public Archer(Point center, IEnumerable<FocusableSprite> sprites)
+        public Archer(Point center, IEnumerable<Sprite> sprites)
             : base(center, sprites)
         { }
     }

@@ -5,14 +5,14 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Units
 {
-    public abstract class Unit : FocusableSprite
+    public abstract class Unit : Sprite
     {
         private readonly LinkedList<(Point point, Sprite target)> _pathCycle = new LinkedList<(Point, Sprite)>();
         private LinkedListNode<(Point point, Sprite target)> _currentPathTarget;
         private bool _isPathLoop;
 
-        protected Unit(Point center, IEnumerable<FocusableSprite> sprites)
-            : base(center, true, sprites, true)
+        protected Unit(Point center, IEnumerable<Sprite> sprites)
+            : base(center, true, true, sprites)
         { }
 
         /// <summary>
@@ -116,10 +116,10 @@ namespace Age_Of_Nothing.Sprites.Units
             return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
 
-        public static T Instanciate<T>(Point center, IEnumerable<FocusableSprite> sprites) where T : Unit
+        public static T Instanciate<T>(Point center, IEnumerable<Sprite> sprites) where T : Unit
         {
             return (T)typeof(T)
-                .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<FocusableSprite>) })
+                .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<Sprite>) })
                 .Invoke(new object[] { center, sprites });
         }
     }

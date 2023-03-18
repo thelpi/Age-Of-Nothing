@@ -14,7 +14,7 @@ namespace Age_Of_Nothing
 
         // Assumes all sources are the same
         public IReadOnlyList<Sprite> Sources => _sources;
-        public FocusableSprite Target { get; }
+        public Sprite Target { get; }
         // The total number of frames to craft; might change mid-term depending on source count
         public int TotalFramesCount { get; private set; }
         // The number of frames required to perform the craft for a single source.
@@ -23,11 +23,11 @@ namespace Age_Of_Nothing
 
         public int CurrentSources { get; private set; }
 
-        public Craft(Sprite source, FocusableSprite target)
+        public Craft(Sprite source, Sprite target)
             : this(new List<Sprite> { source }, target)
         { }
 
-        public Craft(List<Sprite> sources, FocusableSprite target)
+        public Craft(List<Sprite> sources, Sprite target)
         {
             _sources = sources;
             Target = target;

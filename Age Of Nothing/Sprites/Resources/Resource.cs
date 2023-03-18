@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace Age_Of_Nothing.Sprites.Resources
 {
-    public abstract class Resource : FocusableSprite
+    public abstract class Resource : Sprite
     {
         private int _quantity;
 
@@ -22,8 +22,8 @@ namespace Age_Of_Nothing.Sprites.Resources
 
         public abstract ResourceTypes ResourceType { get; }
 
-        protected Resource(Point center, int quantity, IEnumerable<FocusableSprite> sprites)
-            : base(center, true, sprites, false)
+        protected Resource(Point center, int quantity, IEnumerable<Sprite> sprites)
+            : base(center, true, false, sprites)
         {
             _quantity = quantity;
         }

@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Swordsman : Unit
     {
-        public Swordsman(Point center, IEnumerable<FocusableSprite> sprites)
+        public Swordsman(Point center, IEnumerable<Sprite> sprites)
             : base(center, sprites)
         { }
     }

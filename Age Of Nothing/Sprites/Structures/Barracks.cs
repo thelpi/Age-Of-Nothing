@@ -10,7 +10,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(1000)]
     public class Barracks : Structure
     {
-        public Barracks(Point topleft, IEnumerable<FocusableSprite> sprites)
+        public Barracks(Point topleft, IEnumerable<Sprite> sprites)
             : base(topleft, sprites)
         { }
     }

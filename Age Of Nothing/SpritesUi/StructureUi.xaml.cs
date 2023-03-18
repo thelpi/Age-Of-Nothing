@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Age_Of_Nothing.Sprites;
 using Age_Of_Nothing.Sprites.Structures;
 
 namespace Age_Of_Nothing.SpritesUi
@@ -81,11 +80,11 @@ namespace Age_Of_Nothing.SpritesUi
                                 MainCanvas.Children.Remove(_surround);
                         };
                     }
-                    else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                    else if (e.PropertyName == Sprites.Sprite.HoverPropertyName)
                     {
                         action = () => _visual.Fill = _brushes[(Sprite.GetType(), true)];
                     }
-                    else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                    else if (e.PropertyName == Sprites.Sprite.UnhoverPropertyName)
                     {
                         action = () => _visual.Fill = _brushes[(Sprite.GetType(), false)];
                     }

@@ -36,7 +36,7 @@ namespace Age_Of_Nothing.Sprites.Units
             }
         }
 
-        public Villager(Point center, IEnumerable<FocusableSprite> sprites)
+        public Villager(Point center, IEnumerable<Sprite> sprites)
             : base(center, sprites)
         { }
 

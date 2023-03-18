@@ -5,10 +5,10 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Structures
 {
-    public abstract class Structure : FocusableSprite
+    public abstract class Structure : Sprite
     {
-        protected Structure(Point basePoint, IEnumerable<FocusableSprite> sprites)
-            : base(basePoint, false, sprites, false)
+        protected Structure(Point basePoint, IEnumerable<Sprite> sprites)
+            : base(basePoint, false, false, sprites)
         { }
 
         public int GetUnitsStorage()

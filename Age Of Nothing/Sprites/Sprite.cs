@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
@@ -6,12 +7,14 @@ namespace Age_Of_Nothing.Sprites
 {
     public abstract class Sprite : INotifyPropertyChanged
     {
+        private bool _focused;
         private Point _center;
         private int _lifePoints;
 
         public bool HasLifePoints => LifePoints > -1;
 
         public Rect Surface { get; private set; }
+        protected IEnumerable<Sprite> Sprites { get; }
         public bool CanMove { get; }
         public Point Center
         {
@@ -38,9 +41,22 @@ namespace Age_Of_Nothing.Sprites
             }
         }
 
+        public bool Focused
+        {
+            get => _focused;
+            set
+            {
+                if (_focused != value)
+                {
+                    _focused = value;
+                    OnPropertyChanged(nameof(Focused));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Sprite(Point basePoint, bool isCenter, bool canMove)
+        protected Sprite(Point basePoint, bool isCenter, bool canMove, IEnumerable<Sprite> sprites)
         {
             var size = GetSpriteSize(GetType());
 
@@ -52,6 +68,8 @@ namespace Age_Of_Nothing.Sprites
                 ? basePoint
                 : Surface.GetCenter();
             _lifePoints = GetDefaultLifePoints(GetType());
+
+            Sprites = sprites;
         }
 
         public void TakeDamage(int damagePoints)
@@ -107,5 +125,32 @@ namespace Age_Of_Nothing.Sprites
         {
             return t.GetAttribute<LifePointsAttribute>()?.LifePoints ?? -1;
         }
+
+        /// <summary>
+        /// Enable / Disable the focus and disable focus on other sprites if this one is focused.
+        /// </summary>
+        public void ToggleFocus()
+        {
+            Focused = !Focused;
+            if (Focused)
+            {
+                foreach (var x in Sprites)
+                {
+                    if (x != this)
+                        x.Focused = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simulates the sprite is hovered
+        /// </summary>
+        public void ForceHover(bool forceHover)
+        {
+            OnPropertyChanged(forceHover ? HoverPropertyName : UnhoverPropertyName);
+        }
+
+        public const string HoverPropertyName = "Hover";
+        public const string UnhoverPropertyName = "Unhover";
     }
 }

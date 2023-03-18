@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Knight : Unit
     {
-        public Knight(Point center, IEnumerable<FocusableSprite> sprites)
+        public Knight(Point center, IEnumerable<Sprite> sprites)
             : base(center, sprites)
         { }
     }

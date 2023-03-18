@@ -26,7 +26,6 @@ namespace Age_Of_Nothing
         private IEnumerable<Villager> _villagers => _sprites.OfType<Villager>();
         private IEnumerable<Market> _markets => _sprites.OfType<Market>();
         private IEnumerable<Structure> _structures => _sprites.OfType<Structure>();
-        private IEnumerable<FocusableSprite> _focusables => _sprites.OfType<FocusableSprite>();
 
         public int PotentialPopulation => _structures.Sum(x => x.GetUnitsStorage());
         public int Population => _units.Count();
@@ -94,16 +93,16 @@ namespace Age_Of_Nothing
             _resourcesQty[ResourceTypes.Rock] = 10000;
             _resourcesQty[ResourceTypes.Wood] = 10000;
 
-            _sprites.Add(new Villager(new Point(200, 200), _focusables));
-            _sprites.Add(new Villager(new Point(100, 100), _focusables));
-            _sprites.Add(new Villager(new Point(300, 300), _focusables));
-            _sprites.Add(new RockMine(100, new Point(400, 120), _focusables));
-            _sprites.Add(new GoldMine(75, new Point(200, 600), _focusables));
-            _sprites.Add(new Market(new Point(600, 500), _focusables));
-            _sprites.Add(new Dwelling(new Point(1100, 10), _focusables));
-            _sprites.Add(new Dwelling(new Point(1100, 90), _focusables));
+            _sprites.Add(new Villager(new Point(200, 200), _sprites));
+            _sprites.Add(new Villager(new Point(100, 100), _sprites));
+            _sprites.Add(new Villager(new Point(300, 300), _sprites));
+            _sprites.Add(new RockMine(100, new Point(400, 120), _sprites));
+            _sprites.Add(new GoldMine(75, new Point(200, 600), _sprites));
+            _sprites.Add(new Market(new Point(600, 500), _sprites));
+            _sprites.Add(new Dwelling(new Point(1100, 10), _sprites));
+            _sprites.Add(new Dwelling(new Point(1100, 90), _sprites));
 
-            var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), _focusables, 0);
+            var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), _sprites, 0);
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
@@ -120,7 +119,7 @@ namespace Age_Of_Nothing
             lock (_craftQueue)
             {
                 if (_structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
-                    _craftQueue.Add(new Craft(focusedStructure, Unit.Instanciate<T>(focusedStructure.Center, _focusables)));
+                    _craftQueue.Add(new Craft(focusedStructure, Unit.Instanciate<T>(focusedStructure.Center, _sprites)));
             }
         }
 
@@ -128,7 +127,7 @@ namespace Age_Of_Nothing
         {
             lock (_sprites)
             {
-                var sprite = _focusables.FirstOrDefault(x => x.Focused && x.HasLifePoints);
+                var sprite = _sprites.FirstOrDefault(x => x.Focused && x.HasLifePoints);
                 if (sprite != null)
                     sprite.TakeDamage(int.MaxValue);
             }
@@ -150,7 +149,7 @@ namespace Age_Of_Nothing
 
         public void ClearFocus()
         {
-            foreach (var sp in _focusables)
+            foreach (var sp in _sprites)
                 sp.Focused = false;
         }
 
@@ -169,7 +168,7 @@ namespace Age_Of_Nothing
             if (!hasUnitSelected)
             {
                 // take the first focus
-                foreach (var x in _focusables.Where(x => !(x is Unit)))
+                foreach (var x in _sprites.Where(x => !(x is Unit)))
                 {
                     if (zone.IntersectsWith(x.Surface))
                     {
@@ -182,7 +181,7 @@ namespace Age_Of_Nothing
 
         public void RefreshHover(Rect zone)
         {
-            foreach (var sp in _focusables)
+            foreach (var sp in _sprites)
                 sp.ForceHover(zone.IntersectsWith(sp.Surface));
         }
 
@@ -208,9 +207,9 @@ namespace Age_Of_Nothing
                     var villagerFocused = _villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
                     {
-                        var sprite = (FocusableSprite)type
-                            .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<FocusableSprite>) })
-                            .Invoke(new object[] { surface.TopLeft, _focusables });
+                        var sprite = (Sprite)type
+                            .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<Sprite>) })
+                            .Invoke(new object[] { surface.TopLeft, _sprites });
                         if (CheckStructureResources(sprite))
                         {
                             _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));

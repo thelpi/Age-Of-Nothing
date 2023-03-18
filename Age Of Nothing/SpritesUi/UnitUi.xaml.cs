@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Age_Of_Nothing.Sprites;
 using Age_Of_Nothing.Sprites.Units;
 
 namespace Age_Of_Nothing.SpritesUi
@@ -94,11 +93,11 @@ namespace Age_Of_Nothing.SpritesUi
                 {
                     action = () => _visual.Fill = GetFill();
                 }
-                else if (e.PropertyName == FocusableSprite.HoverPropertyName)
+                else if (e.PropertyName == Sprites.Sprite.HoverPropertyName)
                 {
                     action = () => _visual.Fill = GetFill(true);
                 }
-                else if (e.PropertyName == FocusableSprite.UnhoverPropertyName)
+                else if (e.PropertyName == Sprites.Sprite.UnhoverPropertyName)
                 {
                     action = () => _visual.Fill = GetFill();
                 }

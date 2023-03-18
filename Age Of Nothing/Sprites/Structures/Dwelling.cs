@@ -11,7 +11,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(200)]
     public class Dwelling : Structure
     {
-        public Dwelling(Point topleft, IEnumerable<FocusableSprite> sprites)
+        public Dwelling(Point topleft, IEnumerable<Sprite> sprites)
             : base(topleft, sprites)
         { }
     }

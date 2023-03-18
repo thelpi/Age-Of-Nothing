@@ -13,7 +13,7 @@ namespace Age_Of_Nothing.Sprites.Resources
 
         public int ForestPatchIndex { get; }
 
-        private Forest(Point center, int forestPatchIndex, IEnumerable<FocusableSprite> sprites)
+        private Forest(Point center, int forestPatchIndex, IEnumerable<Sprite> sprites)
             : base(center, _quantity, sprites)
         {
             ForestPatchIndex = forestPatchIndex;
@@ -26,7 +26,7 @@ namespace Age_Of_Nothing.Sprites.Resources
         /// <param name="sprites">Every focusable sprite</param>
         /// <param name="forestPatchIndex">The forest patch index</param>
         /// <returns></returns>
-        public static IEnumerable<Forest> GenerateForestPatch(Rect patchSurface, IEnumerable<FocusableSprite> sprites, int forestPatchIndex)
+        public static IEnumerable<Forest> GenerateForestPatch(Rect patchSurface, IEnumerable<Sprite> sprites, int forestPatchIndex)
         {
             var size = GetSpriteSize(typeof(Forest));
             for (var i = patchSurface.X; i < patchSurface.BottomRight.X; i += size.Width)

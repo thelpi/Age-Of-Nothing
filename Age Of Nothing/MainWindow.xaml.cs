@@ -56,7 +56,7 @@ namespace Age_Of_Nothing
             _controller.PropertyChanged += (s, e) =>
             {
                 Action action = null;
-                if (e.PropertyName == nameof(FocusableSprite.Focused))
+                if (e.PropertyName == nameof(Sprite.Focused))
                 {
                     action = () =>
                     {

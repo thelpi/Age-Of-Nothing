@@ -9,7 +9,7 @@ namespace Age_Of_Nothing.Sprites.Resources
     {
         public override ResourceTypes ResourceType => ResourceTypes.Gold;
 
-        public GoldMine(int quantity, Point position, IEnumerable<FocusableSprite> sprites)
+        public GoldMine(int quantity, Point position, IEnumerable<Sprite> sprites)
             : base(position, quantity, sprites)
         { }
     }
