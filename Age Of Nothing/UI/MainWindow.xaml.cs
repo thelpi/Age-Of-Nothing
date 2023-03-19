@@ -11,7 +11,7 @@ using Age_Of_Nothing.Sprites;
 using Age_Of_Nothing.Sprites.Structures;
 using Age_Of_Nothing.Sprites.Units;
 
-namespace Age_Of_Nothing
+namespace Age_Of_Nothing.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
