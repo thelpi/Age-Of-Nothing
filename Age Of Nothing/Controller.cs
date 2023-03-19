@@ -121,7 +121,11 @@ namespace Age_Of_Nothing
             lock (_craftQueue)
             {
                 if (Structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
-                    _craftQueue.Add(new Craft(focusedStructure, Unit.Instanciate<T>(focusedStructure.Center, _sprites)));
+                {
+                    var sprite = Unit.Instanciate<T>(focusedStructure.Center, _sprites);
+                    if (CheckStructureResources(sprite))
+                        _craftQueue.Add(new Craft(focusedStructure, sprite));
+                }
             }
         }
 
@@ -311,16 +315,17 @@ namespace Age_Of_Nothing
 
         private void ManageCraftsToCancel()
         {
-            var cancelledCrafts = new List<Craft>(10);
+            var canceledCrafts = new List<Craft>(10);
 
             foreach (var craft in _craftQueue)
             {
-                if (craft.CheckForCancellation(_sprites))
-                    cancelledCrafts.Add(craft);
+                if (craft.CheckForCancelation(_sprites, _craftQueue))
+                    canceledCrafts.Add(craft);
             }
 
-            foreach (var craft in cancelledCrafts)
+            foreach (var craft in canceledCrafts)
             {
+                // note: we don't refund units when started; maybe we should?
                 if (!craft.Started)
                     RefundResources(craft.Target.GetType());
                 _craftQueue.Remove(craft);

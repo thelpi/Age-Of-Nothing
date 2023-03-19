@@ -20,6 +20,7 @@ namespace Age_Of_Nothing
         // The total number of frames to craft; might change mid-term depending on source count
         private int _totalFramesCount;
         private double _progression;
+        private bool _cancelationPending;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -75,37 +76,31 @@ namespace Age_Of_Nothing
             _sources.Add(sprite);
         }
 
-        public bool CheckForCancellation(IReadOnlyCollection<Sprite> sprites)
+        public void Cancel()
         {
-            // Reasons for cancellation:
-            // - there is no source remaining to complete the craft
-            // - the surface for the structure is already occupied by another structure
-            // - villagers lost focus on structure to craft
-            // TODO: we should keep the craft pending in the last case
+            _cancelationPending = true;
+        }
+
+        public bool CheckForCancelation(IReadOnlyCollection<Sprite> sprites, IReadOnlyCollection<Craft> crafts)
+        {
             var cancel = false;
 
-            var lost = _sources
-                .Where(x => !sprites.Contains(x))
-                .ToList();
-
-            foreach (var ms in lost)
+            if (_cancelationPending)
+                cancel = true;
+            else if (Target.Is<Structure>())
             {
-                if (RemoveSource(ms))
+                if (IntersectWithExistingStructure(sprites))
                     cancel = true;
+                else if (IntersectWithStartedCraft(crafts))
+                    cancel = true;
+                else
+                    CheckObsoleteSources(sprites); // this does not cancel the craft
             }
-
-            if (Target.Is<Structure>())
+            else if (Target.Is<Unit>())
             {
-                if (sprites.Where(x => !x.Is<Unit>()).Any(x => x.Surface.IntersectsWith(Target.Surface)))
+                // the hosting structure does not exist anymore
+                if (CheckObsoleteSources(sprites))
                     cancel = true;
-                var unfocused = _sources
-                    .Where(x => x.Is<Villager>(out var villager) && !villager.IsSpriteOnPath(Target))
-                    .ToList();
-                foreach (var ms in unfocused)
-                {
-                    if (RemoveSource(ms))
-                        cancel = true;
-                }
             }
 
             return cancel;
@@ -157,6 +152,17 @@ namespace Age_Of_Nothing
             return finish;
         }
 
+        private bool IntersectWithExistingStructure(IReadOnlyCollection<Sprite> sprites)
+        {
+            return sprites.Any(x => x != Target && x.Is<Structure>() && x.Surface.IntersectsWith(Target.Surface));
+        }
+
+        private bool CheckObsoleteSources(IReadOnlyCollection<Sprite> sprites)
+        {
+            _sources.RemoveAll(x => !sprites.Contains(x));
+            return _sources.Count == 0;
+        }
+
         private void SetStartingFrame(int currentFrame, int availableSourcesCount = 1)
         {
             if (!Started)
@@ -185,15 +191,14 @@ namespace Age_Of_Nothing
             return Started && currentFrame - _startingFrame >= _totalFramesCount;
         }
 
-        private bool RemoveSource(Sprite sprite)
-        {
-            _sources.Remove(sprite);
-            return _sources.Count == 0;
-        }
-
         private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
         {
             return (int)Math.Round(unitaryFramesToPerformRemaining / (double)_currentSources);
+        }
+
+        private bool IntersectWithStartedCraft(IReadOnlyCollection<Craft> crafts)
+        {
+            return crafts.Any(x => x != this && x.Started && x.Target.Is<Structure>() && x.Target.Surface.IntersectsWith(Target.Surface));
         }
     }
 }
