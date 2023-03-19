@@ -234,5 +234,10 @@ namespace Age_Of_Nothing
                 Visual = oGrid
             };
         }
+
+        public static bool DisplayBlueprint(Sprite sprite)
+        {
+            return !sprite.Is<Unit>();
+        }
     }
 }

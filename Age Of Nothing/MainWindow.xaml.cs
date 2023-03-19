@@ -75,12 +75,12 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
-                        // TODO: parameter for "display blueprint"
-                        if (!addEvt.Sprite.Is<Unit>() || !addEvt.IsBlueprint)
+                        if (!addEvt.IsBlueprint || SpriteUi.DisplayBlueprint(addEvt.Sprite))
                             MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsBlueprint));
 
                         if (addEvt.IsBlueprint)
                         {
+                            // TODO: refacto
                             var panel = new StackPanel
                             {
                                 Orientation = Orientation.Vertical,
@@ -114,8 +114,7 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                        // TODO: parameter for "display blueprint"
-                        if (!rmvEvt.Sprite.Is<Unit>() || !rmvEvt.IsBlueprint)
+                        if (!rmvEvt.IsBlueprint || SpriteUi.DisplayBlueprint(rmvEvt.Sprite))
                             MainCanvas.Children.Remove(FindCanvasElement(rmvEvt.Sprite));
 
                         if (rmvEvt.IsBlueprint)
