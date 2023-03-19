@@ -78,13 +78,13 @@ namespace Age_Of_Nothing.Sprites
                 LifePoints -= LifePoints < damagePoints ? LifePoints : damagePoints;
         }
 
-        protected bool Move(Point middlePoint)
+        protected bool Move(Rect surface)
         {
             if (!CanMove)
                 return false;
 
-            Surface = middlePoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
-            Center = middlePoint;
+            Surface = surface;
+            Center = surface.GetCenter();
             return true;
         }
 

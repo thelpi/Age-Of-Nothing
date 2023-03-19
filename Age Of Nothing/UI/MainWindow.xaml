@@ -3,12 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
+        mc:Ignorable="d" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown"
-        Title="MainWindow" Height="900" Width="1600">
-    <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        Title="MainWindow">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1600" />
+            <ColumnDefinition Width="134" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="900" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" DockPanel.Dock="Top">
             <StackPanel Orientation="Horizontal" Margin="5" Height="30" Background="Gainsboro">
                 <Image Width="25" Height="25" Source="../Resources/Images/wood.png" Margin="5, 0, 5, 0" />
                 <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" Text="{Binding Path=WoodQuantity}" TextAlignment="Center" VerticalAlignment="Stretch" />
@@ -26,7 +34,7 @@
                 <TextBlock Width="50" Height="22" Padding="3" Background="White" Margin="0, 0, 5, 0" TextAlignment="Center" VerticalAlignment="Stretch" Name="PopulationValueText" />
             </StackPanel>
         </StackPanel>
-        <Expander ExpandDirection="Left" DockPanel.Dock="Right" IsExpanded="True">
+        <Expander Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" ExpandDirection="Left" DockPanel.Dock="Right" IsExpanded="True">
             <StackPanel Margin="5" Orientation="Vertical">
                 <Button Name="CreateVillagerButton" Content="Create villager" Width="100" Click="CreateVillagerButton_Click" IsEnabled="False" />
                 <Button Margin="0, 5, 0, 0" Name="CreateSwordsmanButton" Content="Create swordsman" Width="100" Click="CreateSwordsmanButton_Click"  IsEnabled="False" />
@@ -39,7 +47,7 @@
                 <StackPanel Margin="0, 15, 0, 0" Orientation="Vertical" Name="CraftQueuePanel" />
             </StackPanel>
         </Expander>
-        <Canvas DockPanel.Dock="Bottom" Name="MainCanvas"
+        <Canvas Grid.Row="1" Grid.Column="0" Width="1600" Height="900" DockPanel.Dock="Bottom" Name="MainCanvas"
             Background="LightGreen"
             MouseRightButtonDown="MainCanvas_MouseRightButtonDown"
             MouseRightButtonUp="MainCanvas_MouseRightButtonUp"
@@ -48,5 +56,5 @@
             MouseLeave="MainCanvas_MouseLeave"
             MouseMove="MainCanvas_MouseMove"
             />
-    </DockPanel>
+    </Grid>
 </Window>

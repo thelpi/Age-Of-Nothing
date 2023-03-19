@@ -17,5 +17,12 @@ namespace Age_Of_Nothing
         {
             return collection.OrderBy(x => Point.Subtract(position, x.Center).LengthSquared).First();
         }
+
+        public static bool IntersectIntangibleStructure(this Rect surface, IEnumerable<Sprites.Sprite> sprites)
+        {
+            return sprites.Any(x => x.Is<Sprites.Structures.Structure>(out var structure)
+                && structure.Tangible
+                && structure.Surface.IntersectsWith(surface));
+        }
     }
 }

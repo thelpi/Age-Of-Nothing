@@ -19,6 +19,8 @@ namespace Age_Of_Nothing
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
 
+        private readonly Rect _surface;
+
         private int _frames;
 
         private IEnumerable<Sprite> NonUnits => _sprites.Except(Units);
@@ -34,8 +36,10 @@ namespace Age_Of_Nothing
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Controller()
+        public Controller(double width, double height)
         {
+            _surface = new Rect(0, 0, width, height);
+
             _resourcesQty = System.Enum.GetValues(typeof(ResourceTypes))
                 .Cast<ResourceTypes>()
                 .ToDictionary(x => x, x => 0);
@@ -206,8 +210,7 @@ namespace Age_Of_Nothing
             lock (_craftQueue)
             {
                 var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
-                // TODO: surface should be inside the game area entirely
-                if (!SurfaceIsEngaged(surface))
+                if (!SurfaceIsEngaged(surface) && _surface.Contains(surface))
                 {
                     var villagerFocused = Villagers.Where(x => x.Focused);
                     if (villagerFocused.Any())
@@ -249,10 +252,14 @@ namespace Age_Of_Nothing
 
         private void ManageUnitsMovements()
         {
+            var pendingStructure = _craftQueue
+                .Where(x => x.Started && x.Target.Is<Structure>())
+                .Select(x => (Structure)x.Target);
+
             var emptyResources = new List<Sprite>(5);
             foreach (var unit in Units)
             {
-                var emptyResourceSprite = ManageUnitMovement(unit);
+                var emptyResourceSprite = ManageUnitMovement(unit, pendingStructure);
                 if (emptyResourceSprite != null)
                     emptyResources.Add(emptyResourceSprite);
             }
@@ -260,11 +267,11 @@ namespace Age_Of_Nothing
             emptyResources.ForEach(x => _sprites.Remove(x));
         }
 
-        private Sprite ManageUnitMovement(Unit unit)
+        private Sprite ManageUnitMovement(Unit unit, IEnumerable<Structure> pendingStructure)
         {
             Sprite emptyResourceSprite = null;
 
-            var tgt = unit.CheckForMovement();
+            var tgt = unit.CheckForMovement(pendingStructure);
             if (tgt != null && unit.Is<Villager>(out var villager))
             {
                 var carry = villager.CheckCarry(tgt);

@@ -50,7 +50,7 @@ namespace Age_Of_Nothing.UI
                 Opacity = 0.1
             };
 
-            _controller = new Controller();
+            _controller = new Controller(MainCanvas.Width, MainCanvas.Height);
             _controller.PropertyChanged += (s, e) =>
             {
                 Action action = null;

@@ -19,7 +19,7 @@ namespace Age_Of_Nothing.Sprites.Units
         /// Check if the unit has to move in this frame
         /// </summary>
         /// <returns>The sprite the unit is on to (if any; and if in the path cycle).</returns>
-        public Sprite CheckForMovement()
+        public Sprite CheckForMovement(IEnumerable<Structures.Structure> progressingCrafts)
         {
             lock (_pathCycle)
             {
@@ -29,11 +29,23 @@ namespace Age_Of_Nothing.Sprites.Units
 
                 // compte the point on the distance to reach the targer
                 // (in straight line)
-                var (point, target) = _currentPathTarget.Value;
-                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, point.X, point.Y, GetDefaultSpeed());
+                var (targetPoint, target) = _currentPathTarget.Value;
+                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, targetPoint.X, targetPoint.Y, GetDefaultSpeed());
 
-                Move(new Point(x2, y2));
-                if (point == Center)
+                var newSurface = new Point(x2, y2).ComputeSurfaceFromMiddlePoint(Surface.Size);
+
+                // TODO: allow villagers to help for crafting
+
+                // HACK: when a unit is already on a tangible structure
+                // everything is allowed to get out
+                // the use case if when a villager finish to craft a wall (he's on the center)
+                var currentlyOn = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+                var nextOn = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+                if (!currentlyOn && nextOn)
+                    return null;
+
+                Move(newSurface);
+                if (targetPoint == Center)
                 {
                     // has reached the target
                     // if last node of the circle, sets loop if enabled
