@@ -99,7 +99,9 @@ namespace Age_Of_Nothing.Sprites.Units
                     craft.AddSource(this);
                 }
                 else
+                {
                     SetPathCycle((originalPoint, null));
+                }
             }
             else
             {

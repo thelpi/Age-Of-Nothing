@@ -8,10 +8,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Age_Of_Nothing.Events;
 using Age_Of_Nothing.Sprites;
-using Age_Of_Nothing.Sprites.Resources;
 using Age_Of_Nothing.Sprites.Structures;
 using Age_Of_Nothing.Sprites.Units;
-using Age_Of_Nothing.SpritesUi;
 
 namespace Age_Of_Nothing
 {
@@ -77,13 +75,9 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
-                        // We wont fix this if only 3 subtypes
-                        if (addEvt.Sprite.Is<Unit>(out var addU) && !addEvt.IsBlueprint)
-                            MainCanvas.Children.Add(new UnitUi(addU));
-                        else if (addEvt.Sprite.Is<Structure>(out var addS))
-                            MainCanvas.Children.Add(new StructureUi(addS, addEvt.IsBlueprint));
-                        else if (addEvt.Sprite.Is<Resource>(out var addR))
-                            MainCanvas.Children.Add(new ResourceUi(addR));
+                        // TODO: parameter for "display blueprint"
+                        if (!addEvt.Sprite.Is<Unit>() || !addEvt.IsBlueprint)
+                            MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsBlueprint));
 
                         if (addEvt.IsBlueprint)
                         {
@@ -120,13 +114,9 @@ namespace Age_Of_Nothing
                     action = () =>
                     {
                         var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                        // We wont fix this if only 3 subtypes
-                        if (rmvEvt.Sprite.Is<Unit>(out var rmvU) && !rmvEvt.IsBlueprint)
-                            MainCanvas.Children.Remove(FindCanvasElement<UnitUi, Unit>(rmvU));
-                        else if (rmvEvt.Sprite.Is<Structure>(out var rmvS))
-                            MainCanvas.Children.Remove(FindCanvasElement<StructureUi, Structure>(rmvS));
-                        else if (rmvEvt.Sprite.Is<Resource>(out var rmvR))
-                            MainCanvas.Children.Remove(FindCanvasElement<ResourceUi, Resource>(rmvR));
+                        // TODO: parameter for "display blueprint"
+                        if (!rmvEvt.Sprite.Is<Unit>() || !rmvEvt.IsBlueprint)
+                            MainCanvas.Children.Remove(FindCanvasElement(rmvEvt.Sprite));
 
                         if (rmvEvt.IsBlueprint)
                             CraftQueuePanel.Children.Remove(GetCraftSpriteVisualItem(rmvEvt.Sprite));
@@ -286,11 +276,9 @@ namespace Age_Of_Nothing
             _structureShadowGu.Height = 0;
         }
 
-        private UIElement FindCanvasElement<T, T2>(T2 sprite)
-            where T : BaseSpriteUi<T2>
-            where T2 : Sprite
+        private UIElement FindCanvasElement(Sprite sprite)
         {
-            return MainCanvas.Children.OfType<T>().FirstOrDefault(x => x.Sprite == sprite);
+            return MainCanvas.Children.OfType<SpriteUi>().FirstOrDefault(x => x.Sprite == sprite);
         }
 
         private void Refresh(object sender, ElapsedEventArgs e)
