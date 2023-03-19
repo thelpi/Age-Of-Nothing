@@ -15,7 +15,7 @@ namespace Age_Of_Nothing
         // The number of frames required to perform the craft for a single source.
         private readonly int _unitaryFramesToPerform;
 
-        private int _startingFrame;
+        private int _elapsedFrames;
         private int _currentSources;
         // The total number of frames to craft; might change mid-term depending on source count
         private int _totalFramesCount;
@@ -123,47 +123,72 @@ namespace Age_Of_Nothing
         public bool CheckForCompletion(int frames, bool popAvailable, IReadOnlyCollection<Craft> craftQueue)
         {
             var finish = false;
+            var stuck = false;
 
             if (Target.Is<Unit>())
             {
-                // if the max pop. is reached, we keep the craft pending
-                if (HasFinished(frames))
-                {
-                    finish = popAvailable;
-                }
-                // to start the craft, any of the sources should not have another craft already started
-                else if (!Started && !craftQueue.Any(x => x.IsStartedWithCommonSource(this)))
+                if (HasFinished())
                 {
                     if (popAvailable)
-                        SetStartingFrame(frames);
+                        finish = true;
+                    else
+                        stuck = true;
+                }
+                else if (!Started)
+                {
+                    if (popAvailable && !SourceIsBusy(craftQueue))
+                        SetStartingFrame();
+                    else
+                        stuck = true;
+                }
+                else
+                {
+                    if (popAvailable)
+                        _elapsedFrames++;
+                    else
+                        stuck = true;
                 }
             }
             else if (Target.Is<Structure>(out var tgtStruct))
             {
-                if (HasFinished(frames))
-                {
+                if (HasFinished())
                     finish = true;
+                else if (!Started)
+                {
+                    var availableSources = ComputeAvailableSources();
+                    if (availableSources > 0)
+                        SetStartingFrame(availableSources);
+                    else
+                        stuck = true;
                 }
                 else
                 {
-                    var availableSources = _sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == tgtStruct.Center);
-                    if (!Started)
-                    {
-                        if (availableSources > 0)
-                            SetStartingFrame(frames, availableSources);
-                    }
+                    var availableSources = ComputeAvailableSources();
+                    if (availableSources != _currentSources)
+                        UpdateSources(frames, availableSources);
+
+                    if (availableSources > 0)
+                        _elapsedFrames += availableSources;
                     else
-                    {
-                        if (availableSources != _currentSources)
-                            UpdateSources(frames, availableSources);
-                    }
+                        stuck = true;
                 }
             }
 
             if (Started)
-                Progression = (frames - _startingFrame) / (double)_totalFramesCount;
+                Progression = _elapsedFrames / (double)_unitaryFramesToPerform;
+            Stuck = stuck;
 
             return finish;
+        }
+
+        private int ComputeAvailableSources()
+        {
+            return _sources.Count(x => x.Is<Villager>(out var villager) && villager.Center == Target.Center);
+        }
+
+        private bool SourceIsBusy(IReadOnlyCollection<Craft> craftQueue)
+        {
+            return craftQueue.Any(x => x.IsStartedWithCommonSource(this));
         }
 
         private bool IntersectWithExistingStructure(IReadOnlyCollection<Sprite> sprites)
@@ -177,13 +202,13 @@ namespace Age_Of_Nothing
             return _sources.Count == 0;
         }
 
-        private void SetStartingFrame(int currentFrame, int availableSourcesCount = 1)
+        private void SetStartingFrame(int availableSourcesCount = 1)
         {
             if (!Started)
             {
                 _currentSources = availableSourcesCount;
-                _startingFrame = currentFrame;
                 _totalFramesCount = ComputeRemainingFramesToPerform(_unitaryFramesToPerform);
+                _elapsedFrames++;
                 Started = true;
             }
         }
@@ -191,8 +216,7 @@ namespace Age_Of_Nothing
         private void UpdateSources(int currentFrame, int availableSourcesCount)
         {
             _currentSources = availableSourcesCount;
-            var framesElapsed = Started ? currentFrame - _startingFrame : 0;
-            _totalFramesCount = framesElapsed + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - framesElapsed);
+            _totalFramesCount = _elapsedFrames + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - _elapsedFrames);
         }
 
         private bool IsStartedWithCommonSource(Craft craft)
@@ -200,9 +224,9 @@ namespace Age_Of_Nothing
             return craft != this && _sources.Any(_ => craft._sources.Contains(_)) && Started;
         }
 
-        private bool HasFinished(int currentFrame)
+        private bool HasFinished()
         {
-            return Started && currentFrame - _startingFrame >= _totalFramesCount;
+            return Started && _elapsedFrames >= _unitaryFramesToPerform;
         }
 
         private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
