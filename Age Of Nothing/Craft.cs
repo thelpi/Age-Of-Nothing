@@ -21,6 +21,7 @@ namespace Age_Of_Nothing
         private int _totalFramesCount;
         private double _progression;
         private bool _cancelationPending;
+        private bool _stuck;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,6 +37,19 @@ namespace Age_Of_Nothing
                 {
                     _progression = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progression)));
+                }
+            }
+        }
+
+        public bool Stuck
+        {
+            get => _stuck;
+            private set
+            {
+                if (_stuck != value)
+                {
+                    _stuck = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Stuck)));
                 }
             }
         }
