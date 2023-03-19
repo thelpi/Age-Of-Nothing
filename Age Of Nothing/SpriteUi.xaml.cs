@@ -19,32 +19,27 @@ namespace Age_Of_Nothing
     public partial class SpriteUi : UserControl
     {
         private const int UnitIndexZ = 2;
-        private const double UnitFocusStroke = 1;
-        private const double UnitSpaceBetween = 1;
+        private const int DefaultIndexZ = 1;
 
-        private const int StructureIndexZ = 1;
-        private const double StructureFocusStroke = 2;
-        private const double StructureSpaceBetween = 2;
-
-        private const int ResourceIndexZ = 1;
-        private const double ResourceFocusStroke = 2;
-        private const double ResourceSpaceBetween = 2;
-
-        private readonly double _focusStroke;
-        private readonly double _strokeAndSpace;
-        private readonly double _totalStrokeSize;
+        private const double FocusStroke = 2;
+        private const double SpaceBetween = 2;
+        private static readonly double StrokeAndSpace = FocusStroke + SpaceBetween;
+        private static readonly double TotalStrokeSize = StrokeAndSpace * 2;
 
         private readonly Shape _surround;
         private readonly Shape _visual;
 
         public Sprite Sprite { get; }
 
-        private readonly Brush _goldCarryBrush = GetImageFill(Brushes.SandyBrown, "gold");
-        private readonly Brush _woodCarryBrush = GetImageFill(Brushes.SandyBrown, "wood");
-        private readonly Brush _rockCarryBrush = GetImageFill(Brushes.SandyBrown, "rock");
-        private readonly Brush _goldCarryBrushHover = GetImageFill(Brushes.PeachPuff, "gold");
-        private readonly Brush _woodCarryBrushHover = GetImageFill(Brushes.PeachPuff, "wood");
-        private readonly Brush _rockCarryBrushHover = GetImageFill(Brushes.PeachPuff, "rock");
+        private static readonly IReadOnlyDictionary<(ResourceTypes, bool), Brush> _resourcebrushes = new Dictionary<(ResourceTypes, bool), Brush>
+        {
+            { (ResourceTypes.Gold, false), GetImageFill(Brushes.SandyBrown, "gold") },
+            { (ResourceTypes.Gold, true), GetImageFill(Brushes.PeachPuff, "gold") },
+            { (ResourceTypes.Wood, false), GetImageFill(Brushes.SandyBrown, "wood") },
+            { (ResourceTypes.Wood, true), GetImageFill(Brushes.PeachPuff, "wood") },
+            { (ResourceTypes.Rock, false), GetImageFill(Brushes.SandyBrown, "rock") },
+            { (ResourceTypes.Rock, true), GetImageFill(Brushes.PeachPuff, "rock") },
+        };
 
         private static readonly IReadOnlyDictionary<(Type, bool), Brush> _brushes = new Dictionary<(Type, bool), Brush>
         {
@@ -76,44 +71,20 @@ namespace Age_Of_Nothing
 
             Sprite = sprite;
 
-            SetValue(Panel.ZIndexProperty, sprite.Is<Unit>()
-                ? UnitIndexZ
-                : (sprite.Is<Structure>()
-                    ? StructureIndexZ
-                    : ResourceIndexZ));
+            SetValue(Panel.ZIndexProperty, GetIndexZ());
 
-            _focusStroke = sprite.Is<Unit>()
-                ? UnitFocusStroke
-                : (sprite.Is<Structure>()
-                    ? StructureFocusStroke
-                    : ResourceFocusStroke);
-            _strokeAndSpace = sprite.Is<Unit>()
-                ? UnitFocusStroke + UnitSpaceBetween
-                : (sprite.Is<Structure>()
-                    ? StructureFocusStroke + StructureSpaceBetween
-                    : ResourceFocusStroke + ResourceSpaceBetween);
-            _totalStrokeSize = _strokeAndSpace * 2;
-
-            _visual = sprite.Is<Structure>()
-                ? (Shape)new Rectangle()
-                : (sprite.Is<Unit>()
-                    ? new Ellipse()
-                    : new Ellipse());
+            _visual = BuildShape();
             _visual.Width = Sprite.Surface.Width;
             _visual.Height = Sprite.Surface.Height;
             _visual.Fill = GetFill();
             _visual.Opacity = isBlueprint ? 0.5 : 1;
             MainCanvas.Children.Add(_visual);
 
-            _surround = sprite.Is<Structure>()
-                ? (Shape)new Rectangle()
-                : (sprite.Is<Unit>()
-                    ? new Ellipse()
-                    : new Ellipse());
+            _surround = BuildShape();
             _surround.Stroke = Brushes.Black;
-            _surround.StrokeThickness = _focusStroke;
-            _surround.Width = Sprite.Surface.Width + _totalStrokeSize;
-            _surround.Height = Sprite.Surface.Height + _totalStrokeSize;
+            _surround.StrokeThickness = FocusStroke;
+            _surround.Width = Sprite.Surface.Width + TotalStrokeSize;
+            _surround.Height = Sprite.Surface.Height + TotalStrokeSize;
             _surround.Fill = Brushes.Transparent;
 
             // do not move this line above the _visual definition
@@ -165,30 +136,19 @@ namespace Age_Of_Nothing
         private Brush GetFill(bool forceHover = false)
         {
             var hover = IsMouseOver || forceHover;
-            if (Sprite.Is<Villager>(out var villager))
-            {
-                return villager.Carry?.r switch
-                {
-                    ResourceTypes.Gold => hover ? _goldCarryBrushHover : _goldCarryBrush,
-                    ResourceTypes.Wood => hover ? _woodCarryBrushHover : _woodCarryBrush,
-                    ResourceTypes.Rock => hover ? _rockCarryBrushHover : _rockCarryBrush,
-                    _ => _brushes[(Sprite.GetType(), hover)]
-                };
-            }
-            else
-            {
-                return _brushes[(Sprite.GetType(), hover)];
-            }
+            return Sprite.Is<Villager>(out var villager) && villager.Carry.HasValue
+                ? _resourcebrushes[(villager.Carry.Value.r, hover)]
+                : _brushes[(Sprite.GetType(), hover)];
         }
 
         private void SetControlDimensionsAndPosition()
         {
-            MainCanvas.Width = Sprite.Surface.Width + (Sprite.Focused ? _totalStrokeSize : 0);
-            MainCanvas.Height = Sprite.Surface.Height + (Sprite.Focused ? _totalStrokeSize : 0);
-            SetValue(Canvas.LeftProperty, Sprite.Surface.Left - (Sprite.Focused ? _strokeAndSpace : 0));
-            SetValue(Canvas.TopProperty, Sprite.Surface.Top - (Sprite.Focused ? _strokeAndSpace : 0));
-            _visual.SetValue(Canvas.LeftProperty, Sprite.Focused ? _strokeAndSpace : double.NaN);
-            _visual.SetValue(Canvas.TopProperty, Sprite.Focused ? _strokeAndSpace : double.NaN);
+            MainCanvas.Width = Sprite.Surface.Width + (Sprite.Focused ? TotalStrokeSize : 0);
+            MainCanvas.Height = Sprite.Surface.Height + (Sprite.Focused ? TotalStrokeSize : 0);
+            SetValue(Canvas.LeftProperty, Sprite.Surface.Left - (Sprite.Focused ? StrokeAndSpace : 0));
+            SetValue(Canvas.TopProperty, Sprite.Surface.Top - (Sprite.Focused ? StrokeAndSpace : 0));
+            _visual.SetValue(Canvas.LeftProperty, Sprite.Focused ? StrokeAndSpace : double.NaN);
+            _visual.SetValue(Canvas.TopProperty, Sprite.Focused ? StrokeAndSpace : double.NaN);
         }
 
         private static Brush GetImageFill(Brush backgroundBrush, string imageName)
@@ -238,6 +198,16 @@ namespace Age_Of_Nothing
         public static bool DisplayBlueprint(Sprite sprite)
         {
             return !sprite.Is<Unit>();
+        }
+
+        public int GetIndexZ()
+        {
+            return Sprite.Is<Unit>() ? UnitIndexZ : DefaultIndexZ;
+        }
+
+        public Shape BuildShape()
+        {
+            return Sprite.Is<Structure>() ? (Shape)new Rectangle() : new Ellipse();
         }
     }
 }
