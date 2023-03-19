@@ -7,9 +7,13 @@ namespace Age_Of_Nothing.Sprites.Structures
 {
     public abstract class Structure : Sprite
     {
-        protected Structure(Point basePoint, IEnumerable<Sprite> sprites)
+        public bool Tangible { get; set; }
+
+        protected Structure(Point basePoint, IEnumerable<Sprite> sprites, bool tangible)
             : base(basePoint, false, false, sprites)
-        { }
+        {
+            Tangible = tangible;
+        }
 
         public int GetUnitsStorage()
         {

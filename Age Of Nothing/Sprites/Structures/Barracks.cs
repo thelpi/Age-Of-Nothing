@@ -11,7 +11,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     public class Barracks : Structure
     {
         public Barracks(Point topleft, IEnumerable<Sprite> sprites)
-            : base(topleft, sprites)
+            : base(topleft, sprites, false)
         { }
     }
 }

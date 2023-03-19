@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     public class Market : Structure
     {
         public Market(Point topLeft, IEnumerable<Sprite> sprites)
-            : base(topLeft, sprites)
+            : base(topLeft, sprites, false)
         { }
     }
 }

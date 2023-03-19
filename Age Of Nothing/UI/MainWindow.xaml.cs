@@ -62,6 +62,7 @@ namespace Age_Of_Nothing.UI
                         var villagerFocus = _controller.HasFocus<Villager>();
                         var barracksFocus = _controller.HasFocus<Barracks>();
                         CreateDwellingButton.IsEnabled = villagerFocus;
+                        CreateWallButton.IsEnabled = villagerFocus;
                         CreateMarketButton.IsEnabled = villagerFocus;
                         CreateBarracksButton.IsEnabled = villagerFocus;
                         CreateVillagerButton.IsEnabled = _controller.HasFocus<Market>();
@@ -206,6 +207,11 @@ namespace Age_Of_Nothing.UI
         private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
         {
             SetStructureShadowSize<Barracks>();
+        }
+
+        private void CreateWallButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetStructureShadowSize<Wall>();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

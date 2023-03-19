@@ -47,6 +47,8 @@ namespace Age_Of_Nothing.UI
             { (typeof(Market), true), GetImageFill(Brushes.MediumPurple, "market") },
             { (typeof(Dwelling), false), GetImageFill(Brushes.Sienna, "dwelling") },
             { (typeof(Dwelling), true), GetImageFill(Brushes.Peru, "dwelling") },
+            { (typeof(Wall), false), GetImageFill(Brushes.Chocolate, "wall") },
+            { (typeof(Wall), true), GetImageFill(Brushes.BurlyWood, "wall") },
             { (typeof(Barracks), false), GetImageFill(Brushes.Crimson, "barracks") },
             { (typeof(Barracks), true), GetImageFill(Brushes.Salmon, "barracks") },
             { (typeof(Villager), false), Brushes.SandyBrown },

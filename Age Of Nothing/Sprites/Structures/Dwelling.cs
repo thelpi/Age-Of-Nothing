@@ -12,7 +12,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     public class Dwelling : Structure
     {
         public Dwelling(Point topleft, IEnumerable<Sprite> sprites)
-            : base(topleft, sprites)
+            : base(topleft, sprites, false)
         { }
     }
 }

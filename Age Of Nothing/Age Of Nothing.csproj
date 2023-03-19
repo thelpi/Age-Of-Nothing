@@ -19,6 +19,7 @@
     <None Remove="Resources\Images\population.png" />
     <None Remove="Resources\Images\rock.png" />
     <None Remove="Resources\Images\sword.png" />
+    <None Remove="Resources\Images\wall.png" />
     <None Remove="Resources\Images\wood.png" />
   </ItemGroup>
 
@@ -54,6 +55,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\sword.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\wall.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\wood.png">
