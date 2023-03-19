@@ -10,13 +10,13 @@ namespace Age_Of_Nothing.Events
 
         public Sprite Sprite { get; }
 
-        public bool IsBlueprint { get; }
+        public bool IsCraft { get; }
 
-        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool isBlueprint)
+        public SpritesCollectionChangedEventArgs(Sprite sprite, bool add, bool isCraft)
             : base(add ? SpritesCollectionAddPropertyName : SpritesCollectionRemovePropertyName)
         {
             Sprite = sprite;
-            IsBlueprint = isBlueprint;
+            IsCraft = isCraft;
         }
     }
 }

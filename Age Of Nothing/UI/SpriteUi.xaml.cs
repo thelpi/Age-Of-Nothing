@@ -65,7 +65,7 @@ namespace Age_Of_Nothing.UI
             { (typeof(Forest), true), GetImageFill(Brushes.ForestGreen, "forest") }
         };
 
-        public SpriteUi(Sprite sprite, bool isBlueprint)
+        public SpriteUi(Sprite sprite, bool isCraft)
         {
             InitializeComponent();
 
@@ -77,7 +77,7 @@ namespace Age_Of_Nothing.UI
             _visual.Width = Sprite.Surface.Width;
             _visual.Height = Sprite.Surface.Height;
             _visual.Fill = GetFill();
-            _visual.Opacity = isBlueprint ? 0.5 : 1;
+            _visual.Opacity = isCraft ? 0.5 : 1;
             MainCanvas.Children.Add(_visual);
 
             _surround = BuildShape();
@@ -90,7 +90,7 @@ namespace Age_Of_Nothing.UI
             // do not move this line above the _visual definition
             SetControlDimensionsAndPosition();
 
-            if (!isBlueprint)
+            if (!isCraft)
             {
                 MouseEnter += (a, b) => _visual.Fill = GetFill();
                 MouseLeave += (a, b) => _visual.Fill = GetFill();
@@ -195,7 +195,7 @@ namespace Age_Of_Nothing.UI
             };
         }
 
-        public static bool DisplayBlueprint(Sprite sprite)
+        public static bool DisplayCraft(Sprite sprite)
         {
             return !sprite.Is<Unit>();
         }

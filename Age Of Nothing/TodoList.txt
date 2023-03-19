@@ -7,4 +7,4 @@ Initialize controller with static dataset
 
 Point de ralliement
 
-Focus on bluePrint
+Focus on craft

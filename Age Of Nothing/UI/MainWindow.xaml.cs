@@ -75,10 +75,10 @@ namespace Age_Of_Nothing.UI
                     action = () =>
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
-                        if (!addEvt.IsBlueprint || SpriteUi.DisplayBlueprint(addEvt.Sprite))
-                            MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsBlueprint));
+                        if (!addEvt.IsCraft || SpriteUi.DisplayCraft(addEvt.Sprite))
+                            MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsCraft));
 
-                        if (addEvt.IsBlueprint)
+                        if (addEvt.IsCraft)
                         {
                             // TODO: refacto
                             var panel = new StackPanel
@@ -114,10 +114,10 @@ namespace Age_Of_Nothing.UI
                     action = () =>
                     {
                         var rmvEvt = e as SpritesCollectionChangedEventArgs;
-                        if (!rmvEvt.IsBlueprint || SpriteUi.DisplayBlueprint(rmvEvt.Sprite))
+                        if (!rmvEvt.IsCraft || SpriteUi.DisplayCraft(rmvEvt.Sprite))
                             MainCanvas.Children.Remove(FindCanvasElement(rmvEvt.Sprite));
 
-                        if (rmvEvt.IsBlueprint)
+                        if (rmvEvt.IsCraft)
                             CraftQueuePanel.Children.Remove(GetCraftSpriteVisualItem(rmvEvt.Sprite));
                     };
                 }
