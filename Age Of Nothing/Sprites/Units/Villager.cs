@@ -93,7 +93,8 @@ namespace Age_Of_Nothing.Sprites.Units
             var target = targets.FirstOrDefault(x => x.Is<Resource>() || x.Is<Structure>());
             if (target == null)
             {
-                if (inProgressCrafts.FirstIfNotNull(x => x.Target.Is<Structure>(), out var craft))
+                if (inProgressCrafts.FirstIfNotNull(x =>
+                    x.Target.Is<Structure>() && x.Target.Surface.Contains(originalPoint), out var craft))
                 {
                     SetPathCycle((craft.Target.Center, craft.Target));
                     craft.AddSource(this);
