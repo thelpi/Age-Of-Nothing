@@ -46,7 +46,7 @@ namespace Age_Of_Nothing
                 {
                     foreach (var sprite in e.NewItems.OfType<Sprite>())
                     {
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true, false));
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(sprite, true));
                         sprite.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName == nameof(sprite.LifePoints))
@@ -63,7 +63,7 @@ namespace Age_Of_Nothing
                 if (e.OldItems != null)
                 {
                     foreach (var item in e.OldItems.OfType<Sprite>())
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item, false, false));
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(item, false));
                 }
 
                 // in case of dwellings or units count has changed
@@ -76,7 +76,7 @@ namespace Age_Of_Nothing
                 {
                     foreach (var craft in e.NewItems.OfType<Craft>())
                     {
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, true, true));
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft, true));
                         // propagate the event
                         craft.PropertyChanged += (_, eSub) => PropertyChanged?.Invoke(craft, eSub);
                     }
@@ -85,7 +85,7 @@ namespace Age_Of_Nothing
                 if (e.OldItems != null)
                 {
                     foreach (var craft in e.OldItems.OfType<Craft>())
-                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft.Target, false, true));
+                        PropertyChanged?.Invoke(this, new SpritesCollectionChangedEventArgs(craft, false));
                 }
             };
         }
