@@ -115,9 +115,9 @@ namespace Age_Of_Nothing
                 _sprites.Add(forest);
         }
 
-        public bool HasFocus<T>() where T : Sprite
+        public IEnumerable<T> FocusedSprites<T>() where T : Sprite
         {
-            return _sprites.Any(x => x.Focused && x.Is<T>());
+            return _sprites.Where(x => x.Focused).OfType<T>();
         }
 
         public void AddUnitToStack<T>() where T : Unit

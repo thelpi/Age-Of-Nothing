@@ -58,17 +58,17 @@ namespace Age_Of_Nothing.UI
                 {
                     action = () =>
                     {
-                        // TODO: we should do better with the target type and CraftInAttribute
-                        var villagerFocus = _controller.HasFocus<Villager>();
-                        var barracksFocus = _controller.HasFocus<Barracks>();
+                        var villagerFocus = _controller.FocusedSprites<Villager>().Any();
                         CreateDwellingButton.IsEnabled = villagerFocus;
                         CreateWallButton.IsEnabled = villagerFocus;
                         CreateMarketButton.IsEnabled = villagerFocus;
                         CreateBarracksButton.IsEnabled = villagerFocus;
-                        CreateVillagerButton.IsEnabled = _controller.HasFocus<Market>();
-                        CreateSwordsmanButton.IsEnabled = barracksFocus;
-                        CreateArcherButton.IsEnabled = barracksFocus;
-                        CreateKnightButton.IsEnabled = barracksFocus;
+
+                        var structureFocus = _controller.FocusedSprites<Structure>();
+                        CreateVillagerButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Villager>());
+                        CreateSwordsmanButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Swordsman>());
+                        CreateArcherButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Archer>());
+                        CreateKnightButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Knight>());
                     };
                 }
                 else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName)
