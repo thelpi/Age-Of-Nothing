@@ -165,6 +165,8 @@ namespace Age_Of_Nothing
 
         public void FocusOnZone(Rect zone)
         {
+            ClearHover(zone);
+
             var hasUnitSelected = false;
             foreach (var unit in Units)
             {
@@ -193,6 +195,12 @@ namespace Age_Of_Nothing
         {
             foreach (var sp in _sprites)
                 sp.ForceHover(zone.IntersectsWith(sp.Surface));
+        }
+
+        public void ClearHover(Rect zone)
+        {
+            foreach (var sp in _sprites)
+                sp.ForceHover(false);
         }
 
         public void SetTargetPositionsOnFocused(Point clickPosition)
