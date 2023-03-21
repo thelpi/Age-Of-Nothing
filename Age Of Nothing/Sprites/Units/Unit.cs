@@ -42,7 +42,23 @@ namespace Age_Of_Nothing.Sprites.Units
                 var currentlyOn = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
                 var nextOn = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
                 if (!currentlyOn && nextOn)
-                    return null;
+                {
+                    var i = 1;
+                    var found = false;
+                    while (i <= 4 && !found)
+                    {
+                        var pt = new Point(Center.X + GetDefaultSpeed(), Center.Y);
+                        if (i == 2)
+                            pt = new Point(Center.X, Center.Y + GetDefaultSpeed());
+                        else if (i == 3)
+                            pt = new Point(Center.X - GetDefaultSpeed(), Center.Y);
+                        else if (i == 4)
+                            pt = new Point(Center.X, Center.Y - GetDefaultSpeed());
+                        newSurface = pt.ComputeSurfaceFromMiddlePoint(Surface.Size);
+                        found = !newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+                        i++;
+                    }
+                }
 
                 Move(newSurface);
                 if (targetPoint == Center)
