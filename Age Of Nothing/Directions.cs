@@ -1,6 +1,6 @@
 ﻿namespace Age_Of_Nothing
 {
-    public enum Cardinals
+    public enum Directions
     {
         Left,
         Top,

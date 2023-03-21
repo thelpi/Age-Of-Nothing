@@ -234,7 +234,7 @@ namespace Age_Of_Nothing
                         {
                             _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));
                             foreach (var unit in villagerFocused)
-                                unit.SetPathCycle(new Coordinate(sprite));
+                                unit.SetPathCycle(new MoveTarget(sprite));
                         }
                     }
                 }

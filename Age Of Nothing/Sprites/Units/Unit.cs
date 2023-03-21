@@ -7,8 +7,8 @@ namespace Age_Of_Nothing.Sprites.Units
 {
     public abstract class Unit : Sprite
     {
-        private readonly LinkedList<Coordinate> _pathCycle = new LinkedList<Coordinate>();
-        private LinkedListNode<Coordinate> _currentPathTarget;
+        private readonly LinkedList<MoveTarget> _pathCycle = new LinkedList<MoveTarget>();
+        private LinkedListNode<MoveTarget> _currentPathTarget;
         private bool _isPathLoop;
 
         protected Unit(Point center, IEnumerable<Sprite> sprites)
@@ -18,7 +18,7 @@ namespace Age_Of_Nothing.Sprites.Units
         /// <summary>
         /// Check if the unit has to move in this frame
         /// </summary>
-        /// <returns>The sprite the unit is on to (if any; and if in the path cycle).</returns>
+        /// <returns>The destination sprite, if the destination has been reached on this frame.</returns>
         public Sprite CheckForMovement(IEnumerable<Structures.Structure> progressingCrafts)
         {
             lock (_pathCycle)
@@ -27,46 +27,65 @@ namespace Age_Of_Nothing.Sprites.Units
                 if (_currentPathTarget == null)
                     return null;
 
-                // compte the point on the distance to reach the targer
-                // (in straight line)
-                var targetPoint = _currentPathTarget.Value.TargetPoint;
-                var target = _currentPathTarget.Value.TargetSprite;
-                var currentCardinal = _currentPathTarget.Value.CurrentCardinal;
-                var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, targetPoint.X, targetPoint.Y, GetDefaultSpeed());
+                var currentTargetPoint = _currentPathTarget.Value.TargetPoint;
+                var currentTargetSprite = _currentPathTarget.Value.TargetSprite;
+                var currentForcedDirection = _currentPathTarget.Value.ForcedDirection;
 
-                var newSurface = new Point(x2, y2).ComputeSurfaceFromMiddlePoint(Surface.Size);
+                // compute the point on the distance to reach the targer
+                // (in straight line)
+                var newPoint = GeometryTools.ComputePointOnLine(
+                    Center.X, Center.Y,
+                    currentTargetPoint.X,
+                    currentTargetPoint.Y, GetDefaultSpeed());
+
+                // the surface of the sprite once it will be moved
+                var newSurface = newPoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
 
                 // TODO: allow villagers to help for crafting
 
-                // HACK: when a unit is already on a tangible structure
+                // does the unit already intersect a structure?
+                var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+
+                // will the unit intersect a structure with the new surface?
+                var willIntersectStructureNext = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+
+                // HACK: when alreadyIntersectingStructure is TRUE
                 // everything is allowed to get out
-                // the use case if when a villager finish to craft a wall (he's on the center)
-                var currentlyOn = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
-                var nextOn = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
-                if (currentlyOn.Count == 0 && nextOn.Count > 0)
+                // the use case if when a villager finish to craft a tangible structure (like a wall)
+                // at this instant, he's on the center of the structure
+                if (!alreadyIntersectingStructure && willIntersectStructureNext)
                 {
-                    var possibleNewPoints = SystemExtensions.GetEnum<Cardinals>()
+                    var possibleNewPoints = SystemExtensions.GetEnum<Directions>()
                         .Select(card => (card, Center.GetPointFromCardinal(card, GetDefaultSpeed())))
-                        .Where(x => x.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size).IntersectIntangibleStructure(Sprites.Concat(progressingCrafts)).Count == 0);
+                        .Where(x => !x.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size).IntersectIntangibleStructure(Sprites.Concat(progressingCrafts)));
 
                     // TODO: add the check "in the area of the map"
-                    (Cardinals, Point)? bestPoint = null;
+                    (Directions, Point)? bestPoint = null;
                     if (possibleNewPoints.Any(x => x.Item2.X >= 0 && x.Item2.Y >= 0))
-                        bestPoint = possibleNewPoints.OrderByDescending(x => x.card == currentCardinal).ThenBy(x => Point.Subtract(targetPoint, x.Item2).LengthSquared).First();
+                        bestPoint = possibleNewPoints.OrderByDescending(x => x.card == currentForcedDirection).ThenBy(x => Point.Subtract(currentTargetPoint, x.Item2).LengthSquared).First();
 
                     if (bestPoint.HasValue)
                     {
                         newSurface = bestPoint.Value.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size);
-                        _currentPathTarget.Value.CurrentCardinal = bestPoint.Value.Item1;
+                        _currentPathTarget.Value.ForcedDirection = bestPoint.Value.Item1;
                     }
                     else
+                    {
+                        _currentPathTarget = null;
                         return null;
+                    }
                 }
                 else
-                    _currentPathTarget.Value.CurrentCardinal = null;
+                {
+                    // If we can get closer to the target without following a forced direction
+                    // The current one (if any) is disabled
+                    _currentPathTarget.Value.ForcedDirection = null;
+                }
 
+                // Proceed to move
                 Move(newSurface);
-                if (targetPoint == Center)
+
+                if (currentTargetPoint == Center)
                 {
                     // has reached the target
                     // if last node of the circle, sets loop if enabled
@@ -77,10 +96,10 @@ namespace Age_Of_Nothing.Sprites.Units
                 else
                 {
                     // not yet reaching the target
-                    target = null;
+                    currentTargetSprite = null;
                 }
 
-                return target;
+                return currentTargetSprite;
             }
         }
 
@@ -92,14 +111,14 @@ namespace Age_Of_Nothing.Sprites.Units
         /// note the other way around though
         /// even if we could compute the point related to target inside the method
         /// </param>
-        public void SetPathCycle(params Coordinate[] points)
+        public void SetPathCycle(params MoveTarget[] points)
         {
             lock (_pathCycle)
             {
                 _pathCycle.Clear();
                 var first = true;
                 _isPathLoop = false;
-                LinkedListNode<Coordinate> node = null;
+                LinkedListNode<MoveTarget> node = null;
                 foreach (var point in points)
                 {
                     _isPathLoop = !first;
@@ -142,7 +161,7 @@ namespace Age_Of_Nothing.Sprites.Units
         /// <param name="inProgressCrafts"></param>
         public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets, IEnumerable<Craft> inProgressCrafts)
         {
-            SetPathCycle(new Coordinate(originalPoint));
+            SetPathCycle(new MoveTarget(originalPoint));
         }
 
         private double GetDefaultSpeed()

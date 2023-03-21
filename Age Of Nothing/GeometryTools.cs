@@ -16,7 +16,7 @@ namespace Age_Of_Nothing
         /// <param name="speed">The speed, in pixels per call, of the moving object.</param>
         /// <returns>The new point; if beyong target, the target is returned.</returns>
         /// <exception cref="InvalidOperationException">The quadratic equation has no solution.</exception>
-        public static (double x2, double y2) ComputePointOnLine(
+        public static Point ComputePointOnLine(
             double xSource, double ySource, double xTarget, double yTarget, double speed)
         {
             double x2, y2;
@@ -64,8 +64,8 @@ namespace Age_Of_Nothing
                 || (y2 < ySource && y2 < yTarget);
 
             return beyondXTarget || beyondYTarget
-                ? (xTarget, yTarget)
-                : (x2, y2);
+                ? new Point(xTarget, yTarget)
+                : new Point(x2, y2);
         }
 
         /// <summary>
@@ -104,17 +104,17 @@ namespace Age_Of_Nothing
             return new Point(surface.X + surface.Width / 2, surface.Y + surface.Height / 2);
         }
 
-        public static Point GetPointFromCardinal(this Point sourcePoint, Cardinals cardinal, double distance)
+        public static Point GetPointFromCardinal(this Point sourcePoint, Directions cardinal, double distance)
         {
             switch (cardinal)
             {
-                case Cardinals.Bottom:
+                case Directions.Bottom:
                     return new Point(sourcePoint.X, sourcePoint.Y + distance);
-                case Cardinals.Top:
+                case Directions.Top:
                     return new Point(sourcePoint.X, sourcePoint.Y - distance);
-                case Cardinals.Left:
+                case Directions.Left:
                     return new Point(sourcePoint.X - distance, sourcePoint.Y);
-                case Cardinals.Right:
+                case Directions.Right:
                 default:
                     return new Point(sourcePoint.X + distance, sourcePoint.Y);
             }

@@ -3,21 +3,21 @@ using Age_Of_Nothing.Sprites;
 
 namespace Age_Of_Nothing
 {
-    public class Coordinate
+    public class MoveTarget
     {
         public Sprite TargetSprite { get; }
 
-        public Cardinals? CurrentCardinal { get; set; }
+        public Directions? ForcedDirection { get; set; }
 
         public Point TargetPoint { get; }
 
-        public Coordinate(Sprite targetSprite)
+        public MoveTarget(Sprite targetSprite)
         {
             TargetPoint = targetSprite.Center;
             TargetSprite = targetSprite;
         }
 
-        public Coordinate(Point targetPoint)
+        public MoveTarget(Point targetPoint)
         {
             TargetPoint = targetPoint;
             TargetSprite = null;

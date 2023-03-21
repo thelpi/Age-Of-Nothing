@@ -16,10 +16,10 @@ namespace Age_Of_Nothing_Unit_Tests
             var yf = 16;
             var distance = 5D;
 
-            var (x2, y2) = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
+            var pt = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
 
-            Assert.Equal(x2Expected, x2);
-            Assert.Equal(y2Expected, y2);
+            Assert.Equal(x2Expected, pt.X);
+            Assert.Equal(y2Expected, pt.Y);
         }
 
         [Theory]
@@ -33,10 +33,10 @@ namespace Age_Of_Nothing_Unit_Tests
             var yf = 16;
             var distance = 11D;
 
-            var (x2, y2) = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
+            var pt = GeometryTools.ComputePointOnLine(x1, y1, xf, yf, distance);
 
-            Assert.Equal(xf, x2);
-            Assert.Equal(yf, y2);
+            Assert.Equal(xf, pt.X);
+            Assert.Equal(yf, pt.Y);
         }
 
         [Fact]
@@ -44,10 +44,10 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 20D;
 
-            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 50, 10, distance);
+            var pt = GeometryTools.ComputePointOnLine(10, 10, 50, 10, distance);
 
-            Assert.Equal(30, x2);
-            Assert.Equal(10, y2);
+            Assert.Equal(30, pt.X);
+            Assert.Equal(10, pt.Y);
         }
 
         [Fact]
@@ -55,10 +55,10 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 20D;
 
-            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
+            var pt = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
 
-            Assert.Equal(10, x2);
-            Assert.Equal(30, y2);
+            Assert.Equal(10, pt.X);
+            Assert.Equal(30, pt.Y);
         }
 
         [Fact]
@@ -66,10 +66,10 @@ namespace Age_Of_Nothing_Unit_Tests
         {
             var distance = 60D;
 
-            var (x2, y2) = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
+            var pt = GeometryTools.ComputePointOnLine(10, 10, 10, 50, distance);
 
-            Assert.Equal(10, x2);
-            Assert.Equal(50, y2);
+            Assert.Equal(10, pt.X);
+            Assert.Equal(50, pt.Y);
         }
     }
 }
