@@ -40,8 +40,7 @@ namespace Age_Of_Nothing
         {
             _surface = new Rect(0, 0, width, height);
 
-            _resourcesQty = System.Enum.GetValues(typeof(ResourceTypes))
-                .Cast<ResourceTypes>()
+            _resourcesQty = SystemExtensions.GetEnum<ResourceTypes>()
                 .ToDictionary(x => x, x => 0);
 
             _sprites.CollectionChanged += (s, e) =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Age_Of_Nothing
 {
@@ -17,6 +18,14 @@ namespace Age_Of_Nothing
             where TAttr : Attribute
         {
             return Attribute.GetCustomAttribute(targetType, typeof(TAttr)) as TAttr;
+        }
+
+        public static IEnumerable<T> GetEnum<T>()
+        {
+            if (!typeof(T).IsEnum)
+                throw new ArgumentException("Type should be enumerable.");
+
+            return Enum.GetValues(typeof(T)).Cast<T>();
         }
     }
 }

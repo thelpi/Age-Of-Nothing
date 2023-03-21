@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace Age_Of_Nothing
@@ -101,6 +102,49 @@ namespace Age_Of_Nothing
         public static Point GetCenter(this Rect surface)
         {
             return new Point(surface.X + surface.Width / 2, surface.Y + surface.Height / 2);
+        }
+
+        public static IEnumerable<Cardinals> GetCommonCardinals(this Rect commonSurface, Rect sourceSurface)
+        {
+            // HACK: assumes that sourceSurface is smaller than commonSurface
+            // Aka not this situation (common is on the RIGHT):
+            // -------|
+            //        |
+            //     |------
+            //     |
+            //     |------
+            //        |
+            // -------|
+
+            var hasTopLeft = commonSurface.Contains(sourceSurface.TopLeft);
+            var hasBottomLeft = commonSurface.Contains(sourceSurface.BottomLeft);
+            var hasTopRight = commonSurface.Contains(sourceSurface.TopRight);
+            var hasBottomRight = commonSurface.Contains(sourceSurface.BottomRight);
+
+            if (hasTopLeft || hasBottomLeft)
+                yield return Cardinals.Left;
+            if (hasTopLeft || hasTopRight)
+                yield return Cardinals.Top;
+            if (hasTopRight || hasBottomRight)
+                yield return Cardinals.Right;
+            if (hasBottomLeft || hasBottomRight)
+                yield return Cardinals.Bottom;
+        }
+
+        public static Point GetPointFromCardinal(this Point sourcePoint, Cardinals cardinal, double distance)
+        {
+            switch (cardinal)
+            {
+                case Cardinals.Bottom:
+                    return new Point(sourcePoint.X, sourcePoint.Y + distance);
+                case Cardinals.Top:
+                    return new Point(sourcePoint.X, sourcePoint.Y - distance);
+                case Cardinals.Left:
+                    return new Point(sourcePoint.X - distance, sourcePoint.Y);
+                case Cardinals.Right:
+                default:
+                    return new Point(sourcePoint.X + distance, sourcePoint.Y);
+            }
         }
     }
 }

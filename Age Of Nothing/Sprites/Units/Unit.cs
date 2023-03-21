@@ -41,23 +41,23 @@ namespace Age_Of_Nothing.Sprites.Units
                 // the use case if when a villager finish to craft a wall (he's on the center)
                 var currentlyOn = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
                 var nextOn = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
-                if (!currentlyOn && nextOn)
+                if (currentlyOn.Count == 0 && nextOn.Count > 0)
                 {
-                    var i = 1;
-                    var found = false;
-                    while (i <= 4 && !found)
-                    {
-                        var pt = new Point(Center.X + GetDefaultSpeed(), Center.Y);
-                        if (i == 2)
-                            pt = new Point(Center.X, Center.Y + GetDefaultSpeed());
-                        else if (i == 3)
-                            pt = new Point(Center.X - GetDefaultSpeed(), Center.Y);
-                        else if (i == 4)
-                            pt = new Point(Center.X, Center.Y - GetDefaultSpeed());
-                        newSurface = pt.ComputeSurfaceFromMiddlePoint(Surface.Size);
-                        found = !newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
-                        i++;
-                    }
+                    var occupiedCardinals = nextOn
+                        .SelectMany(x => x.GetCommonCardinals(newSurface))
+                        .Distinct();
+
+                    var possibleNewPoints = SystemExtensions.GetEnum<Cardinals>()
+                        .Where(x => !occupiedCardinals.Contains(x))
+                        .Select(x => Center.GetPointFromCardinal(x, GetDefaultSpeed()));
+
+                    // TODO: add the check "in the area of the map"
+                    Point? bestPoint = null;
+                    if (possibleNewPoints.Any(x => x.X >= 0 && x.Y >= 0))
+                        bestPoint = possibleNewPoints.OrderBy(x => Point.Subtract(targetPoint, x).LengthSquared).First();
+
+                    if (bestPoint.HasValue)
+                        newSurface = bestPoint.Value.ComputeSurfaceFromMiddlePoint(Surface.Size);
                 }
 
                 Move(newSurface);
