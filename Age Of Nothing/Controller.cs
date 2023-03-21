@@ -107,6 +107,11 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _sprites));
             _sprites.Add(new Dwelling(new Point(1100, 10), _sprites));
             _sprites.Add(new Dwelling(new Point(1100, 90), _sprites));
+            _sprites.Add(new Wall(new Point(340, 330), _sprites));
+            _sprites.Add(new Wall(new Point(340, 357), _sprites));
+            _sprites.Add(new Wall(new Point(340, 384), _sprites));
+            _sprites.Add(new Wall(new Point(367, 384), _sprites));
+            _sprites.Add(new Wall(new Point(394, 384), _sprites));
 
             var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), _sprites, 0);
             _forestPatchs.Add(forests.ToList());
@@ -229,7 +234,7 @@ namespace Age_Of_Nothing
                         {
                             _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));
                             foreach (var unit in villagerFocused)
-                                unit.SetPathCycle((center, sprite));
+                                unit.SetPathCycle(new Coordinate(sprite));
                         }
                     }
                 }

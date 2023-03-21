@@ -7,8 +7,8 @@ namespace Age_Of_Nothing.Sprites.Units
 {
     public abstract class Unit : Sprite
     {
-        private readonly LinkedList<(Point point, Sprite target)> _pathCycle = new LinkedList<(Point, Sprite)>();
-        private LinkedListNode<(Point point, Sprite target)> _currentPathTarget;
+        private readonly LinkedList<Coordinate> _pathCycle = new LinkedList<Coordinate>();
+        private LinkedListNode<Coordinate> _currentPathTarget;
         private bool _isPathLoop;
 
         protected Unit(Point center, IEnumerable<Sprite> sprites)
@@ -29,7 +29,9 @@ namespace Age_Of_Nothing.Sprites.Units
 
                 // compte the point on the distance to reach the targer
                 // (in straight line)
-                var (targetPoint, target) = _currentPathTarget.Value;
+                var targetPoint = _currentPathTarget.Value.TargetPoint;
+                var target = _currentPathTarget.Value.TargetSprite;
+                var currentCardinal = _currentPathTarget.Value.CurrentCardinal;
                 var (x2, y2) = GeometryTools.ComputePointOnLine(Center.X, Center.Y, targetPoint.X, targetPoint.Y, GetDefaultSpeed());
 
                 var newSurface = new Point(x2, y2).ComputeSurfaceFromMiddlePoint(Surface.Size);
@@ -43,22 +45,25 @@ namespace Age_Of_Nothing.Sprites.Units
                 var nextOn = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
                 if (currentlyOn.Count == 0 && nextOn.Count > 0)
                 {
-                    var occupiedCardinals = nextOn
-                        .SelectMany(x => x.GetCommonCardinals(newSurface))
-                        .Distinct();
-
                     var possibleNewPoints = SystemExtensions.GetEnum<Cardinals>()
-                        .Where(x => !occupiedCardinals.Contains(x))
-                        .Select(x => Center.GetPointFromCardinal(x, GetDefaultSpeed()));
+                        .Select(card => (card, Center.GetPointFromCardinal(card, GetDefaultSpeed())))
+                        .Where(x => x.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size).IntersectIntangibleStructure(Sprites.Concat(progressingCrafts)).Count == 0);
 
                     // TODO: add the check "in the area of the map"
-                    Point? bestPoint = null;
-                    if (possibleNewPoints.Any(x => x.X >= 0 && x.Y >= 0))
-                        bestPoint = possibleNewPoints.OrderBy(x => Point.Subtract(targetPoint, x).LengthSquared).First();
+                    (Cardinals, Point)? bestPoint = null;
+                    if (possibleNewPoints.Any(x => x.Item2.X >= 0 && x.Item2.Y >= 0))
+                        bestPoint = possibleNewPoints.OrderByDescending(x => x.card == currentCardinal).ThenBy(x => Point.Subtract(targetPoint, x.Item2).LengthSquared).First();
 
                     if (bestPoint.HasValue)
-                        newSurface = bestPoint.Value.ComputeSurfaceFromMiddlePoint(Surface.Size);
+                    {
+                        newSurface = bestPoint.Value.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size);
+                        _currentPathTarget.Value.CurrentCardinal = bestPoint.Value.Item1;
+                    }
+                    else
+                        return null;
                 }
+                else
+                    _currentPathTarget.Value.CurrentCardinal = null;
 
                 Move(newSurface);
                 if (targetPoint == Center)
@@ -87,14 +92,14 @@ namespace Age_Of_Nothing.Sprites.Units
         /// note the other way around though
         /// even if we could compute the point related to target inside the method
         /// </param>
-        public void SetPathCycle(params (Point, Sprite)[] points)
+        public void SetPathCycle(params Coordinate[] points)
         {
             lock (_pathCycle)
             {
                 _pathCycle.Clear();
                 var first = true;
                 _isPathLoop = false;
-                LinkedListNode<(Point, Sprite)> node = null;
+                LinkedListNode<Coordinate> node = null;
                 foreach (var point in points)
                 {
                     _isPathLoop = !first;
@@ -114,7 +119,7 @@ namespace Age_Of_Nothing.Sprites.Units
         /// <returns></returns>
         public bool IsSpriteOnPath(Sprite sprite)
         {
-            return _pathCycle.Any(tc => tc.target == sprite);
+            return _pathCycle.Any(tc => tc.TargetSprite == sprite);
         }
 
         /// <summary>
@@ -126,7 +131,7 @@ namespace Age_Of_Nothing.Sprites.Units
         {
             // BUG: maybe it should be the next according to where the unit is currently are in the cycle
             // not necessarely the next from the start
-            return _pathCycle.FirstOrDefault(tc => tc.target.Is<T>()).target as T;
+            return _pathCycle.FirstOrDefault(tc => tc.TargetSprite.Is<T>())?.TargetSprite as T;
         }
 
         /// <summary>
@@ -137,7 +142,7 @@ namespace Age_Of_Nothing.Sprites.Units
         /// <param name="inProgressCrafts"></param>
         public virtual void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets, IEnumerable<Craft> inProgressCrafts)
         {
-            SetPathCycle((originalPoint, null));
+            SetPathCycle(new Coordinate(originalPoint));
         }
 
         private double GetDefaultSpeed()

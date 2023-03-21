@@ -96,12 +96,12 @@ namespace Age_Of_Nothing.Sprites.Units
                 if (inProgressCrafts.FirstIfNotNull(x =>
                     x.Target.Is<Structure>() && x.Target.Surface.Contains(originalPoint), out var craft))
                 {
-                    SetPathCycle((craft.Target.Center, craft.Target));
+                    SetPathCycle(new Coordinate(craft.Target));
                     craft.AddSource(this);
                 }
                 else
                 {
-                    SetPathCycle((originalPoint, null));
+                    SetPathCycle(new Coordinate(originalPoint));
                 }
             }
             else
@@ -118,11 +118,11 @@ namespace Age_Of_Nothing.Sprites.Units
                 if (target.Is<Resource>() && Sprites.OfType<Market>().Any())
                 {
                     var closestMarket = Sprites.OfType<Market>().GetClosestSprite(target.Center);
-                    SetPathCycle((target.Center, target), (closestMarket.Center, closestMarket));
+                    SetPathCycle(new Coordinate(target), new Coordinate(closestMarket));
                 }
                 else
                 {
-                    SetPathCycle((target.Center, target));
+                    SetPathCycle(new Coordinate(target));
                 }
             }
         }
@@ -134,9 +134,9 @@ namespace Age_Of_Nothing.Sprites.Units
                 var fpOk = patch.GetClosestSprite(Center);
                 var closestMarket = Sprites.OfType<Market>().GetClosestSprite(fpOk.Center);
                 if (IsMaxCarrying(ResourceTypes.Wood))
-                    SetPathCycle((closestMarket.Center, closestMarket), (fpOk.Center, fpOk));
+                    SetPathCycle(new Coordinate(closestMarket), new Coordinate(fpOk));
                 else
-                    SetPathCycle((fpOk.Center, fpOk), (closestMarket.Center, closestMarket));
+                    SetPathCycle(new Coordinate(fpOk), new Coordinate(closestMarket));
             }
         }
     }
