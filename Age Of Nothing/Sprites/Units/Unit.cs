@@ -55,22 +55,16 @@ namespace Age_Of_Nothing.Sprites.Units
                 // at this instant, he's on the center of the structure
                 if (!alreadyIntersectingStructure && willIntersectStructureNext)
                 {
-                    var possibleNewPoints = SystemExtensions.GetEnum<Directions>()
-                        .Select(card => (card, Center.GetPointFromCardinal(card, GetDefaultSpeed())))
-                        .Where(x => !x.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size).IntersectIntangibleStructure(Sprites.Concat(progressingCrafts)));
-
-                    // TODO: add the check "in the area of the map"
-                    (Directions, Point)? bestPoint = null;
-                    if (possibleNewPoints.Any(x => x.Item2.X >= 0 && x.Item2.Y >= 0))
-                        bestPoint = possibleNewPoints.OrderByDescending(x => x.card == currentForcedDirection).ThenBy(x => Point.Subtract(currentTargetPoint, x.Item2).LengthSquared).First();
-
+                    var bestPoint = UsePathFindingForNextPoint(currentTargetPoint, progressingCrafts, ref currentForcedDirection);
                     if (bestPoint.HasValue)
                     {
-                        newSurface = bestPoint.Value.Item2.ComputeSurfaceFromMiddlePoint(Surface.Size);
-                        _currentPathTarget.Value.ForcedDirection = bestPoint.Value.Item1;
+                        newSurface = bestPoint.Value.ComputeSurfaceFromMiddlePoint(Surface.Size);
+                        _currentPathTarget.Value.ForcedDirection = currentForcedDirection;
                     }
                     else
                     {
+                        // no solution: we cancel the target completely
+                        // it avoids a recomputing at each frame for nothing
                         _currentPathTarget = null;
                         return null;
                     }
@@ -101,6 +95,62 @@ namespace Age_Of_Nothing.Sprites.Units
 
                 return currentTargetSprite;
             }
+        }
+
+        private Point? UsePathFindingForNextPoint(
+            Point currentTargetPoint,
+            IEnumerable<Structures.Structure> progressingCrafts,
+            ref Directions? direction)
+        {
+            Point? bestPoint = null;
+            var distance = double.MaxValue;
+
+            // if we're already in forced direction, we compute the point in this direction
+            if (direction.HasValue)
+                bestPoint = GetNextPointFromDirection(direction.Value, progressingCrafts);
+
+            if (bestPoint.HasValue)
+                return bestPoint;
+
+            // no forced direction, or forced direction unavaible: try other directions
+            foreach (var localDirection in SystemExtensions.GetEnum<Directions>())
+            {
+                // already done above
+                if (localDirection == direction)
+                    continue;
+
+                // compute if point avaiable for the current direction in the loop
+                var localBestPoint = GetNextPointFromDirection(localDirection, progressingCrafts);
+                if (localBestPoint.HasValue)
+                {
+                    // compute the distance between this point and the target
+                    var localDistance = Point.Subtract(localBestPoint.Value, currentTargetPoint).LengthSquared;
+                    if (localDistance < distance)
+                    {
+                        // if closer distance,  that's the point we keep
+                        bestPoint = localBestPoint;
+                        direction = localDirection;
+                        distance = localDistance;
+                    }
+                }
+            }
+
+            return bestPoint;
+        }
+
+        private Point? GetNextPointFromDirection(Directions direction, IEnumerable<Structures.Structure> progressingCrafts)
+        {
+            var nextCenter = Center.GetPointFromCardinal(direction, GetDefaultSpeed());
+
+            // TODO: add the check "in the area of the map"
+            if (nextCenter.X < 0 || nextCenter.Y < 0)
+                return null;
+
+            var intersect = nextCenter
+                .ComputeSurfaceFromMiddlePoint(Surface.Size)
+                .IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+            
+            return intersect ? default(Point?) : nextCenter;
         }
 
         /// <summary>
