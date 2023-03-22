@@ -29,5 +29,15 @@ namespace Age_Of_Nothing
                 && structure.Tangible
                 && structure.Surface.IntersectsWith(surface));
         }
+
+        public static Directions GetOppositeDirection(this Directions direction)
+        {
+            return (Directions)System.Math.Abs((int)direction - 2);
+        }
+
+        public static bool IsOppositeDirection(this Directions direction, Directions otherDirection)
+        {
+            return direction.GetOppositeDirection() == otherDirection;
+        }
     }
 }
