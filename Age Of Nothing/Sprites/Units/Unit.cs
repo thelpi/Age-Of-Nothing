@@ -47,14 +47,31 @@ namespace Age_Of_Nothing.Sprites.Units
                 var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
 
                 // will the unit intersect a structure with the new surface?
-                var willIntersectStructureNext = newSurface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+                var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Sprites.Concat(progressingCrafts));
 
                 // HACK: when alreadyIntersectingStructure is TRUE
                 // everything is allowed to get out
                 // the use case if when a villager finish to craft a tangible structure (like a wall)
                 // at this instant, he's on the center of the structure
-                if (!alreadyIntersectingStructure && willIntersectStructureNext)
+                if (!alreadyIntersectingStructure && intersectionsNext.Any())
                 {
+                    if (currentTargetSprite == null)
+                    {
+                        // The target is not a sprite but just a point
+                        // (or at least was no when set)
+                        // but the target point collides with a sprite
+                        // is this sprite the same sprite as the one who collides now ?
+                        // if so, we stop
+                        var intersections = currentTargetPoint
+                            .ComputeSurfaceFromMiddlePoint(Surface.Size)
+                            .GetIntangibleStructureIntersections(Sprites);
+                        if (intersectionsNext.Any(x => intersections.Contains(x)))
+                        {
+                            _currentPathTarget = null;
+                            return null;
+                        }
+                    }
+
                     var bestPoint = UsePathFindingForNextPoint(currentTargetPoint, progressingCrafts, ref currentForcedDirection);
                     if (bestPoint.HasValue)
                     {

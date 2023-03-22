@@ -20,7 +20,12 @@ namespace Age_Of_Nothing
 
         public static bool IntersectIntangibleStructure(this Rect surface, IEnumerable<Sprites.Sprite> sprites)
         {
-            return sprites.Any(x => x.Is<Sprites.Structures.Structure>(out var structure)
+            return surface.GetIntangibleStructureIntersections(sprites).Any();
+        }
+
+        public static IEnumerable<Sprites.Sprite> GetIntangibleStructureIntersections(this Rect surface, IEnumerable<Sprites.Sprite> sprites)
+        {
+            return sprites.Where(x => x.Is<Sprites.Structures.Structure>(out var structure)
                 && structure.Tangible
                 && structure.Surface.IntersectsWith(surface));
         }
