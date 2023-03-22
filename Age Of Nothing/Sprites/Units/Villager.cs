@@ -7,7 +7,7 @@ using Age_Of_Nothing.Sprites.Structures;
 
 namespace Age_Of_Nothing.Sprites.Units
 {
-    [Dimensions(20)]
+    [Dimensions(10)]
     [CraftTime(120)]
     [Speed(5)]
     [LifePoints(20)]
