@@ -59,7 +59,7 @@ namespace Age_Of_Nothing.Sprites.Units
                     {
                         // The target is not a sprite but just a point
                         // (or at least was no when set)
-                        // but the target point collides with a sprite
+                        // but the target point, with unit surface, collides with a tangible structure
                         // is this sprite the same sprite as the one who collides now ?
                         // if so, we stop
                         var intersections = currentTargetPoint
