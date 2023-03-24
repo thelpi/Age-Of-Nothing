@@ -42,6 +42,7 @@ namespace Age_Of_Nothing.Sprites.Units
                 var newSurface = newPoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
 
                 // does the unit already intersect a structure?
+                // is yes, the unit will be allowed to move throught tangible structures
                 var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
 
                 // will the unit intersect a structure with the new surface?
@@ -55,10 +56,6 @@ namespace Age_Of_Nothing.Sprites.Units
                     && progressingCrafts.Contains(currentTargetSprite)
                     && Is<Villager>();
 
-                // HACK: when alreadyIntersectingStructure is TRUE
-                // everything is allowed to get out
-                // the use case if when a villager finish to craft a tangible structure (like a wall)
-                // at this instant, he's on the center of the structure
                 if (!alreadyIntersectingStructure && intersectionsNext.Any() && !intersectionIsTargetAndCraft)
                 {
                     if (currentTargetSprite == null)
