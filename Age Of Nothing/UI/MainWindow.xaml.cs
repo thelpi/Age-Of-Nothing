@@ -162,7 +162,7 @@ namespace Age_Of_Nothing.UI
 
             if (_structureShadowSize.HasValue)
             {
-                var pos = e.GetPosition(MainCanvas);
+                var pos = e.GetPosition(MainCanvas).RescaleBase10();
                 _structureShadowGu.Width = _structureShadowSize.Value.size.Width;
                 _structureShadowGu.Height = _structureShadowSize.Value.size.Height;
                 _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (_structureShadowSize.Value.size.Width / 2));

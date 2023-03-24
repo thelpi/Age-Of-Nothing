@@ -4,7 +4,7 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Structures
 {
-    [Dimensions(96)]
+    [Dimensions(100)]
     [CraftTime(400)]
     [ResourcesCost(20, 100, 20)]
     [LifePoints(1000)]

@@ -193,7 +193,7 @@ namespace Age_Of_Nothing
 
         private bool IntersectWithExistingStructure(IReadOnlyCollection<Sprite> sprites)
         {
-            return sprites.Any(x => x != Target && x.Is<Structure>() && x.Surface.IntersectsWith(Target.Surface));
+            return sprites.Any(x => x != Target && x.Is<Structure>() && x.Surface.RealIntersectsWith(Target.Surface));
         }
 
         private bool CheckObsoleteSources(IReadOnlyCollection<Sprite> sprites)
@@ -236,7 +236,7 @@ namespace Age_Of_Nothing
 
         private bool IntersectWithStartedCraft(IReadOnlyCollection<Craft> crafts)
         {
-            return crafts.Any(x => x != this && x.Started && x.Target.Is<Structure>() && x.Target.Surface.IntersectsWith(Target.Surface));
+            return crafts.Any(x => x != this && x.Started && x.Target.Is<Structure>() && x.Target.Surface.RealIntersectsWith(Target.Surface));
         }
     }
 }

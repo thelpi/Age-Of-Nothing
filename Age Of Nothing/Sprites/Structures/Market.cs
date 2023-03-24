@@ -6,7 +6,7 @@ namespace Age_Of_Nothing.Sprites.Structures
 {
     [CraftTime(400)]
     [ResourcesCost(10, 200, 50)]
-    [Dimensions(128)]
+    [Dimensions(100)]
     [UnitsStorage(5)]
     [LifePoints(1000)]
     public class Market : Structure

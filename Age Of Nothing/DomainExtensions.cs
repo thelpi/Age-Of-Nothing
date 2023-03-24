@@ -27,7 +27,7 @@ namespace Age_Of_Nothing
         {
             return sprites.Where(x => x.Is<Sprites.Structures.Structure>(out var structure)
                 && structure.Tangible
-                && structure.Surface.IntersectsWith(surface));
+                && structure.Surface.RealIntersectsWith(surface));
         }
 
         public static Directions GetOppositeDirection(this Directions direction)

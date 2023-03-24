@@ -4,7 +4,7 @@ using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Resources
 {
-    [Dimensions(75)]
+    [Dimensions(80)]
     public class GoldMine : Resource
     {
         public override ResourceTypes ResourceType => ResourceTypes.Gold;

@@ -27,5 +27,26 @@ namespace Age_Of_Nothing
 
             return Enum.GetValues(typeof(T)).Cast<T>();
         }
+
+        public static Point RescaleBase10(this Point point)
+        {
+            return new Point(point.X.RescaleBase10(), point.Y.RescaleBase10());
+        }
+
+        public static bool RealIntersectsWith(this Rect mainSurface, Rect secondSurface)
+        {
+            var size = Rect.Intersect(mainSurface, secondSurface).Size;
+            return size.Width > 0 && size.Height > 0;
+        }
+
+        private static double RescaleBase10(this double value)
+        {
+            var valuePow10 = value / 10;
+            var valuePow10Floot = Math.Floor(valuePow10);
+            var decimalPow10 = valuePow10 - valuePow10Floot;
+            return decimalPow10 <= 0.5
+                ? valuePow10Floot * 10
+                : (valuePow10Floot + 1) * 10;
+        }
     }
 }

@@ -107,11 +107,11 @@ namespace Age_Of_Nothing
             _sprites.Add(new Market(new Point(600, 500), _sprites));
             _sprites.Add(new Dwelling(new Point(1100, 10), _sprites));
             _sprites.Add(new Dwelling(new Point(1100, 90), _sprites));
-            _sprites.Add(new Wall(new Point(340, 330), _sprites));
-            _sprites.Add(new Wall(new Point(340, 357), _sprites));
-            _sprites.Add(new Wall(new Point(340, 384), _sprites));
-            _sprites.Add(new Wall(new Point(367, 384), _sprites));
-            _sprites.Add(new Wall(new Point(394, 384), _sprites));
+            _sprites.Add(new Wall(new Point(335, 335), _sprites));
+            _sprites.Add(new Wall(new Point(335, 365), _sprites));
+            _sprites.Add(new Wall(new Point(335, 395), _sprites));
+            _sprites.Add(new Wall(new Point(365, 395), _sprites));
+            _sprites.Add(new Wall(new Point(395, 395), _sprites));
 
             var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), _sprites, 0);
             _forestPatchs.Add(forests.ToList());
@@ -186,7 +186,7 @@ namespace Age_Of_Nothing
                 // take the first focus
                 foreach (var x in _sprites.Where(x => !(x is Unit)))
                 {
-                    if (zone.IntersectsWith(x.Surface))
+                    if (zone.RealIntersectsWith(x.Surface))
                     {
                         x.Focused = true;
                         break;
@@ -198,7 +198,7 @@ namespace Age_Of_Nothing
         public void RefreshHover(Rect zone)
         {
             foreach (var sp in _sprites)
-                sp.ForceHover(zone.IntersectsWith(sp.Surface));
+                sp.ForceHover(zone.RealIntersectsWith(sp.Surface));
         }
 
         public void ClearHover(Rect zone)
@@ -218,6 +218,8 @@ namespace Age_Of_Nothing
         {
             if (type.IsAbstract || !type.IsSubclassOf(typeof(Structure)))
                 throw new System.ArgumentException($"The type should be concrete and inherits from {nameof(Structure)}", nameof(type));
+
+            center = center.RescaleBase10();
 
             lock (_craftQueue)
             {
@@ -243,7 +245,7 @@ namespace Age_Of_Nothing
 
         private bool SurfaceIsEngaged(Rect surface)
         {
-            return NonUnits.Any(x => x.Surface.IntersectsWith(surface));
+            return NonUnits.Any(x => x.Surface.RealIntersectsWith(surface));
         }
 
         private bool CheckStructureResources(Sprite sprite)
