@@ -100,7 +100,9 @@ namespace Age_Of_Nothing
             var cancel = false;
 
             if (_cancelationPending)
+            {
                 cancel = true;
+            }
             else if (Target.Is<Structure>())
             {
                 if (IntersectWithExistingStructure(sprites))
@@ -152,7 +154,9 @@ namespace Age_Of_Nothing
             else if (Target.Is<Structure>(out var tgtStruct))
             {
                 if (HasFinished())
+                {
                     finish = true;
+                }
                 else if (!Started)
                 {
                     var availableSources = ComputeAvailableSources();

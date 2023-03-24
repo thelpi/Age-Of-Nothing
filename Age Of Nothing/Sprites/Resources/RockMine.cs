@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Resources
@@ -9,8 +8,8 @@ namespace Age_Of_Nothing.Sprites.Resources
     {
         public override ResourceTypes ResourceType => ResourceTypes.Rock;
 
-        public RockMine(int quantity, Point position, IEnumerable<Sprite> sprites)
-            : base(position, quantity, sprites)
+        public RockMine(int quantity, Point position, Controller parent)
+            : base(position, quantity, parent)
         { }
     }
 }

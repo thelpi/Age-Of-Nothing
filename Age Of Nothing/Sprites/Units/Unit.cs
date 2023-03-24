@@ -11,8 +11,8 @@ namespace Age_Of_Nothing.Sprites.Units
         private LinkedListNode<MoveTarget> _currentPathTarget;
         private bool _isPathLoop;
 
-        protected Unit(Point center, IEnumerable<Sprite> sprites)
-            : base(center, true, true, sprites)
+        protected Unit(Point center, Controller parent)
+            : base(center, true, true, parent)
         { }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace Age_Of_Nothing.Sprites.Units
 
                 // does the unit already intersect a structure?
                 // is yes, the unit will be allowed to move throught tangible structures
-                var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
+                var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Parent.Sprites.Concat(progressingCrafts));
 
                 // will the unit intersect a structure with the new surface?
-                var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Sprites.Concat(progressingCrafts));
+                var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Parent.Sprites.Concat(progressingCrafts));
 
                 // checks if the single intersection is the current target
                 // and a craft in progress
@@ -67,7 +67,7 @@ namespace Age_Of_Nothing.Sprites.Units
                         // if so, we stop
                         var intersections = currentTargetPoint
                             .ComputeSurfaceFromMiddlePoint(Surface.Size)
-                            .GetIntangibleStructureIntersections(Sprites);
+                            .GetIntangibleStructureIntersections(Parent.Sprites);
                         if (intersectionsNext.Any(x => intersections.Contains(x)))
                         {
                             _currentPathTarget = null;
@@ -162,14 +162,14 @@ namespace Age_Of_Nothing.Sprites.Units
         {
             var nextCenter = Center.GetPointFromCardinal(direction, GetDefaultSpeed());
 
-            // TODO: add the check "in the area of the map"
-            if (nextCenter.X < 0 || nextCenter.Y < 0)
+            var nextSurface = nextCenter.ComputeSurfaceFromMiddlePoint(Surface.Size);
+
+            if (!Parent.IsInBound(nextSurface))
                 return null;
 
-            var intersect = nextCenter
-                .ComputeSurfaceFromMiddlePoint(Surface.Size)
-                .IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
-            
+            var intersect = nextSurface
+                .IntersectIntangibleStructure(Parent.Sprites.Concat(progressingCrafts));
+
             return intersect ? default(Point?) : nextCenter;
         }
 
@@ -239,11 +239,11 @@ namespace Age_Of_Nothing.Sprites.Units
             return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
 
-        public static T Instanciate<T>(Point center, IEnumerable<Sprite> sprites) where T : Unit
+        public static T Instanciate<T>(Point center, Controller parent) where T : Unit
         {
             return (T)typeof(T)
-                .GetConstructor(new[] { typeof(Point), typeof(IEnumerable<Sprite>) })
-                .Invoke(new object[] { center, sprites });
+                .GetConstructor(new[] { typeof(Point), typeof(Controller) })
+                .Invoke(new object[] { center, parent });
         }
     }
 }

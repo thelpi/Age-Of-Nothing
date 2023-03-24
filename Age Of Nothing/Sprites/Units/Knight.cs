@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Units
@@ -12,8 +11,8 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Knight : Unit
     {
-        public Knight(Point center, IEnumerable<Sprite> sprites)
-            : base(center, sprites)
+        public Knight(Point center, Controller parent)
+            : base(center, parent)
         { }
     }
 }

@@ -36,8 +36,8 @@ namespace Age_Of_Nothing.Sprites.Units
             }
         }
 
-        public Villager(Point center, IEnumerable<Sprite> sprites)
-            : base(center, sprites)
+        public Villager(Point center, Controller parent)
+            : base(center, parent)
         { }
 
         /// <summary>
@@ -109,15 +109,15 @@ namespace Age_Of_Nothing.Sprites.Units
                 if (target.Is<Forest>(out var forest))
                 {
                     // finds the closest forest sprite in the patch from the villager position
-                    target = Sprites
+                    target = Parent.Sprites
                         .OfType<Forest>()
                         .Where(x => x.ForestPatchIndex == forest.ForestPatchIndex)
                         .GetClosestSprite(Center);
                 }
 
-                if (target.Is<Resource>() && Sprites.OfType<Market>().Any())
+                if (target.Is<Resource>() && Parent.Sprites.OfType<Market>().Any())
                 {
-                    var closestMarket = Sprites.OfType<Market>().GetClosestSprite(target.Center);
+                    var closestMarket = Parent.Sprites.OfType<Market>().GetClosestSprite(target.Center);
                     SetPathCycle(new MoveTarget(target), new MoveTarget(closestMarket));
                 }
                 else
@@ -129,10 +129,10 @@ namespace Age_Of_Nothing.Sprites.Units
 
         public void ComputeCycleOnForestPatch(List<Forest> patch)
         {
-            if (patch.Count > 0 && Sprites.Any(x => x.Is<Market>()))
+            if (patch.Count > 0 && Parent.Sprites.Any(x => x.Is<Market>()))
             {
                 var fpOk = patch.GetClosestSprite(Center);
-                var closestMarket = Sprites.OfType<Market>().GetClosestSprite(fpOk.Center);
+                var closestMarket = Parent.Sprites.OfType<Market>().GetClosestSprite(fpOk.Center);
                 if (IsMaxCarrying(ResourceTypes.Wood))
                     SetPathCycle(new MoveTarget(closestMarket), new MoveTarget(fpOk));
                 else

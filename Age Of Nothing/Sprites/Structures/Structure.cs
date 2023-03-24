@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
@@ -9,8 +8,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     {
         public bool Tangible { get; set; }
 
-        protected Structure(Point basePoint, IEnumerable<Sprite> sprites, bool tangible)
-            : base(basePoint, false, false, sprites)
+        protected Structure(Point basePoint, Controller parent, bool tangible)
+            : base(basePoint, false, false, parent)
         {
             Tangible = tangible;
         }

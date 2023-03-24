@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Age_Of_Nothing.Sprites.Resources
 {
@@ -22,8 +21,8 @@ namespace Age_Of_Nothing.Sprites.Resources
 
         public abstract ResourceTypes ResourceType { get; }
 
-        protected Resource(Point center, int quantity, IEnumerable<Sprite> sprites)
-            : base(center, true, false, sprites)
+        protected Resource(Point center, int quantity, Controller parent)
+            : base(center, true, false, parent)
         {
             _quantity = quantity;
         }

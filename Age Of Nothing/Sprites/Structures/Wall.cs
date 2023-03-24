@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Structures
@@ -10,8 +9,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(2000)]
     public class Wall : Structure
     {
-        public Wall(Point topLeft, IEnumerable<Sprite> sprites)
-            : base(topLeft, sprites, true)
+        public Wall(Point topLeft, Controller parent)
+            : base(topLeft, parent, true)
         { }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
 namespace Age_Of_Nothing.Sprites.Structures
@@ -11,8 +10,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(200)]
     public class Dwelling : Structure
     {
-        public Dwelling(Point topleft, IEnumerable<Sprite> sprites)
-            : base(topleft, sprites, false)
+        public Dwelling(Point topleft, Controller parent)
+            : base(topleft, parent, false)
         { }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
@@ -11,10 +10,11 @@ namespace Age_Of_Nothing.Sprites
         private Point _center;
         private int _lifePoints;
 
+        protected readonly Controller Parent;
+
         public bool HasLifePoints => LifePoints > -1;
 
         public Rect Surface { get; private set; }
-        protected IEnumerable<Sprite> Sprites { get; }
         public bool CanMove { get; }
         public Point Center
         {
@@ -56,7 +56,7 @@ namespace Age_Of_Nothing.Sprites
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Sprite(Point basePoint, bool isCenter, bool canMove, IEnumerable<Sprite> sprites)
+        protected Sprite(Point basePoint, bool isCenter, bool canMove, Controller parent)
         {
             var size = GetSpriteSize(GetType());
 
@@ -69,7 +69,7 @@ namespace Age_Of_Nothing.Sprites
                 : Surface.GetCenter();
             _lifePoints = GetDefaultLifePoints(GetType());
 
-            Sprites = sprites;
+            Parent = parent;
         }
 
         public void TakeDamage(int damagePoints)
@@ -134,7 +134,7 @@ namespace Age_Of_Nothing.Sprites
             Focused = !Focused;
             if (Focused)
             {
-                foreach (var x in Sprites)
+                foreach (var x in Parent.Sprites)
                 {
                     if (x != this)
                         x.Focused = false;
