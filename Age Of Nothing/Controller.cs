@@ -24,6 +24,7 @@ namespace Age_Of_Nothing
         private int _frames;
 
         public IReadOnlyCollection<Sprite> Sprites => _sprites;
+        public IReadOnlyCollection<Craft> CraftQueue => _craftQueue;
 
         private IEnumerable<Sprite> NonUnits => _sprites.Except(Units);
         private IEnumerable<Unit> Units => _sprites.OfType<Unit>();
@@ -213,7 +214,7 @@ namespace Age_Of_Nothing
         {
             var targets = _sprites.Where(x => x.Surface.Contains(clickPosition));
             foreach (var unit in Units.Where(x => x.Focused))
-                unit.ComputeCycle(clickPosition, targets, _craftQueue);
+                unit.ComputeCycle(clickPosition, targets);
         }
 
         public void BuildStructure(System.Type type, Point center)

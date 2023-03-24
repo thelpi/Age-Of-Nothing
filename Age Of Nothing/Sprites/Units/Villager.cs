@@ -83,9 +83,7 @@ namespace Age_Of_Nothing.Sprites.Units
         }
 
         /// <inheritdoc />
-        public override void ComputeCycle(Point originalPoint,
-            IEnumerable<Sprite> targets,
-            IEnumerable<Craft> inProgressCrafts)
+        public override void ComputeCycle(Point originalPoint, IEnumerable<Sprite> targets)
         {
             // For now, the choice is to only care about structure and resource target
             // AKA no attack from villager on other units
@@ -93,7 +91,7 @@ namespace Age_Of_Nothing.Sprites.Units
             var target = targets.FirstOrDefault(x => x.Is<Resource>() || x.Is<Structure>());
             if (target == null)
             {
-                if (inProgressCrafts.FirstIfNotNull(x =>
+                if (Parent.CraftQueue.FirstIfNotNull(x =>
                     x.Target.Is<Structure>() && x.Target.Surface.Contains(originalPoint), out var craft))
                 {
                     SetPathCycle(new MoveTarget(craft.Target));
