@@ -41,19 +41,25 @@ namespace Age_Of_Nothing.Sprites.Units
                 // the surface of the sprite once it will be moved
                 var newSurface = newPoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
 
-                // TODO: allow villagers to help for crafting
-
                 // does the unit already intersect a structure?
                 var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Sprites.Concat(progressingCrafts));
 
                 // will the unit intersect a structure with the new surface?
                 var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Sprites.Concat(progressingCrafts));
 
+                // checks if the single intersection is the current target
+                // and a craft in progress
+                // unit has to be a villager
+                var intersectionIsTargetAndCraft = intersectionsNext.Count() == 1
+                    && intersectionsNext.First() == currentTargetSprite
+                    && progressingCrafts.Contains(currentTargetSprite)
+                    && Is<Villager>();
+
                 // HACK: when alreadyIntersectingStructure is TRUE
                 // everything is allowed to get out
                 // the use case if when a villager finish to craft a tangible structure (like a wall)
                 // at this instant, he's on the center of the structure
-                if (!alreadyIntersectingStructure && intersectionsNext.Any())
+                if (!alreadyIntersectingStructure && intersectionsNext.Any() && !intersectionIsTargetAndCraft)
                 {
                     if (currentTargetSprite == null)
                     {
