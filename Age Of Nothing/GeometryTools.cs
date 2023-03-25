@@ -24,7 +24,9 @@ namespace Age_Of_Nothing
                 // when not a linear equation
                 // aka straight up/down
                 x2 = xSource;
-                y2 = ySource + speed;
+                y2 = yTarget < ySource
+                    ? ySource - speed
+                    : ySource + speed;
             }
             else
             {
