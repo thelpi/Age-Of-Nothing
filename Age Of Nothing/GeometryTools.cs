@@ -103,6 +103,13 @@ namespace Age_Of_Nothing
             return new Point(surface.X + surface.Width / 2, surface.Y + surface.Height / 2);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourcePoint"></param>
+        /// <param name="cardinal"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         public static Point GetPointFromCardinal(this Point sourcePoint, Directions cardinal, double distance)
         {
             switch (cardinal)
@@ -117,6 +124,50 @@ namespace Age_Of_Nothing
                 default:
                     return new Point(sourcePoint.X + distance, sourcePoint.Y);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modulo"></param>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
+        /// <returns></returns>
+        public static double GetModuloDim(double modulo, double d1, double d2)
+        {
+            return (((int)Math.Floor(Math.Abs(d1 - d2))) / ((int)Math.Floor(modulo)) * modulo) + modulo;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Point RescaleBase10(this Point point)
+        {
+            return new Point(point.X.RescaleBase10(), point.Y.RescaleBase10());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mainSurface"></param>
+        /// <param name="secondSurface"></param>
+        /// <returns></returns>
+        public static bool RealIntersectsWith(this Rect mainSurface, Rect secondSurface)
+        {
+            var size = Rect.Intersect(mainSurface, secondSurface).Size;
+            return size.Width > 0 && size.Height > 0;
+        }
+
+        private static double RescaleBase10(this double value)
+        {
+            var valuePow10 = value / 10;
+            var valuePow10Floot = Math.Floor(valuePow10);
+            var decimalPow10 = valuePow10 - valuePow10Floot;
+            return decimalPow10 <= 0.5
+                ? valuePow10Floot * 10
+                : (valuePow10Floot + 1) * 10;
         }
     }
 }

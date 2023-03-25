@@ -1,5 +1,4 @@
 ﻿Chateau
-Murs
 Technologies
 Délai récolte ressource
 

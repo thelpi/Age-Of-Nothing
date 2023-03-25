@@ -28,8 +28,9 @@ namespace Age_Of_Nothing.UI
         private readonly Rectangle _structureShadowGu;
         private readonly Controller _controller;
 
-        private (Size size, Type target)? _structureShadowSize;
+        private (Size size, Type target, bool continuous)? _structureShadowSize;
         private Point? _selectionPoint;
+        private Point? _craftPoint;
         private volatile bool _refreshing = false;
 
         public MainWindow()
@@ -129,6 +130,10 @@ namespace Age_Of_Nothing.UI
                 _selectionPoint = e.GetPosition(MainCanvas);
                 _controller.ClearFocus();
             }
+            else if (_structureShadowGu == e.Source)
+            {
+                _craftPoint = e.GetPosition(MainCanvas).RescaleBase10();
+            }
         }
 
         private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -162,11 +167,22 @@ namespace Age_Of_Nothing.UI
 
             if (_structureShadowSize.HasValue)
             {
+                var (size, _, continuous) = _structureShadowSize.Value;
                 var pos = e.GetPosition(MainCanvas).RescaleBase10();
-                _structureShadowGu.Width = _structureShadowSize.Value.size.Width;
-                _structureShadowGu.Height = _structureShadowSize.Value.size.Height;
-                _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (_structureShadowSize.Value.size.Width / 2));
-                _structureShadowGu.SetValue(Canvas.TopProperty, pos.Y - (_structureShadowSize.Value.size.Height / 2));
+                if (_craftPoint.HasValue && continuous)
+                {
+                    _structureShadowGu.Width = GeometryTools.GetModuloDim(size.Width, pos.X, _craftPoint.Value.X);
+                    _structureShadowGu.Height = GeometryTools.GetModuloDim(size.Height, pos.Y, _craftPoint.Value.Y);
+                    _structureShadowGu.SetValue(Canvas.LeftProperty, Math.Min(pos.X, _craftPoint.Value.X) - (size.Width / 2));
+                    _structureShadowGu.SetValue(Canvas.TopProperty, Math.Min(pos.Y, _craftPoint.Value.Y) - (size.Width / 2));
+                }
+                else
+                {
+                    _structureShadowGu.Width = size.Width;
+                    _structureShadowGu.Height = size.Height;
+                    _structureShadowGu.SetValue(Canvas.LeftProperty, pos.X - (size.Width / 2));
+                    _structureShadowGu.SetValue(Canvas.TopProperty, pos.Y - (size.Height / 2));
+                }
             }
         }
 
@@ -196,22 +212,22 @@ namespace Age_Of_Nothing.UI
 
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
-            SetStructureShadowSize<Dwelling>();
+            SetStructureShadowSize<Dwelling>(false);
         }
 
         private void CreateMarketButton_Click(object sender, RoutedEventArgs e)
         {
-            SetStructureShadowSize<Market>();
+            SetStructureShadowSize<Market>(false);
         }
 
         private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
         {
-            SetStructureShadowSize<Barracks>();
+            SetStructureShadowSize<Barracks>(false);
         }
 
         private void CreateWallButton_Click(object sender, RoutedEventArgs e)
         {
-            SetStructureShadowSize<Wall>();
+            SetStructureShadowSize<Wall>(true);
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -223,9 +239,9 @@ namespace Age_Of_Nothing.UI
 
         #endregion Events
 
-        private void SetStructureShadowSize<T>() where T : Structure
+        private void SetStructureShadowSize<T>(bool continuous) where T : Structure
         {
-            _structureShadowSize = (Sprite.GetSpriteSize(typeof(T)), typeof(T));
+            _structureShadowSize = (Sprite.GetSpriteSize(typeof(T)), typeof(T), continuous);
         }
 
         private void ResetSelectionRectangle()
@@ -240,6 +256,7 @@ namespace Age_Of_Nothing.UI
             _structureShadowSize = null;
             _structureShadowGu.Width = 0;
             _structureShadowGu.Height = 0;
+            _craftPoint = null;
         }
 
         private UIElement FindCanvasElement(Sprite sprite)
