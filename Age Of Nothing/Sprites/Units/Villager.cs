@@ -104,14 +104,10 @@ namespace Age_Of_Nothing.Sprites.Units
             }
             else
             {
-                if (target.Is<Forest>(out var forest))
-                {
-                    // finds the closest forest sprite in the patch from the villager position
-                    target = Parent.Sprites
-                        .OfType<Forest>()
-                        .Where(x => x.ForestPatchIndex == forest.ForestPatchIndex)
-                        .GetClosestSprite(Center);
-                }
+                // finds the closest sprite of the same ressource type
+                target = Parent.Sprites
+                    .Where(x => x.GetType() == target.GetType())
+                    .GetClosestSprite(Center);
 
                 if (target.Is<Resource>() && Parent.Sprites.OfType<Market>().Any())
                 {
