@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using System.Windows;
@@ -142,10 +143,31 @@ namespace Age_Of_Nothing.UI
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
             if (_structureShadowSize.HasValue)
             {
-                _controller.BuildStructure(_structureShadowSize.Value.target, e.GetPosition(MainCanvas));
+                var finalPoint = e.GetPosition(MainCanvas);
+                List<Point> centers;
+                if (_structureShadowSize.Value.continuous && _craftPoint.HasValue)
+                    centers = GetAllContiguousStructuresCenters(finalPoint);
+                else
+                    centers = new List<Point> { finalPoint };
+                _controller.BuildStructure(_structureShadowSize.Value.target, centers);
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
+        }
+
+        private List<Point> GetAllContiguousStructuresCenters(Point finalPoint)
+        {
+            var centers = new List<Point>(50);
+            var x1 = Math.Min(finalPoint.X, _craftPoint.Value.X);
+            var y1 = Math.Min(finalPoint.Y, _craftPoint.Value.Y);
+            var x2 = Math.Max(finalPoint.X, _craftPoint.Value.X);
+            var y2 = Math.Max(finalPoint.Y, _craftPoint.Value.Y);
+            for (var x = x1; x <= x2; x += _structureShadowSize.Value.size.Width)
+            {
+                for (var y = y1; y <= y2; y += _structureShadowSize.Value.size.Height)
+                    centers.Add(new Point(x, y));
+            }
+            return centers;
         }
 
         private void MainCanvas_MouseLeave(object sender, MouseEventArgs e)

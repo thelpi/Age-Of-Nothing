@@ -217,32 +217,43 @@ namespace Age_Of_Nothing
                 unit.ComputeCycle(clickPosition, targets);
         }
 
-        public void BuildStructure(System.Type type, Point center)
+        public void BuildStructure(System.Type type, IReadOnlyCollection<Point> centers)
         {
             if (type.IsAbstract || !type.IsSubclassOf(typeof(Structure)))
                 throw new System.ArgumentException($"The type should be concrete and inherits from {nameof(Structure)}", nameof(type));
 
-            center = center.RescaleBase10();
+            var villagerFocused = Villagers.Where(x => x.Focused);
+            if (!villagerFocused.Any())
+                return;
 
+            var newCrafts = new List<Craft>(centers.Count);
             lock (_craftQueue)
             {
-                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
-                if (!SurfaceIsEngaged(surface) && IsInBound(surface))
+                foreach (var rawCenter in centers)
                 {
-                    var villagerFocused = Villagers.Where(x => x.Focused);
-                    if (villagerFocused.Any())
+                    var center = rawCenter.RescaleBase10();
+
+                    var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
+                    if (!SurfaceIsEngaged(surface) && IsInBound(surface))
                     {
                         var sprite = (Sprite)type
                             .GetConstructor(new[] { typeof(Point), typeof(Controller) })
                             .Invoke(new object[] { surface.TopLeft, this });
                         if (CheckStructureResources(sprite))
                         {
-                            _craftQueue.Add(new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite));
-                            foreach (var unit in villagerFocused)
-                                unit.SetPathCycle(new MoveTarget(sprite));
+                            var craft = new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, true);
+                            newCrafts.Add(craft);
+                            _craftQueue.Add(craft);
                         }
                     }
                 }
+            }
+
+            foreach (var unit in villagerFocused)
+            {
+                var craftTarget = newCrafts.Select(x => x.Target).GetClosestSprite(unit.Center);
+                unit.SetPathCycle(new MoveTarget(craftTarget));
+                newCrafts.First(x => x.Target == craftTarget).AddSource(unit);
             }
         }
 

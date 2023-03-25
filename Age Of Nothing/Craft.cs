@@ -55,10 +55,10 @@ namespace Age_Of_Nothing
         }
 
         public Craft(Sprite source, Sprite target)
-            : this(new List<Sprite> { source }, target)
+            : this(new List<Sprite> { source }, target, false)
         { }
 
-        public Craft(List<Sprite> sources, Sprite target)
+        public Craft(List<Sprite> sources, Sprite target, bool sourcePrebooking)
         {
             if (sources.Count == 0)
                 throw new ArgumentException("Soruces collection is empty.", nameof(sources));
@@ -72,7 +72,10 @@ namespace Age_Of_Nothing
             if (target.Is<Unit>() && sources.Count > 1)
                 throw new InvalidOperationException("Units can only be crafted by a single source.");
 
-            _sources = sources;
+            if (sourcePrebooking && target.Is<Unit>())
+                throw new InvalidOperationException("Can't prebooking a unit craft.");
+
+            _sources = sourcePrebooking ? new List<Sprite>() : sources;
             Target = target;
             _unitaryFramesToPerform = target.GetCraftTime();
             _sourceType = sources.First().GetType();
