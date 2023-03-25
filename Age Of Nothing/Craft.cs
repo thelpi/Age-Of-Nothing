@@ -17,8 +17,6 @@ namespace Age_Of_Nothing
 
         private int _elapsedFrames;
         private int _currentSources;
-        // The total number of frames to craft; might change mid-term depending on source count
-        private int _totalFramesCount;
         private double _progression;
         private bool _cancelationPending;
         private bool _stuck;
@@ -27,6 +25,8 @@ namespace Age_Of_Nothing
 
         public Sprite Target { get; }
         public bool Started { get; private set; }
+
+        public IReadOnlyCollection<Sprite> Sources => _sources;
 
         public double Progression
         {
@@ -125,7 +125,7 @@ namespace Age_Of_Nothing
             return cancel;
         }
 
-        public bool CheckForCompletion(int frames, bool popAvailable, IReadOnlyCollection<Craft> craftQueue)
+        public bool CheckForCompletion(bool popAvailable, IReadOnlyCollection<Craft> craftQueue)
         {
             var finish = false;
             var stuck = false;
@@ -154,7 +154,7 @@ namespace Age_Of_Nothing
                         stuck = true;
                 }
             }
-            else if (Target.Is<Structure>(out var tgtStruct))
+            else if (Target.Is<Structure>())
             {
                 if (HasFinished())
                 {
@@ -172,7 +172,7 @@ namespace Age_Of_Nothing
                 {
                     var availableSources = ComputeAvailableSources();
                     if (availableSources != _currentSources)
-                        UpdateSources(frames, availableSources);
+                        UpdateSources(availableSources);
 
                     if (availableSources > 0)
                         _elapsedFrames += availableSources;
@@ -214,16 +214,14 @@ namespace Age_Of_Nothing
             if (!Started)
             {
                 _currentSources = availableSourcesCount;
-                _totalFramesCount = ComputeRemainingFramesToPerform(_unitaryFramesToPerform);
                 _elapsedFrames++;
                 Started = true;
             }
         }
 
-        private void UpdateSources(int currentFrame, int availableSourcesCount)
+        private void UpdateSources(int availableSourcesCount)
         {
             _currentSources = availableSourcesCount;
-            _totalFramesCount = _elapsedFrames + ComputeRemainingFramesToPerform(_unitaryFramesToPerform - _elapsedFrames);
         }
 
         private bool IsStartedWithCommonSource(Craft craft)
@@ -234,11 +232,6 @@ namespace Age_Of_Nothing
         private bool HasFinished()
         {
             return Started && _elapsedFrames >= _unitaryFramesToPerform;
-        }
-
-        private int ComputeRemainingFramesToPerform(int unitaryFramesToPerformRemaining)
-        {
-            return (int)Math.Round(unitaryFramesToPerformRemaining / (double)_currentSources);
         }
 
         private bool IntersectWithStartedCraft(IReadOnlyCollection<Craft> crafts)

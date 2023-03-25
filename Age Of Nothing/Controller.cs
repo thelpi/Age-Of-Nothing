@@ -341,16 +341,31 @@ namespace Age_Of_Nothing
             var finishedCrafts = new List<Craft>(10);
             foreach (var craft in _craftQueue)
             {
-                if (craft.CheckForCompletion(_frames, Population < PotentialPopulation, _craftQueue))
+                if (craft.CheckForCompletion(Population < PotentialPopulation, _craftQueue))
                 {
                     _sprites.Add(craft.Target);
                     finishedCrafts.Add(craft);
                 }
             }
 
+            var structuresToFinish = _craftQueue
+                .Where(x => x.Target.Is<Structure>() && !finishedCrafts.Contains(x))
+                .ToList();
+
             var craftsToRemove = _craftQueue.Where(x => finishedCrafts.Contains(x)).ToList();
             foreach (var craft in craftsToRemove)
+            {
                 _craftQueue.Remove(craft);
+                if (craft.Target.Is<Structure>() && structuresToFinish.Count > 0)
+                {
+                    foreach (var unit in craft.Sources.OfType<Villager>())
+                    {
+                        var craftTarget = structuresToFinish.Select(x => x.Target).GetClosestSprite(unit.Center);
+                        unit.SetPathCycle(new MoveTarget(craftTarget));
+                        _craftQueue.First(x => x.Target == craftTarget).AddSource(unit);
+                    }
+                }
+            }
         }
 
         private void ManageCraftsToCancel()
