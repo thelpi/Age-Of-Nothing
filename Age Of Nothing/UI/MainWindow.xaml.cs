@@ -174,13 +174,13 @@ namespace Age_Of_Nothing.UI
                 _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY), _selectionPoint.Value.MoveFromOffset(OffsetX, OffsetY)));
             if (_structureShadowSize.HasValue)
             {
-                var finalPoint = e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY);
+                var finalPoint = e.GetPosition(MainCanvas);
                 List<Point> centers;
                 if (_structureShadowSize.Value.continuous && _craftPoint.HasValue)
                     centers = GetAllContiguousStructuresCenters(finalPoint);
                 else
                     centers = new List<Point> { finalPoint };
-                _controller.BuildStructure(_structureShadowSize.Value.target, centers);
+                _controller.BuildStructure(_structureShadowSize.Value.target, centers.Select(x => x.MoveFromOffset(OffsetX, OffsetY)).ToList());
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
