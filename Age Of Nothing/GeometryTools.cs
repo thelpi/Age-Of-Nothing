@@ -114,18 +114,13 @@ namespace Age_Of_Nothing
         /// <returns></returns>
         public static Point GetPointFromCardinal(this Point sourcePoint, Directions cardinal, double distance)
         {
-            switch (cardinal)
+            return cardinal switch
             {
-                case Directions.Bottom:
-                    return new Point(sourcePoint.X, sourcePoint.Y + distance);
-                case Directions.Top:
-                    return new Point(sourcePoint.X, sourcePoint.Y - distance);
-                case Directions.Left:
-                    return new Point(sourcePoint.X - distance, sourcePoint.Y);
-                case Directions.Right:
-                default:
-                    return new Point(sourcePoint.X + distance, sourcePoint.Y);
-            }
+                Directions.Bottom => new Point(sourcePoint.X, sourcePoint.Y + distance),
+                Directions.Top => new Point(sourcePoint.X, sourcePoint.Y - distance),
+                Directions.Left => new Point(sourcePoint.X - distance, sourcePoint.Y),
+                _ => new Point(sourcePoint.X + distance, sourcePoint.Y),
+            };
         }
 
         /// <summary>
