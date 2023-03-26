@@ -198,10 +198,5 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
                 Assert.Equal(blankPoint, current.Value.point);
             }
         }
-
-        // TODO: should test
-        // - when mix villager and non villager
-        // - when market does not exist
-        // - when several market
     }
 }

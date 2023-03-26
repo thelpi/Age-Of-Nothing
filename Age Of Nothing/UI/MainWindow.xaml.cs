@@ -31,29 +31,29 @@ namespace Age_Of_Nothing.UI
         private readonly Rectangle _structureShadowGu;
         private readonly Rectangle _area;
         private readonly Controller _controller;
+        private readonly Button[] _areaButtons;
 
         private (Size size, Type target, bool continuous)? _structureShadowSize;
         private Point? _selectionPoint;
         private Point? _craftPoint;
-        private volatile bool _refreshing = false;
+        private bool _refreshing = false;
         private Directions? _scrollingX;
         private Directions? _scrollingY;
-        private Button[] _areaButtons = null;
 
         public double OffsetX { get; private set; }
         public double OffsetY { get; private set; }
-        private Button[] AreaButtons => _areaButtons ??= new[]
-        {
-            LeftTopButton, TopButton, RightTopButton,
-            LeftButton, RightButton,
-            LeftBottomButton, BottomButton, RightBottomButton
-        };
 
         public MainWindow()
         {
             InitializeComponent();
             _timer.Elapsed += Refresh;
-            _timer.Start();
+
+            _areaButtons = new[]
+            {
+                LeftTopButton, TopButton, RightTopButton,
+                LeftButton, RightButton,
+                LeftBottomButton, BottomButton, RightBottomButton
+            };
 
             _structureShadowGu = new Rectangle
             {
@@ -79,7 +79,6 @@ namespace Age_Of_Nothing.UI
             };
             _area.SetValue(Panel.ZIndexProperty, 0);
             SetAreaPosition();
-            MainCanvas.Children.Add(_area);
 
             _controller.PropertyChanged += (s, e) =>
             {
@@ -131,12 +130,15 @@ namespace Age_Of_Nothing.UI
                     Dispatcher.BeginInvoke(action);
             };
 
+            MainCanvas.Children.Add(_area);
             MainCanvas.Children.Add(_selectionRectGu);
             MainCanvas.Children.Add(_structureShadowGu);
 
             DataContext = _controller;
 
             _controller.Initialize();
+
+            _timer.Start();
         }
 
         #region Events
@@ -149,12 +151,13 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ResetStructureShadow();
-            _controller.SetTargetPositionsOnFocused(RescaleFromOffset(e.GetPosition(MainCanvas)));
+            var targetPoint = e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY);
+            _controller.SetTargetPositionsOnFocused(targetPoint);
         }
 
         private void MainCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender == e.Source)
+            if (_area == e.Source)
             {
                 _selectionPoint = e.GetPosition(MainCanvas);
                 _controller.ClearFocus();
@@ -168,10 +171,10 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_selectionPoint.HasValue)
-                _controller.FocusOnZone(new Rect(RescaleFromOffset(e.GetPosition(MainCanvas)), RescaleFromOffset(_selectionPoint.Value)));
+                _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY), _selectionPoint.Value.MoveFromOffset(OffsetX, OffsetY)));
             if (_structureShadowSize.HasValue)
             {
-                var finalPoint = RescaleFromOffset(e.GetPosition(MainCanvas));
+                var finalPoint = e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY);
                 List<Point> centers;
                 if (_structureShadowSize.Value.continuous && _craftPoint.HasValue)
                     centers = GetAllContiguousStructuresCenters(finalPoint);
@@ -181,21 +184,6 @@ namespace Age_Of_Nothing.UI
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
-        }
-
-        private List<Point> GetAllContiguousStructuresCenters(Point finalPoint)
-        {
-            var centers = new List<Point>(50);
-            var x1 = Math.Min(finalPoint.X, _craftPoint.Value.X);
-            var y1 = Math.Min(finalPoint.Y, _craftPoint.Value.Y);
-            var x2 = Math.Max(finalPoint.X, _craftPoint.Value.X);
-            var y2 = Math.Max(finalPoint.Y, _craftPoint.Value.Y);
-            for (var x = x1; x <= x2; x += _structureShadowSize.Value.size.Width)
-            {
-                for (var y = y1; y <= y2; y += _structureShadowSize.Value.size.Height)
-                    centers.Add(new Point(x, y));
-            }
-            return centers;
         }
 
         private void MainCanvas_MouseLeave(object sender, MouseEventArgs e)
@@ -212,7 +200,7 @@ namespace Age_Of_Nothing.UI
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
-                _controller.RefreshHover(new Rect(RescaleFromOffset(_selectionPoint.Value), RescaleFromOffset(e.GetPosition(MainCanvas))));
+                _controller.RefreshHover(new Rect(_selectionPoint.Value.MoveFromOffset(OffsetX, OffsetY), e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY)));
             }
 
             if (_structureShadowSize.HasValue)
@@ -299,12 +287,27 @@ namespace Age_Of_Nothing.UI
 
         #endregion Events
 
+        private List<Point> GetAllContiguousStructuresCenters(Point finalPoint)
+        {
+            var centers = new List<Point>(50);
+            var x1 = Math.Min(finalPoint.X, _craftPoint.Value.X);
+            var y1 = Math.Min(finalPoint.Y, _craftPoint.Value.Y);
+            var x2 = Math.Max(finalPoint.X, _craftPoint.Value.X);
+            var y2 = Math.Max(finalPoint.Y, _craftPoint.Value.Y);
+            for (var x = x1; x <= x2; x += _structureShadowSize.Value.size.Width)
+            {
+                for (var y = y1; y <= y2; y += _structureShadowSize.Value.size.Height)
+                    centers.Add(new Point(x, y));
+            }
+            return centers;
+        }
+
         private void SetAreaDirections()
         {
             var hasHit = false;
             if (Mouse.DirectlyOver is Decorator decorator)
             {
-                var btn = AreaButtons.FirstOrDefault(x => decorator.TemplatedParent == x);
+                var btn = _areaButtons.FirstOrDefault(x => decorator.TemplatedParent == x);
                 if (btn != null)
                 {
                     var directions = btn.Tag.ToString().Split('-').Select(x =>
@@ -393,11 +396,6 @@ namespace Age_Of_Nothing.UI
         private CraftUi GetCraftSpriteVisualItem(Craft craft)
         {
             return CraftQueuePanel.Children.OfType<CraftUi>().FirstOrDefault(x => x.Craft == craft);
-        }
-
-        private Point RescaleFromOffset(Point p)
-        {
-            return new Point(p.X - OffsetX, p.Y - OffsetY);
         }
     }
 }

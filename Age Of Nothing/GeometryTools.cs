@@ -162,6 +162,18 @@ namespace Age_Of_Nothing
             return size.Width > 0 && size.Height > 0;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <returns></returns>
+        public static Point MoveFromOffset(this Point p, double offsetX, double offsetY)
+        {
+            return new Point(p.X - offsetX, p.Y - offsetY);
+        }
+
         private static double RescaleBase10(this double value)
         {
             var valuePow10 = value / 10;
