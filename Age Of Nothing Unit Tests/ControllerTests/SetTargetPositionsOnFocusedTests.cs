@@ -16,7 +16,7 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
         [Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsMine_WhenMarketExists_CreateCycleBetweenMineCenterAndMarketCenter()
         {
-            var controller = new Controller();
+            var controller = new Controller(true);
             controller.Initialize();
 
             var pointFocusAll = new Rect(0, 0, 1000, 1000);
@@ -61,7 +61,7 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
         [Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsForest_WhenMarketExists_CreateCycleBetweenClosestForestCenterAndMarketCenter()
         {
-            var controller = new Controller();
+            var controller = new Controller(true);
             controller.Initialize();
 
             var pointFocusAll = new Rect(0, 0, 1000, 1000);
@@ -124,7 +124,7 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
         [Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsMarket_CreatePathToMarketCenter()
         {
-            var controller = new Controller();
+            var controller = new Controller(true);
             controller.Initialize();
 
             var pointFocusAll = new Rect(0, 0, 1000, 1000);
@@ -164,7 +164,7 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
         [Fact]
         public void SetTargetPositionsOnFocused_WhenSourceIsAnyUnit_WhenTargetIsBlankPoint_CreateDirectPathToPoint()
         {
-            var controller = new Controller();
+            var controller = new Controller(true);
             controller.Initialize();
 
             var pointFocusAll = new Rect(0, 0, 1000, 1000);

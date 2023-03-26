@@ -2,8 +2,6 @@
 Technologies
 Délai récolte ressource
 
-Initialize controller with static dataset
-
 Point de ralliement
 
 Focus on craft

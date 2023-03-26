@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -18,13 +19,13 @@ namespace Age_Of_Nothing
         private readonly Dictionary<ResourceTypes, int> _resourcesQty;
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
-
-        private readonly Rect _surface;
+        private readonly Random _rdm = new Random();
+        private readonly bool _test;
 
         private int _frames;
 
-        public double Width => _surface.Width;
-        public double Height => _surface.Height;
+        public int Width { get; }
+        public int Height { get; }
         public IReadOnlyCollection<Sprite> Sprites => _sprites;
         public IReadOnlyCollection<Craft> CraftQueue => _craftQueue;
 
@@ -41,9 +42,11 @@ namespace Age_Of_Nothing
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Controller()
+        public Controller(bool test)
         {
-            _surface = new Rect(0, 0, 3200, 1800);
+            Width = test ? 3200 : 6400;
+            Height = test ? 1800 : 3600;
+            _test = test;
 
             _resourcesQty = SystemExtensions.GetEnum<ResourceTypes>()
                 .ToDictionary(x => x, x => 0);
@@ -100,10 +103,88 @@ namespace Age_Of_Nothing
 
         public void Initialize()
         {
-            _resourcesQty[ResourceTypes.Gold] = 10000;
-            _resourcesQty[ResourceTypes.Rock] = 10000;
-            _resourcesQty[ResourceTypes.Wood] = 10000;
+            if (_test)
+            {
+                _resourcesQty[ResourceTypes.Gold] = 10000;
+                _resourcesQty[ResourceTypes.Rock] = 10000;
+                _resourcesQty[ResourceTypes.Wood] = 10000;
+                InitializeTestData();
+            }
+            else
+            {
+                _resourcesQty[ResourceTypes.Gold] = 400;
+                _resourcesQty[ResourceTypes.Rock] = 400;
+                _resourcesQty[ResourceTypes.Wood] = 400;
+                InitializeRealData();
+            }
+        }
 
+        private void InitializeRealData()
+        {
+            const int wallDimX = 24;
+            const int wallDimY = 18;
+            var wallSize = Sprite.GetSpriteSize(typeof(Wall));
+            for (var i = 0; i < wallDimX; i++)
+            {
+                for (var j = 0; j < wallDimY; j++)
+                {
+                    // TODO: not really scientific but good results
+                    var x = (Width / 2) + (wallDimX / 2 * wallSize.Width / 2) + (i * wallSize.Width);
+                    var y = (Height / 2) + (wallDimY / 2 * wallSize.Height / 2) + (j * wallSize.Height);
+
+                    var isBoundX = i == 0 || i == wallDimX - 1;
+                    var isBoundY = j == 0 || j == wallDimY - 1;
+                    if (isBoundX || isBoundY)
+                    {
+                        // openings
+                        if (isBoundX && j > (wallDimY / 2) - 2 && j < (wallDimY / 2) + 2)
+                            continue;
+                        if (isBoundY && i > (wallDimX / 2) - 2 && i < (wallDimX / 2) + 2)
+                            continue;
+
+                        var wall = new Wall(new Point(x, y), this);
+                        _sprites.Add(wall);
+                    }
+                    else if (i == wallDimX / 2 && j == wallDimY / 2)
+                    {
+                        var market = new Market(new Point(x, y), this);
+                        _sprites.Add(market);
+                    }
+                    else if ((i == wallDimX / 4 && j == wallDimY / 4)
+                        || (i == wallDimX / 4 * 3 && j == wallDimY / 4)
+                        || (i == wallDimX / 4 && j == wallDimY / 4 * 3)
+                        || (i == wallDimX / 4 * 3 && j == wallDimY / 4 * 3))
+                    {
+                        var villager = new Villager(new Point(x, y), this);
+                        _sprites.Add(villager);
+                    }
+                }
+            }
+
+            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+
+            for (var i = 0; i < 20; i++)
+            {
+                var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(50, Width - 350), _rdm.Next(50, Height - 150), 300, 100), this, 0);
+                _forestPatchs.Add(new List<Forest>(50));
+                foreach (var forest in forests)
+                {
+                    if (!_sprites.Any(x => x.Surface.RealIntersectsWith(forest.Surface)))
+                    {
+                        _forestPatchs.Last().Add(forest);
+                        _sprites.Add(forest);
+                    }
+                }
+            }
+        }
+
+        private void InitializeTestData()
+        {
             _sprites.Add(new Villager(new Point(1800, 1100), this));
             _sprites.Add(new Villager(new Point(1700, 1000), this));
             _sprites.Add(new Villager(new Point(1900, 1200), this));
@@ -122,6 +203,19 @@ namespace Age_Of_Nothing
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
+        }
+
+        private void InstanciateAndAddRandomSprite(Func<Sprite> builder)
+        {
+            Sprite sprite;
+            do
+            {
+                sprite = builder();
+                if (_sprites.Any(x => x.Surface.RealIntersectsWith(sprite.Surface)))
+                    sprite = null;
+            }
+            while (sprite == null);
+            _sprites.Add(sprite);
         }
 
         public IEnumerable<T> FocusedSprites<T>() where T : Sprite
@@ -259,7 +353,7 @@ namespace Age_Of_Nothing
 
         public bool IsInBound(Rect surface)
         {
-            return _surface.Contains(surface);
+            return new Rect(0, 0, Width, Height).Contains(surface);
         }
 
         private bool SurfaceIsEngaged(Rect surface)
