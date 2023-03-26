@@ -164,9 +164,9 @@ namespace Age_Of_Nothing
         /// <param name="offsetX"></param>
         /// <param name="offsetY"></param>
         /// <returns></returns>
-        public static Point MoveFromOffset(this Point p, double offsetX, double offsetY)
+        public static Point MoveFromOffset(this Point p, Point offset)
         {
-            return new Point(p.X - offsetX, p.Y - offsetY);
+            return new Point(p.X - offset.X, p.Y - offset.Y);
         }
 
         private static double RescaleBase10(this double value)

@@ -40,8 +40,7 @@ namespace Age_Of_Nothing.UI
         private Directions? _scrollingX;
         private Directions? _scrollingY;
 
-        public double OffsetX { get; private set; }
-        public double OffsetY { get; private set; }
+        public Point Offset { get; private set; }
 
         public MainWindow()
         {
@@ -68,8 +67,7 @@ namespace Age_Of_Nothing.UI
             };
 
             _controller = new Controller();
-            OffsetX = -(_controller.Width / 2);
-            OffsetY = -(_controller.Height / 2);
+            Offset = new Point(-_controller.Width / 2, -_controller.Height / 2);
 
             _area = new Rectangle
             {
@@ -151,7 +149,7 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ResetStructureShadow();
-            var targetPoint = e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY);
+            var targetPoint = e.GetPosition(MainCanvas).MoveFromOffset(Offset);
             _controller.SetTargetPositionsOnFocused(targetPoint);
         }
 
@@ -171,14 +169,14 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_selectionPoint.HasValue)
-                _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY), _selectionPoint.Value.MoveFromOffset(OffsetX, OffsetY)));
+                _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas).MoveFromOffset(Offset), _selectionPoint.Value.MoveFromOffset(Offset)));
             if (_structureShadowSize.HasValue)
             {
                 var finalPoint = e.GetPosition(MainCanvas);
                 var centers = _structureShadowSize.Value.continuous && _craftPoint.HasValue
                     ? GetAllContiguousStructuresCenters(finalPoint)
                     : new List<Point> { finalPoint };
-                _controller.BuildStructure(_structureShadowSize.Value.target, centers.Select(x => x.MoveFromOffset(OffsetX, OffsetY)).ToList());
+                _controller.BuildStructure(_structureShadowSize.Value.target, centers.Select(x => x.MoveFromOffset(Offset)).ToList());
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
@@ -198,7 +196,7 @@ namespace Age_Of_Nothing.UI
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
-                _controller.RefreshHover(new Rect(_selectionPoint.Value.MoveFromOffset(OffsetX, OffsetY), e.GetPosition(MainCanvas).MoveFromOffset(OffsetX, OffsetY)));
+                _controller.RefreshHover(new Rect(_selectionPoint.Value.MoveFromOffset(Offset), e.GetPosition(MainCanvas).MoveFromOffset(Offset)));
             }
 
             if (_structureShadowSize.HasValue)
@@ -357,22 +355,21 @@ namespace Age_Of_Nothing.UI
 
             if (_scrollingX.HasValue || _scrollingY.HasValue)
             {
-                var newOffsetX = OffsetX;
-                if (_scrollingX == Directions.Right && OffsetX - AreaMoveRateX >= -_controller.Width)
+                var newOffsetX = Offset.X;
+                if (_scrollingX == Directions.Right && Offset.X - AreaMoveRateX >= -_controller.Width)
                     newOffsetX -= AreaMoveRateX;
-                else if (_scrollingX == Directions.Left && OffsetX + AreaMoveRateX <= 0)
+                else if (_scrollingX == Directions.Left && Offset.X + AreaMoveRateX <= 0)
                     newOffsetX += AreaMoveRateX;
 
-                var newOffsetY = OffsetY;
-                if (_scrollingY == Directions.Bottom && OffsetY - AreaMoveRateY >= -_controller.Height)
+                var newOffsetY = Offset.Y;
+                if (_scrollingY == Directions.Bottom && Offset.Y - AreaMoveRateY >= -_controller.Height)
                     newOffsetY -= AreaMoveRateY;
-                else if (_scrollingY == Directions.Top && OffsetY + AreaMoveRateX <= 0)
+                else if (_scrollingY == Directions.Top && Offset.Y + AreaMoveRateX <= 0)
                     newOffsetY += AreaMoveRateY;
 
-                if (newOffsetX != OffsetX || newOffsetY != OffsetY)
+                if (newOffsetX != Offset.X || newOffsetY != Offset.Y)
                 {
-                    OffsetX = newOffsetX;
-                    OffsetY = newOffsetY;
+                    Offset = new Point(newOffsetX, newOffsetY);
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         foreach (var spriteUi in MainCanvas.Children.OfType<SpriteUi>())
@@ -387,8 +384,8 @@ namespace Age_Of_Nothing.UI
 
         private void SetAreaPosition()
         {
-            _area.SetValue(Canvas.LeftProperty, OffsetX + (_controller.Width / 4));
-            _area.SetValue(Canvas.TopProperty, OffsetY + (_controller.Height / 4));
+            _area.SetValue(Canvas.LeftProperty, Offset.X + (_controller.Width / 4));
+            _area.SetValue(Canvas.TopProperty, Offset.Y + (_controller.Height / 4));
         }
 
         private CraftUi GetCraftSpriteVisualItem(Craft craft)
