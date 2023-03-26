@@ -131,27 +131,39 @@ namespace Age_Of_Nothing
 
         public void AddUnitToStack<T>() where T : Unit
         {
-            if (Structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
+            lock (_craftQueue)
             {
-                var sprite = Unit.Instanciate<T>(focusedStructure.Center, this);
-                if (CheckStructureResources(sprite))
-                    _craftQueue.Add(new Craft(focusedStructure, sprite));
+                if (Structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
+                {
+                    var sprite = Unit.Instanciate<T>(focusedStructure.Center, this);
+                    if (CheckStructureResources(sprite))
+                        _craftQueue.Add(new Craft(focusedStructure, sprite));
+                }
             }
         }
 
         public void CheckForDeletion()
         {
-            var sprite = _sprites.FirstOrDefault(x => x.Focused && x.HasLifePoints);
-            if (sprite != null)
-                sprite.TakeDamage(int.MaxValue);
+            lock (_sprites)
+            {
+                var sprite = _sprites.FirstOrDefault(x => x.Focused && x.HasLifePoints);
+                if (sprite != null)
+                    sprite.TakeDamage(int.MaxValue);
+            }
         }
 
         public void NewFrameCheck()
         {
             _frames++;
-            ManageUnitsMovements();
-            ManageCraftsToCancel();
-            ManageCraftsInProgress();
+            lock (_sprites)
+            {
+                ManageUnitsMovements();
+                lock (_craftQueue)
+                {
+                    ManageCraftsToCancel();
+                    ManageCraftsInProgress();
+                }
+            }
         }
 
         public void ClearFocus()
@@ -217,21 +229,24 @@ namespace Age_Of_Nothing
                 return;
 
             var newCrafts = new List<Craft>(centers.Count);
-            foreach (var rawCenter in centers)
+            lock (_craftQueue)
             {
-                var center = rawCenter.RescaleBase10();
-
-                var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
-                if (!SurfaceIsEngaged(surface) && IsInBound(surface))
+                foreach (var rawCenter in centers)
                 {
-                    var sprite = (Sprite)type
-                        .GetConstructor(new[] { typeof(Point), typeof(Controller) })
-                        .Invoke(new object[] { surface.TopLeft, this });
-                    if (CheckStructureResources(sprite))
+                    var center = rawCenter.RescaleBase10();
+
+                    var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
+                    if (!SurfaceIsEngaged(surface) && IsInBound(surface))
                     {
-                        var craft = new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, true);
-                        newCrafts.Add(craft);
-                        _craftQueue.Add(craft);
+                        var sprite = (Sprite)type
+                            .GetConstructor(new[] { typeof(Point), typeof(Controller) })
+                            .Invoke(new object[] { surface.TopLeft, this });
+                        if (CheckStructureResources(sprite))
+                        {
+                            var craft = new Craft(villagerFocused.Cast<Sprite>().ToList(), sprite, true);
+                            newCrafts.Add(craft);
+                            _craftQueue.Add(craft);
+                        }
                     }
                 }
             }
