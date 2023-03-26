@@ -231,10 +231,8 @@ namespace Age_Of_Nothing
             var newCrafts = new List<Craft>(centers.Count);
             lock (_craftQueue)
             {
-                foreach (var rawCenter in centers)
+                foreach (var center in centers)
                 {
-                    var center = rawCenter.RescaleBase10();
-
                     var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
                     if (!SurfaceIsEngaged(surface) && IsInBound(surface))
                     {

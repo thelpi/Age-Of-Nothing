@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace Age_Of_Nothing
@@ -167,6 +168,28 @@ namespace Age_Of_Nothing
         public static Point MoveFromOffset(this Point p, Point offset)
         {
             return new Point(p.X - offset.X, p.Y - offset.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="finalPoint"></param>
+        /// <param name="structureSize"></param>
+        /// <param name="startPoint"></param>
+        /// <returns></returns>
+        public static List<Point> GetAllContiguousStructuresCenters(this Point finalPoint, Point startPoint, Size structureSize)
+        {
+            var centers = new List<Point>(50);
+            var x1 = Math.Min(finalPoint.X, startPoint.X);
+            var y1 = Math.Min(finalPoint.Y, startPoint.Y);
+            var x2 = Math.Max(finalPoint.X, startPoint.X);
+            var y2 = Math.Max(finalPoint.Y, startPoint.Y);
+            for (var x = x1; x <= x2; x += structureSize.Width)
+            {
+                for (var y = y1; y <= y2; y += structureSize.Height)
+                    centers.Add(new Point(x, y));
+            }
+            return centers;
         }
 
         private static double RescaleBase10(this double value)
