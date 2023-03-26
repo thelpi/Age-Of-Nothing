@@ -29,6 +29,7 @@ namespace Age_Of_Nothing.UI
         private readonly Timer _timer = new Timer(Delay);
         private readonly Rectangle _selectionRectGu;
         private readonly Rectangle _structureShadowGu;
+        private readonly Rectangle _area;
         private readonly Controller _controller;
 
         private (Size size, Type target, bool continuous)? _structureShadowSize;
@@ -69,6 +70,16 @@ namespace Age_Of_Nothing.UI
             _controller = new Controller();
             OffsetX = -(_controller.Width / 2);
             OffsetY = -(_controller.Height / 2);
+
+            _area = new Rectangle
+            {
+                Fill = Brushes.LightGreen,
+                Width = _controller.Width,
+                Height = _controller.Height
+            };
+            _area.SetValue(Panel.ZIndexProperty, 0);
+            SetAreaPosition();
+            MainCanvas.Children.Add(_area);
 
             _controller.PropertyChanged += (s, e) =>
             {
@@ -365,11 +376,18 @@ namespace Age_Of_Nothing.UI
                     {
                         foreach (var spriteUi in MainCanvas.Children.OfType<SpriteUi>())
                             spriteUi.RefreshPosition();
+                        SetAreaPosition();
                     }));
                 }
             }
 
             _refreshing = false;
+        }
+
+        private void SetAreaPosition()
+        {
+            _area.SetValue(Canvas.LeftProperty, OffsetX + (_controller.Width / 4));
+            _area.SetValue(Canvas.TopProperty, OffsetY + (_controller.Height / 4));
         }
 
         private CraftUi GetCraftSpriteVisualItem(Craft craft)
