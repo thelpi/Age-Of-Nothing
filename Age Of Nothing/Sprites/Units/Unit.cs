@@ -21,100 +21,97 @@ namespace Age_Of_Nothing.Sprites.Units
         /// <returns>The destination sprite, if the destination has been reached on this frame.</returns>
         public Sprite CheckForMovement(IEnumerable<Structures.Structure> progressingCrafts)
         {
-            lock (_pathCycle)
+            // no target: no move
+            if (_currentPathTarget == null)
+                return null;
+
+            var currentTargetPoint = _currentPathTarget.Value.TargetPoint;
+            var currentTargetSprite = _currentPathTarget.Value.TargetSprite;
+            var currentForcedDirection = _currentPathTarget.Value.ForcedDirection;
+
+            // compute the point on the distance to reach the targer
+            // (in straight line)
+            var newPoint = GeometryTools.ComputePointOnLine(
+                Center.X, Center.Y,
+                currentTargetPoint.X,
+                currentTargetPoint.Y, GetDefaultSpeed());
+
+            // the surface of the sprite once it will be moved
+            var newSurface = newPoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
+
+            // does the unit already intersect a structure?
+            // is yes, the unit will be allowed to move throught tangible structures
+            var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Parent.Sprites.Concat(progressingCrafts));
+
+            // will the unit intersect a structure with the new surface?
+            var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Parent.Sprites.Concat(progressingCrafts));
+
+            // checks if the single intersection is the current target
+            // and a craft in progress
+            // unit has to be a villager
+            var intersectionIsTargetAndCraft = intersectionsNext.Count() == 1
+                && intersectionsNext.First() == currentTargetSprite
+                && progressingCrafts.Contains(currentTargetSprite)
+                && Is<Villager>();
+
+            if (!alreadyIntersectingStructure && intersectionsNext.Any() && !intersectionIsTargetAndCraft)
             {
-                // no target: no move
-                if (_currentPathTarget == null)
-                    return null;
-
-                var currentTargetPoint = _currentPathTarget.Value.TargetPoint;
-                var currentTargetSprite = _currentPathTarget.Value.TargetSprite;
-                var currentForcedDirection = _currentPathTarget.Value.ForcedDirection;
-
-                // compute the point on the distance to reach the targer
-                // (in straight line)
-                var newPoint = GeometryTools.ComputePointOnLine(
-                    Center.X, Center.Y,
-                    currentTargetPoint.X,
-                    currentTargetPoint.Y, GetDefaultSpeed());
-
-                // the surface of the sprite once it will be moved
-                var newSurface = newPoint.ComputeSurfaceFromMiddlePoint(Surface.Size);
-
-                // does the unit already intersect a structure?
-                // is yes, the unit will be allowed to move throught tangible structures
-                var alreadyIntersectingStructure = Surface.IntersectIntangibleStructure(Parent.Sprites.Concat(progressingCrafts));
-
-                // will the unit intersect a structure with the new surface?
-                var intersectionsNext = newSurface.GetIntangibleStructureIntersections(Parent.Sprites.Concat(progressingCrafts));
-
-                // checks if the single intersection is the current target
-                // and a craft in progress
-                // unit has to be a villager
-                var intersectionIsTargetAndCraft = intersectionsNext.Count() == 1
-                    && intersectionsNext.First() == currentTargetSprite
-                    && progressingCrafts.Contains(currentTargetSprite)
-                    && Is<Villager>();
-
-                if (!alreadyIntersectingStructure && intersectionsNext.Any() && !intersectionIsTargetAndCraft)
+                if (currentTargetSprite == null)
                 {
-                    if (currentTargetSprite == null)
+                    // The target is not a sprite but just a point
+                    // (or at least was no when set)
+                    // but the target point, with unit surface, collides with a tangible structure
+                    // is this sprite the same sprite as the one who collides now ?
+                    // if so, we stop
+                    var intersections = currentTargetPoint
+                        .ComputeSurfaceFromMiddlePoint(Surface.Size)
+                        .GetIntangibleStructureIntersections(Parent.Sprites);
+                    if (intersectionsNext.Any(x => intersections.Contains(x)))
                     {
-                        // The target is not a sprite but just a point
-                        // (or at least was no when set)
-                        // but the target point, with unit surface, collides with a tangible structure
-                        // is this sprite the same sprite as the one who collides now ?
-                        // if so, we stop
-                        var intersections = currentTargetPoint
-                            .ComputeSurfaceFromMiddlePoint(Surface.Size)
-                            .GetIntangibleStructureIntersections(Parent.Sprites);
-                        if (intersectionsNext.Any(x => intersections.Contains(x)))
-                        {
-                            _currentPathTarget = null;
-                            return null;
-                        }
-                    }
-
-                    var bestPoint = UsePathFindingForNextPoint(currentTargetPoint, progressingCrafts, ref currentForcedDirection);
-                    if (bestPoint.HasValue)
-                    {
-                        newSurface = bestPoint.Value.ComputeSurfaceFromMiddlePoint(Surface.Size);
-                        _currentPathTarget.Value.ForcedDirection = currentForcedDirection;
-                    }
-                    else
-                    {
-                        // no solution: we cancel the target completely
-                        // it avoids a recomputing at each frame for nothing
                         _currentPathTarget = null;
                         return null;
                     }
                 }
-                else
-                {
-                    // If we can get closer to the target without following a forced direction
-                    // The current one (if any) is disabled
-                    _currentPathTarget.Value.ForcedDirection = null;
-                }
 
-                // Proceed to move
-                Move(newSurface);
-
-                if (currentTargetPoint == Center)
+                var bestPoint = UsePathFindingForNextPoint(currentTargetPoint, progressingCrafts, ref currentForcedDirection);
+                if (bestPoint.HasValue)
                 {
-                    // has reached the target
-                    // if last node of the circle, sets loop if enabled
-                    _currentPathTarget = _currentPathTarget.Next;
-                    if (_currentPathTarget == null && _isPathLoop)
-                        _currentPathTarget = _pathCycle.First;
+                    newSurface = bestPoint.Value.ComputeSurfaceFromMiddlePoint(Surface.Size);
+                    _currentPathTarget.Value.ForcedDirection = currentForcedDirection;
                 }
                 else
                 {
-                    // not yet reaching the target
-                    currentTargetSprite = null;
+                    // no solution: we cancel the target completely
+                    // it avoids a recomputing at each frame for nothing
+                    _currentPathTarget = null;
+                    return null;
                 }
-
-                return currentTargetSprite;
             }
+            else
+            {
+                // If we can get closer to the target without following a forced direction
+                // The current one (if any) is disabled
+                _currentPathTarget.Value.ForcedDirection = null;
+            }
+
+            // Proceed to move
+            Move(newSurface);
+
+            if (currentTargetPoint == Center)
+            {
+                // has reached the target
+                // if last node of the circle, sets loop if enabled
+                _currentPathTarget = _currentPathTarget.Next;
+                if (_currentPathTarget == null && _isPathLoop)
+                    _currentPathTarget = _pathCycle.First;
+            }
+            else
+            {
+                // not yet reaching the target
+                currentTargetSprite = null;
+            }
+
+            return currentTargetSprite;
         }
 
         private Point? UsePathFindingForNextPoint(
@@ -183,22 +180,19 @@ namespace Age_Of_Nothing.Sprites.Units
         /// </param>
         public void SetPathCycle(params MoveTarget[] points)
         {
-            lock (_pathCycle)
+            _pathCycle.Clear();
+            var first = true;
+            _isPathLoop = false;
+            LinkedListNode<MoveTarget> node = null;
+            foreach (var point in points)
             {
-                _pathCycle.Clear();
-                var first = true;
-                _isPathLoop = false;
-                LinkedListNode<MoveTarget> node = null;
-                foreach (var point in points)
-                {
-                    _isPathLoop = !first;
-                    node = first
-                        ? _pathCycle.AddFirst(point)
-                        : _pathCycle.AddAfter(node, point);
-                    first = false;
-                }
-                _currentPathTarget = _pathCycle.First;
+                _isPathLoop = !first;
+                node = first
+                    ? _pathCycle.AddFirst(point)
+                    : _pathCycle.AddAfter(node, point);
+                first = false;
             }
+            _currentPathTarget = _pathCycle.First;
         }
 
         /// <summary>
