@@ -259,6 +259,16 @@ namespace Age_Of_Nothing.UI
                 _controller.CheckForDeletion();
         }
 
+        private void AreaButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void AreaButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+
+        }
+
         #endregion Events
 
         private void SetStructureShadowSize<T>(bool continuous) where T : Structure
