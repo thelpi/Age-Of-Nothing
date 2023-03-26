@@ -138,7 +138,7 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ResetStructureShadow();
-            _controller.SetTargetPositionsOnFocused(e.GetPosition(MainCanvas));
+            _controller.SetTargetPositionsOnFocused(RescaleFromOffset(e.GetPosition(MainCanvas)));
         }
 
         private void MainCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -157,10 +157,10 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_selectionPoint.HasValue)
-                _controller.FocusOnZone(new Rect(e.GetPosition(MainCanvas), _selectionPoint.Value));
+                _controller.FocusOnZone(new Rect(RescaleFromOffset(e.GetPosition(MainCanvas)), RescaleFromOffset(_selectionPoint.Value)));
             if (_structureShadowSize.HasValue)
             {
-                var finalPoint = e.GetPosition(MainCanvas);
+                var finalPoint = RescaleFromOffset(e.GetPosition(MainCanvas));
                 List<Point> centers;
                 if (_structureShadowSize.Value.continuous && _craftPoint.HasValue)
                     centers = GetAllContiguousStructuresCenters(finalPoint);
@@ -201,7 +201,7 @@ namespace Age_Of_Nothing.UI
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
-                _controller.RefreshHover(rect);
+                _controller.RefreshHover(new Rect(RescaleFromOffset(_selectionPoint.Value), RescaleFromOffset(e.GetPosition(MainCanvas))));
             }
 
             if (_structureShadowSize.HasValue)
@@ -375,6 +375,11 @@ namespace Age_Of_Nothing.UI
         private CraftUi GetCraftSpriteVisualItem(Craft craft)
         {
             return CraftQueuePanel.Children.OfType<CraftUi>().FirstOrDefault(x => x.Craft == craft);
+        }
+
+        private Point RescaleFromOffset(Point p)
+        {
+            return new Point(p.X - OffsetX, p.Y - OffsetY);
         }
     }
 }
