@@ -20,6 +20,7 @@ namespace Age_Of_Nothing.UI
     public partial class MainWindow : Window
     {
         private const int Fps = 20;
+        private const double AreaMoveRate = 5;
 
         private static readonly Key[] _deleteKeys = new[] { Key.Delete, Key.X };
         private static readonly double Delay = 1 / (Fps / (double)1000);
@@ -37,8 +38,8 @@ namespace Age_Of_Nothing.UI
         private Directions? _scrollingY;
         private Button[] _areaButtons = null;
 
-        public double OffsetX { get; private set; } = 0;
-        public double OffsetY { get; private set; } = 0;
+        public double OffsetX { get; private set; }
+        public double OffsetY { get; private set; }
         private Button[] AreaButtons => _areaButtons ??= new[]
         {
             LeftTopButton, TopButton, RightTopButton,
@@ -65,6 +66,9 @@ namespace Age_Of_Nothing.UI
             };
 
             _controller = new Controller();
+            OffsetX = -(_controller.Width / 2);
+            OffsetY = -(_controller.Height / 2);
+
             _controller.PropertyChanged += (s, e) =>
             {
                 Action action = null;
@@ -342,15 +346,15 @@ namespace Age_Of_Nothing.UI
             {
                 var newOffsetX = OffsetX;
                 if (_scrollingX == Directions.Right) //  && OffsetX - 4 >= 0
-                    newOffsetX -= 4;
+                    newOffsetX -= AreaMoveRate * 16 / 9;
                 else if (_scrollingX == Directions.Left) //  && OffsetX + 4 <= _controller.Width
-                    newOffsetX += 4;
+                    newOffsetX += AreaMoveRate * 16 / 9;
 
                 var newOffsetY = OffsetY;
                 if (_scrollingY == Directions.Bottom) //  && OffsetY - 2 >= 0
-                    newOffsetY -= 2;
+                    newOffsetY -= AreaMoveRate;
                 else if (_scrollingY == Directions.Top) // && OffsetY + 2 <= _controller.Height
-                    newOffsetY += 2;
+                    newOffsetY += AreaMoveRate;
 
                 if (newOffsetX != OffsetX || newOffsetY != OffsetY)
                 {
