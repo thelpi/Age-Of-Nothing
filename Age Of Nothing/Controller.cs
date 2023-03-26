@@ -118,7 +118,7 @@ namespace Age_Of_Nothing
             _sprites.Add(new Wall(new Point(1965, 1295), this));
             _sprites.Add(new Wall(new Point(1995, 1295), this));
 
-            var forests = Forest.GenerateForestPatch(new Rect(700, 200, 300, 100), this, 0);
+            var forests = Forest.GenerateForestPatch(new Rect(2300, 1100, 300, 100), this, 0);
             _forestPatchs.Add(forests.ToList());
             foreach (var forest in _forestPatchs.Last())
                 _sprites.Add(forest);
