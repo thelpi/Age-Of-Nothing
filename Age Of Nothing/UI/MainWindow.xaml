@@ -46,14 +46,14 @@
                 <RowDefinition />
                 <RowDefinition Height="20" />
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="0" Grid.Column="1" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="0" Grid.Column="2" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="1" Grid.Column="0" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="1" Grid.Column="2" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="2" Grid.Column="0" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="2" Grid.Column="1" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Button Grid.Row="2" Grid.Column="2" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="0" Grid.Column="0" Name="LeftTopButton" Tag="Left-Top" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="0" Grid.Column="1" Name="TopButton" Tag="-Top" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="0" Grid.Column="2" Name="RightTopButton" Tag="Right-Top" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="1" Grid.Column="0" Name="LeftButton" Tag="Left-" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="1" Grid.Column="2" Name="RightButton" Tag="Right-" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="2" Grid.Column="0" Name="LeftBottomButton" Tag="Left-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="2" Grid.Column="1" Name="BottomButton" Tag="-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
+            <Button Grid.Row="2" Grid.Column="2" Name="RightBottomButton" Tag="Right-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
             <Canvas Grid.Row="1" Grid.Column="1" Name="MainCanvas" Background="LightGreen"
             MouseRightButtonDown="MainCanvas_MouseRightButtonDown"
             MouseRightButtonUp="MainCanvas_MouseRightButtonUp"

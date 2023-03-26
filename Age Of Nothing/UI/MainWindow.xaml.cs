@@ -33,6 +33,18 @@ namespace Age_Of_Nothing.UI
         private Point? _selectionPoint;
         private Point? _craftPoint;
         private volatile bool _refreshing = false;
+        private Directions? _scrollingX;
+        private Directions? _scrollingY;
+        private Button[] _areaButtons = null;
+
+        public double OffsetX { get; private set; } = 0;
+        public double OffsetY { get; private set; } = 0;
+        private Button[] AreaButtons => _areaButtons ??= new[]
+        {
+            LeftTopButton, TopButton, RightTopButton,
+            LeftButton, RightButton,
+            LeftBottomButton, BottomButton, RightBottomButton
+        };
 
         public MainWindow()
         {
@@ -52,7 +64,7 @@ namespace Age_Of_Nothing.UI
                 Opacity = 0.1
             };
 
-            _controller = new Controller(MainCanvas.Width, MainCanvas.Height);
+            _controller = new Controller();
             _controller.PropertyChanged += (s, e) =>
             {
                 Action action = null;
@@ -79,7 +91,7 @@ namespace Age_Of_Nothing.UI
                     {
                         var addEvt = e as SpritesCollectionChangedEventArgs;
                         if (!addEvt.IsCraft || SpriteUi.DisplayCraft(addEvt.Sprite))
-                            MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsCraft));
+                            MainCanvas.Children.Add(new SpriteUi(addEvt.Sprite, addEvt.IsCraft, this));
                         if (addEvt.IsCraft)
                             CraftQueuePanel.Children.Add(new UI.CraftUi(addEvt.Craft));
                     };
@@ -261,15 +273,38 @@ namespace Age_Of_Nothing.UI
 
         private void AreaButton_MouseEnter(object sender, MouseEventArgs e)
         {
-
+            SetAreaDirections();
         }
 
         private void AreaButton_MouseLeave(object sender, MouseEventArgs e)
         {
-
+            SetAreaDirections();
         }
 
         #endregion Events
+
+        private void SetAreaDirections()
+        {
+            var hasHit = false;
+            if (Mouse.DirectlyOver is Decorator decorator)
+            {
+                var btn = AreaButtons.FirstOrDefault(x => decorator.TemplatedParent == x);
+                if (btn != null)
+                {
+                    var directions = btn.Tag.ToString().Split('-').Select(x =>
+                        string.IsNullOrWhiteSpace(x) ? default(Directions?) : Enum.Parse<Directions>(x));
+                    _scrollingX = directions.ElementAt(0);
+                    _scrollingY = directions.ElementAt(1);
+                    hasHit = true;
+                }
+            }
+
+            if (!hasHit)
+            {
+                _scrollingX = null;
+                _scrollingY = null;
+            }
+        }
 
         private void SetStructureShadowSize<T>(bool continuous) where T : Structure
         {
@@ -302,6 +337,32 @@ namespace Age_Of_Nothing.UI
             _refreshing = true;
 
             _controller.NewFrameCheck();
+
+            if (_scrollingX.HasValue || _scrollingY.HasValue)
+            {
+                var newOffsetX = OffsetX;
+                if (_scrollingX == Directions.Left && OffsetX - 4 >= 0)
+                    newOffsetX -= 4;
+                else if (_scrollingX == Directions.Right && OffsetX + 4 <= _controller.Width)
+                    newOffsetX += 4;
+
+                var newOffsetY = OffsetY;
+                if (_scrollingY == Directions.Top && OffsetY - 2 >= 0)
+                    newOffsetY -= 2;
+                else if (_scrollingY == Directions.Bottom && OffsetY + 2 <= _controller.Height)
+                    newOffsetY += 2;
+
+                if (newOffsetX != OffsetX || newOffsetY != OffsetY)
+                {
+                    OffsetX = newOffsetX;
+                    OffsetY = newOffsetY;
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        foreach (var spriteUi in MainCanvas.Children.OfType<SpriteUi>())
+                            spriteUi.RefreshPosition();
+                    }));
+                }
+            }
 
             _refreshing = false;
         }

@@ -23,6 +23,8 @@ namespace Age_Of_Nothing
 
         private int _frames;
 
+        public double Width => _surface.Width;
+        public double Height => _surface.Height;
         public IReadOnlyCollection<Sprite> Sprites => _sprites;
         public IReadOnlyCollection<Craft> CraftQueue => _craftQueue;
 
@@ -39,9 +41,9 @@ namespace Age_Of_Nothing
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Controller(double width, double height)
+        public Controller()
         {
-            _surface = new Rect(0, 0, width, height);
+            _surface = new Rect(0, 0, 3200, 1800);
 
             _resourcesQty = SystemExtensions.GetEnum<ResourceTypes>()
                 .ToDictionary(x => x, x => 0);

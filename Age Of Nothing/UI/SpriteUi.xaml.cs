@@ -67,9 +67,13 @@ namespace Age_Of_Nothing.UI
             { (typeof(Forest), true), GetImageFill(Brushes.ForestGreen, "forest") }
         };
 
-        public SpriteUi(Sprite sprite, bool isCraft)
+        private readonly MainWindow _parent;
+
+        public SpriteUi(Sprite sprite, bool isCraft, MainWindow parent)
         {
             InitializeComponent();
+
+            _parent = parent;
 
             Sprite = sprite;
 
@@ -147,10 +151,15 @@ namespace Age_Of_Nothing.UI
         {
             MainCanvas.Width = Sprite.Surface.Width + (Sprite.Focused ? TotalStrokeSize : 0);
             MainCanvas.Height = Sprite.Surface.Height + (Sprite.Focused ? TotalStrokeSize : 0);
-            SetValue(Canvas.LeftProperty, Sprite.Surface.Left - (Sprite.Focused ? StrokeAndSpace : 0));
-            SetValue(Canvas.TopProperty, Sprite.Surface.Top - (Sprite.Focused ? StrokeAndSpace : 0));
+            RefreshPosition();
             _visual.SetValue(Canvas.LeftProperty, Sprite.Focused ? StrokeAndSpace : double.NaN);
             _visual.SetValue(Canvas.TopProperty, Sprite.Focused ? StrokeAndSpace : double.NaN);
+        }
+
+        public void RefreshPosition()
+        {
+            SetValue(Canvas.LeftProperty, Sprite.Surface.Left - (Sprite.Focused ? StrokeAndSpace : 0) + _parent.OffsetX);
+            SetValue(Canvas.TopProperty, Sprite.Surface.Top - (Sprite.Focused ? StrokeAndSpace : 0) + _parent.OffsetY);
         }
 
         private static Brush GetImageFill(Brush backgroundBrush, string imageName)
