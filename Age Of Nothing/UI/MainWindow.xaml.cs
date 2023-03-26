@@ -20,8 +20,9 @@ namespace Age_Of_Nothing.UI
     public partial class MainWindow : Window
     {
         private const int Fps = 20;
-        private const double AreaMoveRate = 5;
+        private const double AreaMoveRateY = 5;
 
+        private static readonly double AreaMoveRateX = AreaMoveRateY * 16 / 9;
         private static readonly Key[] _deleteKeys = new[] { Key.Delete, Key.X };
         private static readonly double Delay = 1 / (Fps / (double)1000);
 
@@ -345,16 +346,16 @@ namespace Age_Of_Nothing.UI
             if (_scrollingX.HasValue || _scrollingY.HasValue)
             {
                 var newOffsetX = OffsetX;
-                if (_scrollingX == Directions.Right) //  && OffsetX - 4 >= 0
-                    newOffsetX -= AreaMoveRate * 16 / 9;
-                else if (_scrollingX == Directions.Left) //  && OffsetX + 4 <= _controller.Width
-                    newOffsetX += AreaMoveRate * 16 / 9;
+                if (_scrollingX == Directions.Right)
+                    newOffsetX -= AreaMoveRateX;
+                else if (_scrollingX == Directions.Left)
+                    newOffsetX += AreaMoveRateX;
 
                 var newOffsetY = OffsetY;
-                if (_scrollingY == Directions.Bottom) //  && OffsetY - 2 >= 0
-                    newOffsetY -= AreaMoveRate;
-                else if (_scrollingY == Directions.Top) // && OffsetY + 2 <= _controller.Height
-                    newOffsetY += AreaMoveRate;
+                if (_scrollingY == Directions.Bottom)
+                    newOffsetY -= AreaMoveRateY;
+                else if (_scrollingY == Directions.Top)
+                    newOffsetY += AreaMoveRateY;
 
                 if (newOffsetX != OffsetX || newOffsetY != OffsetY)
                 {
