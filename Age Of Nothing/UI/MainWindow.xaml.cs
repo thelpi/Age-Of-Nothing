@@ -340,18 +340,8 @@ namespace Age_Of_Nothing.UI
 
             if (_scrollingX.HasValue || _scrollingY.HasValue)
             {
-                var newOffsetX = Offset.X;
-                if (_scrollingX == Directions.Right && Offset.X - AreaMoveRateX >= -_controller.Width)
-                    newOffsetX -= AreaMoveRateX;
-                else if (_scrollingX == Directions.Left && Offset.X + AreaMoveRateX <= 0)
-                    newOffsetX += AreaMoveRateX;
-
-                var newOffsetY = Offset.Y;
-                if (_scrollingY == Directions.Bottom && Offset.Y - AreaMoveRateY >= -_controller.Height)
-                    newOffsetY -= AreaMoveRateY;
-                else if (_scrollingY == Directions.Top && Offset.Y + AreaMoveRateX <= 0)
-                    newOffsetY += AreaMoveRateY;
-
+                var newOffsetX = GetNewOffsetX();
+                var newOffsetY = GetNewOffsetY();
                 if (newOffsetX != Offset.X || newOffsetY != Offset.Y)
                 {
                     Offset = new Point(newOffsetX, newOffsetY);
@@ -365,6 +355,26 @@ namespace Age_Of_Nothing.UI
             }
 
             _refreshing = false;
+        }
+
+        private double GetNewOffsetY()
+        {
+            var newOffsetY = Offset.Y;
+            if (_scrollingY == Directions.Bottom && Offset.Y - AreaMoveRateY >= -_controller.Height)
+                newOffsetY -= AreaMoveRateY;
+            else if (_scrollingY == Directions.Top && Offset.Y + AreaMoveRateX <= 0)
+                newOffsetY += AreaMoveRateY;
+            return newOffsetY;
+        }
+
+        private double GetNewOffsetX()
+        {
+            var newOffsetX = Offset.X;
+            if (_scrollingX == Directions.Right && Offset.X - AreaMoveRateX >= -_controller.Width)
+                newOffsetX -= AreaMoveRateX;
+            else if (_scrollingX == Directions.Left && Offset.X + AreaMoveRateX <= 0)
+                newOffsetX += AreaMoveRateX;
+            return newOffsetX;
         }
 
         private void SetAreaPosition()
