@@ -341,15 +341,15 @@ namespace Age_Of_Nothing.UI
             if (_scrollingX.HasValue || _scrollingY.HasValue)
             {
                 var newOffsetX = OffsetX;
-                if (_scrollingX == Directions.Left && OffsetX - 4 >= 0)
+                if (_scrollingX == Directions.Right) //  && OffsetX - 4 >= 0
                     newOffsetX -= 4;
-                else if (_scrollingX == Directions.Right && OffsetX + 4 <= _controller.Width)
+                else if (_scrollingX == Directions.Left) //  && OffsetX + 4 <= _controller.Width
                     newOffsetX += 4;
 
                 var newOffsetY = OffsetY;
-                if (_scrollingY == Directions.Top && OffsetY - 2 >= 0)
+                if (_scrollingY == Directions.Bottom) //  && OffsetY - 2 >= 0
                     newOffsetY -= 2;
-                else if (_scrollingY == Directions.Bottom && OffsetY + 2 <= _controller.Height)
+                else if (_scrollingY == Directions.Top) // && OffsetY + 2 <= _controller.Height
                     newOffsetY += 2;
 
                 if (newOffsetX != OffsetX || newOffsetY != OffsetY)

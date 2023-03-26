@@ -54,7 +54,7 @@
             <Button Grid.Row="2" Grid.Column="0" Name="LeftBottomButton" Tag="Left-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
             <Button Grid.Row="2" Grid.Column="1" Name="BottomButton" Tag="-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
             <Button Grid.Row="2" Grid.Column="2" Name="RightBottomButton" Tag="Right-Bottom" MouseEnter="AreaButton_MouseEnter" MouseLeave="AreaButton_MouseLeave" />
-            <Canvas Grid.Row="1" Grid.Column="1" Name="MainCanvas" Background="LightGreen"
+            <Canvas ClipToBounds="True" Grid.Row="1" Grid.Column="1" Name="MainCanvas" Background="LightGreen"
             MouseRightButtonDown="MainCanvas_MouseRightButtonDown"
             MouseRightButtonUp="MainCanvas_MouseRightButtonUp"
             MouseLeftButtonDown="MainCanvas_MouseLeftButtonDown"
