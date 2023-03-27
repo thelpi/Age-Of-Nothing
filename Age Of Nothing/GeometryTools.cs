@@ -167,7 +167,7 @@ namespace Age_Of_Nothing
         /// <returns></returns>
         public static Point MoveFromOffset(this Point p, Point offset, Point middle)
         {
-            return new Point(p.X + offset.X - middle.X, p.Y + offset.Y + middle.Y);
+            return new Point(p.X + offset.X - middle.X, p.Y + offset.Y - middle.Y);
         }
 
         /// <summary>
