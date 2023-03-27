@@ -353,11 +353,14 @@ namespace Age_Of_Nothing
                 }
             }
 
-            foreach (var unit in villagerFocused)
+            if (newCrafts.Count > 0)
             {
-                var craftTarget = newCrafts.Select(x => x.Target).GetClosestSprite(unit.Center);
-                unit.SetPathCycle(new MoveTarget(craftTarget));
-                newCrafts.First(x => x.Target == craftTarget).AddSource(unit);
+                foreach (var unit in villagerFocused)
+                {
+                    var craftTarget = newCrafts.Select(x => x.Target).GetClosestSprite(unit.Center);
+                    unit.SetPathCycle(new MoveTarget(craftTarget));
+                    newCrafts.First(x => x.Target == craftTarget).AddSource(unit);
+                }
             }
         }
 
