@@ -104,19 +104,9 @@ namespace Age_Of_Nothing
         public Point Initialize()
         {
             if (_test)
-            {
-                _resourcesQty[ResourceTypes.Gold] = 10000;
-                _resourcesQty[ResourceTypes.Rock] = 10000;
-                _resourcesQty[ResourceTypes.Wood] = 10000;
                 InitializeTestData();
-            }
             else
-            {
-                _resourcesQty[ResourceTypes.Gold] = 400;
-                _resourcesQty[ResourceTypes.Rock] = 400;
-                _resourcesQty[ResourceTypes.Wood] = 400;
                 InitializeRealData();
-            }
 
             // TODO: fix when ready
             return Sprites.OfType<Market>().First().Center;
@@ -124,6 +114,10 @@ namespace Age_Of_Nothing
 
         private void InitializeRealData()
         {
+            _resourcesQty[ResourceTypes.Gold] = 400;
+            _resourcesQty[ResourceTypes.Rock] = 400;
+            _resourcesQty[ResourceTypes.Wood] = 400;
+
             const int wallDimX = 24;
             const int wallDimY = 18;
             const int goldPatchDensity = 5;
@@ -195,6 +189,10 @@ namespace Age_Of_Nothing
 
         private void InitializeTestData()
         {
+            _resourcesQty[ResourceTypes.Gold] = 10000;
+            _resourcesQty[ResourceTypes.Rock] = 10000;
+            _resourcesQty[ResourceTypes.Wood] = 10000;
+
             _sprites.Add(new Villager(new Point(1800, 1100), this));
             _sprites.Add(new Villager(new Point(1700, 1000), this));
             _sprites.Add(new Villager(new Point(1900, 1200), this));
