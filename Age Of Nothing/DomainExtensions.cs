@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -32,7 +33,7 @@ namespace Age_Of_Nothing
 
         public static Directions GetOppositeDirection(this Directions direction)
         {
-            return (Directions)System.Math.Abs((int)direction - 2);
+            return (Directions)Math.Abs((int)direction - 2);
         }
 
         public static bool IsOppositeDirection(this Directions direction, Directions otherDirection)

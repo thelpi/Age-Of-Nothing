@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using Age_Of_Nothing.Sprites.Attributes;
 
@@ -116,12 +117,12 @@ namespace Age_Of_Nothing.Sprites
             return GetType().GetAttribute<CraftTimeAttribute>()?.FramesCount ?? 0;
         }
 
-        public static Size GetSpriteSize(System.Type t)
+        public static Size GetSpriteSize(Type t)
         {
             return t.GetAttribute<DimensionsAttribute>()?.Size ?? Size.Empty;
         }
 
-        public static int GetDefaultLifePoints(System.Type t)
+        public static int GetDefaultLifePoints(Type t)
         {
             return t.GetAttribute<LifePointsAttribute>()?.LifePoints ?? -1;
         }

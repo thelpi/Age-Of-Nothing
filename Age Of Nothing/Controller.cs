@@ -323,10 +323,10 @@ namespace Age_Of_Nothing
                 unit.ComputeCycle(clickPosition, targets);
         }
 
-        public void BuildStructure(System.Type type, IReadOnlyCollection<Point> centers)
+        public void BuildStructure(Type type, IReadOnlyCollection<Point> centers)
         {
             if (type.IsAbstract || !type.IsSubclassOf(typeof(Structure)))
-                throw new System.ArgumentException($"The type should be concrete and inherits from {nameof(Structure)}", nameof(type));
+                throw new ArgumentException($"The type should be concrete and inherits from {nameof(Structure)}", nameof(type));
 
             var villagerFocused = Villagers.Where(x => x.Focused);
             if (!villagerFocused.Any())
@@ -494,7 +494,7 @@ namespace Age_Of_Nothing
             }
         }
 
-        private void RefundResources(System.Type type)
+        private void RefundResources(Type type)
         {
             var attrValue = type.GetAttribute<ResourcesCostAttribute>();
             if (attrValue == null)
