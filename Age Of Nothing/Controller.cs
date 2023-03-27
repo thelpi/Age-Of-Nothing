@@ -123,7 +123,15 @@ namespace Age_Of_Nothing
         {
             const int wallDimX = 24;
             const int wallDimY = 18;
+            const int goldPatchDensity = 5;
+            const int rockPatchDensity = 5;
+            const int forestPatchDensity = 100;
+
+            var goldMineSize = Sprite.GetSpriteSize(typeof(GoldMine));
+            var rockMinSize = Sprite.GetSpriteSize(typeof(RockMine));
+            var forestSize = Sprite.GetSpriteSize(typeof(Forest));
             var wallSize = Sprite.GetSpriteSize(typeof(Wall));
+
             for (var i = 0; i < wallDimX; i++)
             {
                 for (var j = 0; j < wallDimY; j++)
@@ -161,16 +169,16 @@ namespace Age_Of_Nothing
                 }
             }
 
-            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
-            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
-            InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
-            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
-            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
-            InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next(50, Width - 50), _rdm.Next(50, Height - 50)), this));
+            for (var i = 0; i < rockPatchDensity; i++)
+                InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next((int)rockMinSize.Width, Width - (int)rockMinSize.Width), _rdm.Next((int)rockMinSize.Height, Height - (int)rockMinSize.Height)), this));
+            for (var i = 0; i < goldPatchDensity; i++)
+                InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next((int)goldMineSize.Width, Width - (int)goldMineSize.Width), _rdm.Next((int)goldMineSize.Height, Height - (int)goldMineSize.Height)), this));
 
-            for (var i = 0; i < 20; i++)
+            for (var i = 0; i < forestPatchDensity; i++)
             {
-                var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(50, Width - 350), _rdm.Next(50, Height - 150), 300, 100), this, 0);
+                var patchX = _rdm.Next(3, 16) * (int)forestSize.Width;
+                var patchY = _rdm.Next(2, 8) * (int)forestSize.Height;
+                var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(0, Width - patchX), _rdm.Next(0, Height - patchY), patchX, patchY), this, 0);
                 _forestPatchs.Add(new List<Forest>(50));
                 foreach (var forest in forests)
                 {

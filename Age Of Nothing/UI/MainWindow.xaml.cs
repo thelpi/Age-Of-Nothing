@@ -67,7 +67,7 @@ namespace Age_Of_Nothing.UI
                 Opacity = 0.1
             };
 
-            _controller = new Controller(true);
+            _controller = new Controller(false);
             Offset = new Point(_controller.Width / 2, _controller.Height / 2);
 
             _area = new Rectangle
