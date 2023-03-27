@@ -133,6 +133,7 @@ namespace Age_Of_Nothing
             var forestSize = Sprite.GetSpriteSize(typeof(Forest));
             var wallSize = Sprite.GetSpriteSize(typeof(Wall));
 
+            var campZone = new Rect(Width / 8, Height / 8, wallSize.Width * wallDimX, wallSize.Height * wallDimY);
             for (var i = 0; i < wallDimX; i++)
             {
                 for (var j = 0; j < wallDimY; j++)
@@ -170,9 +171,9 @@ namespace Age_Of_Nothing
             }
 
             for (var i = 0; i < rockPatchDensity; i++)
-                InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next((int)rockMinSize.Width, Width - (int)rockMinSize.Width), _rdm.Next((int)rockMinSize.Height, Height - (int)rockMinSize.Height)), this));
+                InstanciateAndAddRandomSprite(() => new RockMine(100, new Point(_rdm.Next((int)rockMinSize.Width, Width - (int)rockMinSize.Width), _rdm.Next((int)rockMinSize.Height, Height - (int)rockMinSize.Height)), this), campZone);
             for (var i = 0; i < goldPatchDensity; i++)
-                InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next((int)goldMineSize.Width, Width - (int)goldMineSize.Width), _rdm.Next((int)goldMineSize.Height, Height - (int)goldMineSize.Height)), this));
+                InstanciateAndAddRandomSprite(() => new GoldMine(75, new Point(_rdm.Next((int)goldMineSize.Width, Width - (int)goldMineSize.Width), _rdm.Next((int)goldMineSize.Height, Height - (int)goldMineSize.Height)), this), campZone);
 
             for (var i = 0; i < forestPatchDensity; i++)
             {
@@ -182,7 +183,8 @@ namespace Age_Of_Nothing
                 _forestPatchs.Add(new List<Forest>(50));
                 foreach (var forest in forests)
                 {
-                    if (!_sprites.Any(x => x.Surface.RealIntersectsWith(forest.Surface)))
+                    if (!_sprites.Any(x => x.Surface.RealIntersectsWith(forest.Surface))
+                        && !campZone.RealIntersectsWith(forest.Surface))
                     {
                         _forestPatchs.Last().Add(forest);
                         _sprites.Add(forest);
@@ -217,13 +219,14 @@ namespace Age_Of_Nothing
                 _sprites.Add(forest);
         }
 
-        private void InstanciateAndAddRandomSprite(Func<Sprite> builder)
+        private void InstanciateAndAddRandomSprite(Func<Sprite> builder, Rect campZone)
         {
             Sprite sprite;
             do
             {
                 sprite = builder();
-                if (_sprites.Any(x => x.Surface.RealIntersectsWith(sprite.Surface)))
+                if (_sprites.Any(x => x.Surface.RealIntersectsWith(sprite.Surface))
+                    || campZone.RealIntersectsWith(sprite.Surface))
                     sprite = null;
             }
             while (sprite == null);
