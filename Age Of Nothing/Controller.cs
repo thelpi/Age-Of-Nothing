@@ -120,9 +120,13 @@ namespace Age_Of_Nothing
 
             const int wallDimX = 24;
             const int wallDimY = 18;
-            const int goldPatchDensity = 5;
-            const int rockPatchDensity = 5;
+            const int goldPatchDensity = 10;
+            const int rockPatchDensity = 10;
             const int forestPatchDensity = 100;
+            const int MaxForestPatchWidthCount = 16;
+            const int MinForestPatchWidthCount = 3;
+            const int MaxForestPatchHeightCount = 8;
+            const int MinForestPatchHeightCount = 2;
 
             var goldMineSize = Sprite.GetSpriteSize(typeof(GoldMine));
             var rockMinSize = Sprite.GetSpriteSize(typeof(RockMine));
@@ -172,8 +176,8 @@ namespace Age_Of_Nothing
 
             for (var i = 0; i < forestPatchDensity; i++)
             {
-                var patchX = _rdm.Next(3, 16) * (int)forestSize.Width;
-                var patchY = _rdm.Next(2, 8) * (int)forestSize.Height;
+                var patchX = _rdm.Next(MinForestPatchWidthCount, MaxForestPatchWidthCount) * (int)forestSize.Width;
+                var patchY = _rdm.Next(MinForestPatchHeightCount, MaxForestPatchHeightCount) * (int)forestSize.Height;
                 var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(0, Width - patchX), _rdm.Next(0, Height - patchY), patchX, patchY), this, i);
                 _forestPatchs.Add(new List<Forest>(50));
                 foreach (var forest in forests)
