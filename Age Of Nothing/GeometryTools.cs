@@ -165,9 +165,9 @@ namespace Age_Of_Nothing
         /// <param name="offsetX"></param>
         /// <param name="offsetY"></param>
         /// <returns></returns>
-        public static Point MoveFromOffset(this Point p, Point offset)
+        public static Point MoveFromOffset(this Point p, Point offset, Point middle)
         {
-            return new Point(p.X - offset.X, p.Y - offset.Y);
+            return new Point(p.X + offset.X - middle.X, p.Y + offset.Y + middle.Y);
         }
 
         /// <summary>

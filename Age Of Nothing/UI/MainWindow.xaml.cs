@@ -41,6 +41,7 @@ namespace Age_Of_Nothing.UI
         private Directions? _scrollingY;
 
         public Point Offset { get; private set; }
+        public Point Middle => new Point(MainCanvas.ActualWidth / 2, MainCanvas.ActualHeight / 2);
 
         public MainWindow()
         {
@@ -67,7 +68,7 @@ namespace Age_Of_Nothing.UI
             };
 
             _controller = new Controller(true);
-            Offset = new Point(-_controller.Width / 2, -_controller.Height / 2);
+            Offset = new Point(_controller.Width / 2, _controller.Height / 2);
 
             _area = new Rectangle
             {
@@ -76,7 +77,6 @@ namespace Age_Of_Nothing.UI
                 Height = _controller.Height
             };
             _area.SetValue(Panel.ZIndexProperty, 0);
-            SetAreaPosition();
 
             _controller.PropertyChanged += (s, e) =>
             {
@@ -169,14 +169,14 @@ namespace Age_Of_Nothing.UI
         private void MainCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_selectionPoint.HasValue)
-                _controller.FocusOnZone(new Rect(GetTargetPointOffset(e), _selectionPoint.Value.MoveFromOffset(Offset)));
+                _controller.FocusOnZone(new Rect(GetTargetPointOffset(e), _selectionPoint.Value.MoveFromOffset(Offset, Middle)));
             if (_structureShadowSize.HasValue)
             {
                 var finalPoint = e.GetPosition(MainCanvas);
                 var centers = _structureShadowSize.Value.continuous && _craftPoint.HasValue
                     ? finalPoint.GetAllContiguousStructuresCenters(_craftPoint.Value, _structureShadowSize.Value.size)
                     : new List<Point> { finalPoint };
-                _controller.BuildStructure(_structureShadowSize.Value.target, centers.Select(x => x.MoveFromOffset(Offset).RescaleBase10()).ToList());
+                _controller.BuildStructure(_structureShadowSize.Value.target, centers.Select(x => x.MoveFromOffset(Offset, Middle).RescaleBase10()).ToList());
                 ResetStructureShadow();
             }
             ResetSelectionRectangle();
@@ -196,7 +196,7 @@ namespace Age_Of_Nothing.UI
                 _selectionRectGu.Height = rect.Height;
                 _selectionRectGu.SetValue(Canvas.LeftProperty, rect.Left);
                 _selectionRectGu.SetValue(Canvas.TopProperty, rect.Top);
-                _controller.RefreshHover(new Rect(_selectionPoint.Value.MoveFromOffset(Offset), GetTargetPointOffset(e)));
+                _controller.RefreshHover(new Rect(_selectionPoint.Value.MoveFromOffset(Offset, Middle), GetTargetPointOffset(e)));
             }
 
             if (_structureShadowSize.HasValue)
@@ -281,6 +281,11 @@ namespace Age_Of_Nothing.UI
             SetAreaDirections();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            RefreshEveryPosition();
+        }
+
         #endregion Events
 
         private void SetAreaDirections()
@@ -345,24 +350,26 @@ namespace Age_Of_Nothing.UI
                 if (newOffsetX != Offset.X || newOffsetY != Offset.Y)
                 {
                     Offset = new Point(newOffsetX, newOffsetY);
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        foreach (var spriteUi in MainCanvas.Children.OfType<SpriteUi>())
-                            spriteUi.RefreshPosition();
-                        SetAreaPosition();
-                    }));
+                    Dispatcher.BeginInvoke(new Action(RefreshEveryPosition));
                 }
             }
 
             _refreshing = false;
         }
 
+        private void RefreshEveryPosition()
+        {
+            foreach (var spriteUi in MainCanvas.Children.OfType<SpriteUi>())
+                spriteUi.RefreshPosition();
+            SetAreaPosition();
+        }
+
         private double GetNewOffsetY()
         {
             var newOffsetY = Offset.Y;
-            if (_scrollingY == Directions.Bottom && Offset.Y - AreaMoveRateY >= -_controller.Height)
+            if (_scrollingY == Directions.Top && Offset.Y - AreaMoveRateY >= 0)
                 newOffsetY -= AreaMoveRateY;
-            else if (_scrollingY == Directions.Top && Offset.Y + AreaMoveRateX <= 0)
+            else if (_scrollingY == Directions.Bottom && Offset.Y + AreaMoveRateX <= _controller.Height)
                 newOffsetY += AreaMoveRateY;
             return newOffsetY;
         }
@@ -370,17 +377,17 @@ namespace Age_Of_Nothing.UI
         private double GetNewOffsetX()
         {
             var newOffsetX = Offset.X;
-            if (_scrollingX == Directions.Right && Offset.X - AreaMoveRateX >= -_controller.Width)
+            if (_scrollingX == Directions.Left && Offset.X - AreaMoveRateX >= 0)
                 newOffsetX -= AreaMoveRateX;
-            else if (_scrollingX == Directions.Left && Offset.X + AreaMoveRateX <= 0)
+            else if (_scrollingX == Directions.Right && Offset.X + AreaMoveRateX <= _controller.Width)
                 newOffsetX += AreaMoveRateX;
             return newOffsetX;
         }
 
         private void SetAreaPosition()
         {
-            _area.SetValue(Canvas.LeftProperty, Offset.X + (_controller.Width / 4));
-            _area.SetValue(Canvas.TopProperty, Offset.Y + (_controller.Height / 4));
+            _area.SetValue(Canvas.LeftProperty, -Offset.X + Middle.X);
+            _area.SetValue(Canvas.TopProperty, -Offset.Y + Middle.Y);
         }
 
         private CraftUi GetCraftSpriteVisualItem(Craft craft)
@@ -390,7 +397,7 @@ namespace Age_Of_Nothing.UI
 
         private Point GetTargetPointOffset(MouseEventArgs e)
         {
-            return e.GetPosition(MainCanvas).MoveFromOffset(Offset);
+            return e.GetPosition(MainCanvas).MoveFromOffset(Offset, Middle);
         }
     }
 }

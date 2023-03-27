@@ -158,8 +158,8 @@ namespace Age_Of_Nothing.UI
 
         public void RefreshPosition()
         {
-            SetValue(Canvas.LeftProperty, Sprite.Surface.Left - (Sprite.Focused ? StrokeAndSpace : 0) + _parent.Offset.X);
-            SetValue(Canvas.TopProperty, Sprite.Surface.Top - (Sprite.Focused ? StrokeAndSpace : 0) + _parent.Offset.Y);
+            SetValue(Canvas.LeftProperty, Sprite.Surface.Left + _parent.Middle.X - _parent.Offset.X - (Sprite.Focused ? StrokeAndSpace : 0));
+            SetValue(Canvas.TopProperty, Sprite.Surface.Top + _parent.Middle.Y - _parent.Offset.Y - (Sprite.Focused ? StrokeAndSpace : 0));
         }
 
         private static Brush GetImageFill(Brush backgroundBrush, string imageName)
