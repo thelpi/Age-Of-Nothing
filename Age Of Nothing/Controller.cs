@@ -137,8 +137,8 @@ namespace Age_Of_Nothing
                 for (var j = 0; j < wallDimY; j++)
                 {
                     // TODO: not really scientific but good results
-                    var x = (Width / 2) + (wallDimX / 2 * wallSize.Width / 2) + (i * wallSize.Width);
-                    var y = (Height / 2) + (wallDimY / 2 * wallSize.Height / 2) + (j * wallSize.Height);
+                    var x = (Width / 2) + (i * wallSize.Width);
+                    var y = (Height / 2) + (j * wallSize.Height);
 
                     var isBoundX = i == 0 || i == wallDimX - 1;
                     var isBoundY = j == 0 || j == wallDimY - 1;
