@@ -16,8 +16,7 @@ namespace Age_Of_Nothing
     public class Controller : INotifyPropertyChanged
     {
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
-        // TODO: per team
-        private readonly Dictionary<ResourceTypes, int> _resourcesQty;
+        private readonly Dictionary<int, Dictionary<ResourceTypes, int>> _resourcesQty = new Dictionary<int, Dictionary<ResourceTypes, int>>();
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
         private readonly Random _rdm = new Random();
@@ -37,18 +36,15 @@ namespace Age_Of_Nothing
         private IEnumerable<Structure> Structures => _sprites.OfType<Structure>();
         public int PotentialPopulation => Structures.Sum(x => x.GetUnitsStorage());
         public int Population => Units.Count();
-        public int WoodQuantity => _resourcesQty[ResourceTypes.Wood];
-        public int RockQuantity => _resourcesQty[ResourceTypes.Rock];
-        public int GoldQuantity => _resourcesQty[ResourceTypes.Gold];
+        public int WoodQuantity => _resourcesQty[1][ResourceTypes.Wood];
+        public int RockQuantity => _resourcesQty[1][ResourceTypes.Rock];
+        public int GoldQuantity => _resourcesQty[1][ResourceTypes.Gold];
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Controller(GameParameters parameters)
         {
             _parameters = parameters;
-
-            _resourcesQty = SystemExtensions.GetEnum<ResourceTypes>()
-                .ToDictionary(x => x, x => 0);
 
             _sprites.CollectionChanged += (s, e) =>
             {
@@ -102,10 +98,6 @@ namespace Age_Of_Nothing
 
         public Point Initialize()
         {
-            _resourcesQty[ResourceTypes.Gold] = _parameters.GoldStartingValue;
-            _resourcesQty[ResourceTypes.Rock] = _parameters.RockStartingValue;
-            _resourcesQty[ResourceTypes.Wood] = _parameters.WoodStartingValue;
-
             var goldMineSize = Sprite.GetSpriteSize(typeof(GoldMine));
             var rockMinSize = Sprite.GetSpriteSize(typeof(RockMine));
             var forestSize = Sprite.GetSpriteSize(typeof(Forest));
@@ -145,6 +137,13 @@ namespace Age_Of_Nothing
 
         private Rect GenerateTeamCamp(int iTeam)
         {
+            _resourcesQty.Add(iTeam, new Dictionary<ResourceTypes, int>
+            {
+                { ResourceTypes.Gold, _parameters.GoldStartingValue },
+                { ResourceTypes.Rock, _parameters.RockStartingValue },
+                { ResourceTypes.Wood, _parameters.WoodStartingValue }
+            });
+
             var wallSize = Sprite.GetSpriteSize(typeof(Wall));
 
             var campX = iTeam % 2 == 0 ? Width / 8 * 6 : Width / 8;
@@ -215,6 +214,7 @@ namespace Age_Of_Nothing
             {
                 if (Structures.FirstIfNotNull(x => x.CanBuild<T>() && x.Focused, out var focusedStructure))
                 {
+                    // TODO: per team
                     var sprite = Unit.Instanciate<T>(focusedStructure.Center, this, 1);
                     if (CheckStructureResources(sprite))
                         _craftQueue.Add(new Craft(focusedStructure, sprite));
@@ -354,13 +354,13 @@ namespace Age_Of_Nothing
         private bool CheckStructureResources(Sprite sprite)
         {
             var (gold, wood, rock) = sprite.GetResourcesCost();
-            if (wood <= _resourcesQty[ResourceTypes.Wood]
-                && gold <= _resourcesQty[ResourceTypes.Gold]
-                && rock <= _resourcesQty[ResourceTypes.Rock])
+            if (wood <= _resourcesQty[sprite.Team][ResourceTypes.Wood]
+                && gold <= _resourcesQty[sprite.Team][ResourceTypes.Gold]
+                && rock <= _resourcesQty[sprite.Team][ResourceTypes.Rock])
             {
-                UpdateQuantity(ResourceTypes.Wood, -wood);
-                UpdateQuantity(ResourceTypes.Gold, -gold);
-                UpdateQuantity(ResourceTypes.Rock, -rock);
+                UpdateQuantity(sprite.Team, ResourceTypes.Wood, -wood);
+                UpdateQuantity(sprite.Team, ResourceTypes.Gold, -gold);
+                UpdateQuantity(sprite.Team, ResourceTypes.Rock, -rock);
                 return true;
             }
 
@@ -394,7 +394,7 @@ namespace Age_Of_Nothing
                 var carry = villager.CheckCarry(tgt);
                 if (carry.HasValue)
                 {
-                    UpdateQuantity(carry.Value.r, carry.Value.v);
+                    UpdateQuantity(villager.Team, carry.Value.r, carry.Value.v);
                     if (villager.GetNextSpriteOnPath<Forest>() is var f && f != null)
                         villager.ComputeCycleOnForestPatch(_forestPatchs[f.ForestPatchIndex]);
                 }
@@ -466,30 +466,31 @@ namespace Age_Of_Nothing
             {
                 // note: we don't refund units when started; maybe we should?
                 if (!craft.Started)
-                    RefundResources(craft.Target.GetType());
+                    RefundResources(craft.Target.Team, craft.Target.GetType());
                 _craftQueue.Remove(craft);
             }
         }
 
-        private void RefundResources(Type type)
+        private void RefundResources(int team, Type type)
         {
             var attrValue = type.GetAttribute<ResourcesCostAttribute>();
             if (attrValue == null)
                 return;
 
-            UpdateQuantity(ResourceTypes.Gold, attrValue.Gold);
-            UpdateQuantity(ResourceTypes.Wood, attrValue.Wood);
-            UpdateQuantity(ResourceTypes.Rock, attrValue.Rock);
+            UpdateQuantity(team, ResourceTypes.Gold, attrValue.Gold);
+            UpdateQuantity(team, ResourceTypes.Wood, attrValue.Wood);
+            UpdateQuantity(team, ResourceTypes.Rock, attrValue.Rock);
         }
 
-        private void UpdateQuantity(ResourceTypes rt, int minusValue)
+        private void UpdateQuantity(int team, ResourceTypes rt, int minusValue)
         {
             if (minusValue != 0)
             {
-                _resourcesQty[rt] += _resourcesQty[rt] < minusValue
-                    ? _resourcesQty[rt]
+                _resourcesQty[team][rt] += _resourcesQty[team][rt] < minusValue
+                    ? _resourcesQty[team][rt]
                     : minusValue;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{rt}Quantity"));
+                if (team == 1)
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{rt}Quantity"));
             }
         }
     }
