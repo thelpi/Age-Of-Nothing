@@ -102,17 +102,6 @@ namespace Age_Of_Nothing
 
         public Point Initialize()
         {
-            if (_parameters.IsTest)
-                InitializeTestData();
-            else
-                InitializeRealData();
-
-            // TODO: fix when ready
-            return Sprites.OfType<Market>().First().Center;
-        }
-
-        private void InitializeRealData()
-        {
             _resourcesQty[ResourceTypes.Gold] = _parameters.GoldStartingValue;
             _resourcesQty[ResourceTypes.Rock] = _parameters.RockStartingValue;
             _resourcesQty[ResourceTypes.Wood] = _parameters.WoodStartingValue;
@@ -150,6 +139,8 @@ namespace Age_Of_Nothing
                     }
                 }
             }
+
+            return camps.First().GetCenter();
         }
 
         private Rect GenerateTeamCamp(int iTeam)
@@ -197,32 +188,6 @@ namespace Age_Of_Nothing
             }
 
             return camp;
-        }
-
-        private void InitializeTestData()
-        {
-            _resourcesQty[ResourceTypes.Gold] = 10000;
-            _resourcesQty[ResourceTypes.Rock] = 10000;
-            _resourcesQty[ResourceTypes.Wood] = 10000;
-
-            _sprites.Add(new Villager(new Point(1800, 1100), this, 1));
-            _sprites.Add(new Villager(new Point(1700, 1000), this, 1));
-            _sprites.Add(new Villager(new Point(1900, 1200), this, 1));
-            _sprites.Add(new RockMine(100, new Point(2000, 1020), this));
-            _sprites.Add(new GoldMine(75, new Point(1800, 1500), this));
-            _sprites.Add(new Market(new Point(2200, 1400), this, 1));
-            _sprites.Add(new Dwelling(new Point(2700, 910), this, 1));
-            _sprites.Add(new Dwelling(new Point(2700, 990), this, 1));
-            _sprites.Add(new Wall(new Point(1935, 1235), this, 1));
-            _sprites.Add(new Wall(new Point(1935, 1265), this, 1));
-            _sprites.Add(new Wall(new Point(1935, 1295), this, 1));
-            _sprites.Add(new Wall(new Point(1965, 1295), this, 1));
-            _sprites.Add(new Wall(new Point(1995, 1295), this, 1));
-
-            var forests = Forest.GenerateForestPatch(new Rect(2300, 1100, 300, 100), this, 0);
-            _forestPatchs.Add(forests.ToList());
-            foreach (var forest in _forestPatchs.Last())
-                _sprites.Add(forest);
         }
 
         private void InstanciateAndAddRandomSprite(Func<Sprite> builder, List<Rect> camps)
