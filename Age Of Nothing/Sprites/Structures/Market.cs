@@ -10,8 +10,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(1000)]
     public class Market : Structure
     {
-        public Market(Point topLeft, Controller parent)
-            : base(topLeft, parent, false)
+        public Market(Point topLeft, Controller parent, int team)
+            : base(topLeft, parent, false, team)
         { }
     }
 }

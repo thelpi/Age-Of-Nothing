@@ -36,8 +36,8 @@ namespace Age_Of_Nothing.Sprites.Units
             }
         }
 
-        public Villager(Point center, Controller parent)
-            : base(center, parent)
+        public Villager(Point center, Controller parent, int team)
+            : base(center, parent, team)
         { }
 
         /// <summary>

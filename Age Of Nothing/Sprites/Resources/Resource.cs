@@ -22,7 +22,7 @@ namespace Age_Of_Nothing.Sprites.Resources
         public abstract ResourceTypes ResourceType { get; }
 
         protected Resource(Point center, int quantity, Controller parent)
-            : base(center, true, false, parent)
+            : base(center, true, false, parent, 0)
         {
             _quantity = quantity;
         }

@@ -11,8 +11,8 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Archer : Unit
     {
-        public Archer(Point center, Controller parent)
-            : base(center, parent)
+        public Archer(Point center, Controller parent, int team)
+            : base(center, parent, team)
         { }
     }
 }

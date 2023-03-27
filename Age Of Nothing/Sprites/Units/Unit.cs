@@ -11,8 +11,8 @@ namespace Age_Of_Nothing.Sprites.Units
         private LinkedListNode<MoveTarget> _currentPathTarget;
         private bool _isPathLoop;
 
-        protected Unit(Point center, Controller parent)
-            : base(center, true, true, parent)
+        protected Unit(Point center, Controller parent, int team)
+            : base(center, true, true, parent, team)
         { }
 
         /// <summary>
@@ -238,11 +238,11 @@ namespace Age_Of_Nothing.Sprites.Units
             return GetType().GetAttribute<SpeedAttribute>()?.PixelsByFrame ?? 0;
         }
 
-        public static T Instanciate<T>(Point center, Controller parent) where T : Unit
+        public static T Instanciate<T>(Point center, Controller parent, int team) where T : Unit
         {
             return (T)typeof(T)
-                .GetConstructor(new[] { typeof(Point), typeof(Controller) })
-                .Invoke(new object[] { center, parent });
+                .GetConstructor(new[] { typeof(Point), typeof(Controller), typeof(int) })
+                .Invoke(new object[] { center, parent, team });
         }
     }
 }

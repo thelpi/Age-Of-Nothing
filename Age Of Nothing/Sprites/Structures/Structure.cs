@@ -8,8 +8,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     {
         public bool Tangible { get; set; }
 
-        protected Structure(Point basePoint, Controller parent, bool tangible)
-            : base(basePoint, false, false, parent)
+        protected Structure(Point basePoint, Controller parent, bool tangible, int team)
+            : base(basePoint, false, false, parent, team)
         {
             Tangible = tangible;
         }

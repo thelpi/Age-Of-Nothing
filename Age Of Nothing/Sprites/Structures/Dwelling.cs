@@ -10,8 +10,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(200)]
     public class Dwelling : Structure
     {
-        public Dwelling(Point topleft, Controller parent)
-            : base(topleft, parent, false)
+        public Dwelling(Point topleft, Controller parent, int team)
+            : base(topleft, parent, false, team)
         { }
     }
 }

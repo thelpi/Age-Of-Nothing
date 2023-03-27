@@ -9,8 +9,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(2000)]
     public class Wall : Structure
     {
-        public Wall(Point topLeft, Controller parent)
-            : base(topLeft, parent, true)
+        public Wall(Point topLeft, Controller parent, int team)
+            : base(topLeft, parent, true, team)
         { }
     }
 }

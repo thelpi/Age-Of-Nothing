@@ -11,8 +11,8 @@ namespace Age_Of_Nothing.Sprites.Units
     [CraftIn(typeof(Structures.Barracks))]
     public class Swordsman : Unit
     {
-        public Swordsman(Point center, Controller parent)
-            : base(center, parent)
+        public Swordsman(Point center, Controller parent, int team)
+            : base(center, parent, team)
         { }
     }
 }

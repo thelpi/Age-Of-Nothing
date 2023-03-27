@@ -15,6 +15,7 @@ namespace Age_Of_Nothing.Sprites
 
         public bool HasLifePoints => LifePoints > -1;
 
+        public int Team { get; }
         public Rect Surface { get; private set; }
         public bool CanMove { get; }
         public Point Center
@@ -57,7 +58,7 @@ namespace Age_Of_Nothing.Sprites
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected Sprite(Point basePoint, bool isCenter, bool canMove, Controller parent)
+        protected Sprite(Point basePoint, bool isCenter, bool canMove, Controller parent, int team)
         {
             var size = GetSpriteSize(GetType());
 
@@ -71,6 +72,7 @@ namespace Age_Of_Nothing.Sprites
             _lifePoints = GetDefaultLifePoints(GetType());
 
             Parent = parent;
+            Team = team;
         }
 
         public void TakeDamage(int damagePoints)

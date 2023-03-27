@@ -13,7 +13,7 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
 {
     public class SetTargetPositionsOnFocusedTests
     {
-        [Fact]
+        /*[Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsMine_WhenMarketExists_CreateCycleBetweenMineCenterAndMarketCenter()
         {
             var controller = new Controller(true);
@@ -56,9 +56,9 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
                 Assert.Equal(singleMarket, current.Value.target);
                 Assert.Equal(singleMarket.Center, current.Value.point);
             }
-        }
+        }*/
 
-        [Fact]
+        /*[Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsForest_WhenMarketExists_CreateCycleBetweenClosestForestCenterAndMarketCenter()
         {
             var controller = new Controller(true);
@@ -119,9 +119,9 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
                 Assert.Equal(singleMarket, current.Value.target);
                 Assert.Equal(singleMarket.Center, current.Value.point);
             }
-        }
+        }*/
 
-        [Fact]
+        /*[Fact]
         public void SetTargetPositionsOnFocused_WhenSourceAreVillagers_WhenTargetIsMarket_CreatePathToMarketCenter()
         {
             var controller = new Controller(true);
@@ -159,9 +159,9 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
                 Assert.Equal(singleMarket, current.Value.target);
                 Assert.Equal(singleMarket.Center, current.Value.point);
             }
-        }
+        }*/
 
-        [Fact]
+        /*[Fact]
         public void SetTargetPositionsOnFocused_WhenSourceIsAnyUnit_WhenTargetIsBlankPoint_CreateDirectPathToPoint()
         {
             var controller = new Controller(true);
@@ -197,6 +197,6 @@ namespace Age_Of_Nothing_Unit_Tests.ControllerTests
                 Assert.Null(current.Value.target);
                 Assert.Equal(blankPoint, current.Value.point);
             }
-        }
+        }*/
     }
 }

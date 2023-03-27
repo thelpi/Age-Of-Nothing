@@ -9,8 +9,8 @@ namespace Age_Of_Nothing.Sprites.Structures
     [LifePoints(1000)]
     public class Barracks : Structure
     {
-        public Barracks(Point topleft, Controller parent)
-            : base(topleft, parent, false)
+        public Barracks(Point topleft, Controller parent, int team)
+            : base(topleft, parent, false, team)
         { }
     }
 }

@@ -67,7 +67,7 @@ namespace Age_Of_Nothing.UI
                 Opacity = 0.1
             };
 
-            _controller = new Controller(false);
+            _controller = new Controller(new GameParameters());
 
             _area = new Rectangle
             {
