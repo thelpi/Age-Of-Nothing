@@ -1,7 +1,6 @@
 ﻿Chateau
 Technologies
 Délai récolte ressource
-
 Point de ralliement
-
 Focus on craft
+Path finding memory
