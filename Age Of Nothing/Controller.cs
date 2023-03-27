@@ -16,6 +16,7 @@ namespace Age_Of_Nothing
     public class Controller : INotifyPropertyChanged
     {
         private readonly ObservableCollection<Sprite> _sprites = new ObservableCollection<Sprite>();
+        // TODO: per team
         private readonly Dictionary<ResourceTypes, int> _resourcesQty;
         private readonly ObservableCollection<Craft> _craftQueue = new ObservableCollection<Craft>();
         private readonly List<List<Forest>> _forestPatchs = new List<List<Forest>>();
@@ -154,13 +155,17 @@ namespace Age_Of_Nothing
         private Rect GenerateTeamCamp(int iTeam)
         {
             var wallSize = Sprite.GetSpriteSize(typeof(Wall));
-            var camp = new Rect(Width / 8, Height / 8, wallSize.Width * _parameters.WallDimX, wallSize.Height * _parameters.WallDimY);
+
+            var campX = iTeam % 2 == 0 ? Width / 8 * 6 : Width / 8;
+            var campY = iTeam < 3 ? Height / 8 : Height / 8 * 6;
+
+            var camp = new Rect(campX, campY, wallSize.Width * _parameters.WallDimX, wallSize.Height * _parameters.WallDimY);
             for (var i = 0; i < _parameters.WallDimX; i++)
             {
                 for (var j = 0; j < _parameters.WallDimY; j++)
                 {
-                    var x = (Width / 8) + (i * wallSize.Width);
-                    var y = (Height / 8) + (j * wallSize.Height);
+                    var x = campX + (i * wallSize.Width);
+                    var y = campY + (j * wallSize.Height);
 
                     var isBoundX = i == 0 || i == _parameters.WallDimX - 1;
                     var isBoundY = j == 0 || j == _parameters.WallDimY - 1;
@@ -346,6 +351,7 @@ namespace Age_Of_Nothing
                     var surface = center.ComputeSurfaceFromMiddlePoint(Sprite.GetSpriteSize(type));
                     if (!SurfaceIsEngaged(surface) && IsInBound(surface))
                     {
+                        // TODO: per team
                         var sprite = (Sprite)type
                             .GetConstructor(new[] { typeof(Point), typeof(Controller), typeof(int) })
                             .Invoke(new object[] { surface.TopLeft, this, 1 });

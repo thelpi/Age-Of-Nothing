@@ -8,6 +8,7 @@ namespace Age_Of_Nothing.Sprites.Structures
     {
         public bool Tangible { get; set; }
 
+        // any modification should be impacted on "GetConstructor" references
         protected Structure(Point basePoint, Controller parent, bool tangible, int team)
             : base(basePoint, false, false, parent, team)
         {

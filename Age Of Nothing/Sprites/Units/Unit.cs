@@ -11,6 +11,7 @@ namespace Age_Of_Nothing.Sprites.Units
         private LinkedListNode<MoveTarget> _currentPathTarget;
         private bool _isPathLoop;
 
+        // any modification should be impacted on "GetConstructor" references
         protected Unit(Point center, Controller parent, int team)
             : base(center, true, true, parent, team)
         { }
@@ -240,6 +241,7 @@ namespace Age_Of_Nothing.Sprites.Units
 
         public static T Instanciate<T>(Point center, Controller parent, int team) where T : Unit
         {
+            // TODO: per team
             return (T)typeof(T)
                 .GetConstructor(new[] { typeof(Point), typeof(Controller), typeof(int) })
                 .Invoke(new object[] { center, parent, team });

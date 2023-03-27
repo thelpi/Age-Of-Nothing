@@ -20,7 +20,7 @@ namespace Age_Of_Nothing.UI
     public partial class MainWindow : Window
     {
         private const int Fps = 20;
-        private const double AreaMoveRateY = 5;
+        private const double AreaMoveRateY = 20;
 
         private static readonly double AreaMoveRateX = AreaMoveRateY * 16 / 9;
         private static readonly Key[] _deleteKeys = new[] { Key.Delete, Key.X };

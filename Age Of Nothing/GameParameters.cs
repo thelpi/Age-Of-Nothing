@@ -13,7 +13,7 @@
         public int MinForestPatchWidthCount { get; } = 3;
         public int MaxForestPatchHeightCount { get; } = 8;
         public int MinForestPatchHeightCount { get; } = 2;
-        public int TeamsCount { get; } = 1;
+        public int TeamsCount { get; } = 4;
         public bool IsTest { get; } = false;
         public int RockStartingValue { get; } = 400;
         public int GoldStartingValue { get; } = 400;
