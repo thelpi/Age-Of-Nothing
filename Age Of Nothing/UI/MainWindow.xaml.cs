@@ -68,7 +68,6 @@ namespace Age_Of_Nothing.UI
             };
 
             _controller = new Controller(false);
-            Offset = new Point(_controller.Width / 2, _controller.Height / 2);
 
             _area = new Rectangle
             {
@@ -134,7 +133,7 @@ namespace Age_Of_Nothing.UI
 
             DataContext = _controller;
 
-            _controller.Initialize();
+            Offset = _controller.Initialize();
 
             _timer.Start();
         }

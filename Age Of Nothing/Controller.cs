@@ -101,7 +101,7 @@ namespace Age_Of_Nothing
             };
         }
 
-        public void Initialize()
+        public Point Initialize()
         {
             if (_test)
             {
@@ -117,6 +117,9 @@ namespace Age_Of_Nothing
                 _resourcesQty[ResourceTypes.Wood] = 400;
                 InitializeRealData();
             }
+
+            // TODO: fix when ready
+            return Sprites.OfType<Market>().First().Center;
         }
 
         private void InitializeRealData()
@@ -136,7 +139,6 @@ namespace Age_Of_Nothing
             {
                 for (var j = 0; j < wallDimY; j++)
                 {
-                    // TODO: not really scientific but good results
                     var x = (Width / 2) + (i * wallSize.Width);
                     var y = (Height / 2) + (j * wallSize.Height);
 
