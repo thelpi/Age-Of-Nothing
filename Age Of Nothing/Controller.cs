@@ -180,7 +180,7 @@ namespace Age_Of_Nothing
             {
                 var patchX = _rdm.Next(3, 16) * (int)forestSize.Width;
                 var patchY = _rdm.Next(2, 8) * (int)forestSize.Height;
-                var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(0, Width - patchX), _rdm.Next(0, Height - patchY), patchX, patchY), this, 0);
+                var forests = Forest.GenerateForestPatch(new Rect(_rdm.Next(0, Width - patchX), _rdm.Next(0, Height - patchY), patchX, patchY), this, i);
                 _forestPatchs.Add(new List<Forest>(50));
                 foreach (var forest in forests)
                 {
