@@ -146,8 +146,10 @@ namespace Age_Of_Nothing
 
             var wallSize = Sprite.GetSpriteSize(typeof(Wall));
 
-            var campX = iTeam % 2 == 0 ? Width / 8 * 6 : Width / 8;
-            var campY = iTeam < 3 ? Height / 8 : Height / 8 * 6;
+            const int campMargin = 250;
+
+            var campX = iTeam % 2 == 0 ? Width - (wallSize.Width * _parameters.WallDimX) - campMargin : campMargin;
+            var campY = iTeam < 3 ? campMargin : Height - (wallSize.Height * _parameters.WallDimY) - campMargin;
 
             var camp = new Rect(campX, campY, wallSize.Width * _parameters.WallDimX, wallSize.Height * _parameters.WallDimY);
             for (var i = 0; i < _parameters.WallDimX; i++)
