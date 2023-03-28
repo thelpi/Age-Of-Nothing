@@ -89,12 +89,14 @@ namespace Age_Of_Nothing.UI
                         CreateWallButton.IsEnabled = villagerFocus;
                         CreateMarketButton.IsEnabled = villagerFocus;
                         CreateBarracksButton.IsEnabled = villagerFocus;
+                        CreateCastleButton.IsEnabled = villagerFocus;
 
                         var structureFocus = _controller.FocusedSprites<Structure>();
                         CreateVillagerButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Villager>());
                         CreateSwordsmanButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Swordsman>());
                         CreateArcherButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Archer>());
                         CreateKnightButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Knight>());
+                        CreateTrebuchetButton.IsEnabled = structureFocus.Any(x => x.CanBuild<Trebuchet>());
                     };
                 }
                 else if (e.PropertyName == SpritesCollectionChangedEventArgs.SpritesCollectionAddPropertyName)
@@ -243,6 +245,12 @@ namespace Age_Of_Nothing.UI
             _controller.AddUnitToStack<Knight>();
         }
 
+        private void CreateTrebuchetButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetStructureShadow();
+            _controller.AddUnitToStack<Trebuchet>();
+        }
+
         private void CreateDwellingButton_Click(object sender, RoutedEventArgs e)
         {
             SetStructureShadowSize<Dwelling>(false);
@@ -256,6 +264,11 @@ namespace Age_Of_Nothing.UI
         private void CreateBarracksButton_Click(object sender, RoutedEventArgs e)
         {
             SetStructureShadowSize<Barracks>(false);
+        }
+
+        private void CreateCastleButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetStructureShadowSize<Castle>(false);
         }
 
         private void CreateWallButton_Click(object sender, RoutedEventArgs e)

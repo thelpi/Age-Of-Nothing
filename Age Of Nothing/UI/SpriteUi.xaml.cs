@@ -51,6 +51,8 @@ namespace Age_Of_Nothing.UI
             { (typeof(Wall), true), GetImageFill(Brushes.BurlyWood, "wall") },
             { (typeof(Barracks), false), GetImageFill(Brushes.Crimson, "barracks") },
             { (typeof(Barracks), true), GetImageFill(Brushes.Salmon, "barracks") },
+            { (typeof(Castle), false), GetImageFill(Brushes.DarkGray, "castle") },
+            { (typeof(Castle), true), GetImageFill(Brushes.Gray, "castle") },
             { (typeof(Villager), false), Brushes.SandyBrown },
             { (typeof(Villager), true), Brushes.PeachPuff },
             { (typeof(Swordsman), false), GetImageFill(Brushes.Blue, "sword") },
@@ -59,6 +61,8 @@ namespace Age_Of_Nothing.UI
             { (typeof(Archer), true), GetImageFill(Brushes.MediumSlateBlue, "bow") },
             { (typeof(Knight), false), GetImageFill(Brushes.Blue, "horse") },
             { (typeof(Knight), true), GetImageFill(Brushes.MediumSlateBlue, "horse") },
+            { (typeof(Trebuchet), false), GetImageFill(Brushes.Blue, "trebuchet") },
+            { (typeof(Trebuchet), true), GetImageFill(Brushes.MediumSlateBlue, "trebuchet") },
             { (typeof(GoldMine), false), GetImageFill(Brushes.Gold, "mine") },
             { (typeof(GoldMine), true), GetImageFill(Brushes.LightGoldenrodYellow, "mine") },
             { (typeof(RockMine), false), GetImageFill(Brushes.Silver, "mine") },
@@ -187,19 +191,12 @@ namespace Age_Of_Nothing.UI
             };
             oGrid.Children.Add(oRectangle);
 
-            var border = new Border
-            {
-                BorderThickness = new Thickness(0),
-                Padding = new Thickness(20)
-            };
-
             var img = new Image
             {
                 Source = new BitmapImage(new Uri($@"Resources/Images/{imageName}.png", UriKind.Relative))
             };
-            border.Child = img;
 
-            oGrid.Children.Add(border);
+            oGrid.Children.Add(img);
 
             return new VisualBrush
             {
