@@ -1,15 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using Age_Of_Nothing;
-using Age_Of_Nothing.Sprites;
-using Age_Of_Nothing.Sprites.Resources;
-using Age_Of_Nothing.Sprites.Structures;
-using Age_Of_Nothing.Sprites.Units;
-using Xunit;
-
-namespace Age_Of_Nothing_Unit_Tests.ControllerTests
+﻿namespace Age_Of_Nothing_Unit_Tests.ControllerTests
 {
     public class SetTargetPositionsOnFocusedTests
     {

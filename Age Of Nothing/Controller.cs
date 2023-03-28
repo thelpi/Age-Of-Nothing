@@ -217,7 +217,9 @@ namespace Age_Of_Nothing
                 sprite = builder();
                 if (_sprites.Any(x => x.Surface.RealIntersectsWith(sprite.Surface))
                     || camps.Any(x => x.RealIntersectsWith(sprite.Surface)))
+                {
                     sprite = null;
+                }
             }
             while (sprite == null);
             _sprites.Add(sprite);
