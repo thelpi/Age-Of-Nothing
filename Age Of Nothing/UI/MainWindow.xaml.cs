@@ -298,6 +298,11 @@ namespace Age_Of_Nothing.UI
             RefreshEveryPosition();
         }
 
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RefreshEveryPosition();
+        }
+
         #endregion Events
 
         private void SetAreaDirections()

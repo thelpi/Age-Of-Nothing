@@ -508,9 +508,11 @@ namespace Age_Of_Nothing
         {
             if (minusValue != 0)
             {
-                _resourcesQty[team][rt] += _resourcesQty[team][rt] < minusValue
-                    ? _resourcesQty[team][rt]
-                    : minusValue;
+                _resourcesQty[team][rt] += minusValue > 0
+                    ? minusValue
+                    : (_resourcesQty[team][rt] < minusValue
+                        ? _resourcesQty[team][rt]
+                        : minusValue);
                 if (team == 1)
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"{rt}Quantity"));
             }
