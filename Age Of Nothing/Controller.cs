@@ -148,10 +148,28 @@ namespace Age_Of_Nothing
 
             const int campMargin = 250;
 
-            var campX = iTeam % 2 == 0 ? Width - (wallSize.Width * _parameters.WallDimX) - campMargin : campMargin;
-            var campY = iTeam < 3 ? campMargin : Height - (wallSize.Height * _parameters.WallDimY) - campMargin;
+            var campWith = wallSize.Width * _parameters.WallDimX;
+            var campHeight = wallSize.Height * _parameters.WallDimY;
 
-            var camp = new Rect(campX, campY, wallSize.Width * _parameters.WallDimX, wallSize.Height * _parameters.WallDimY);
+            // 1 5 3
+            // 7 X 8
+            // 4 6 2
+            double campX;
+            double campY;
+            switch (iTeam)
+            {
+                case 1: campX = campMargin; campY = campMargin; break;
+                case 4: campX = campMargin; campY = Height - campHeight - campMargin; break;
+                case 7: campX = campMargin; campY = Height / 2 - (campHeight / 2); break;
+                case 5: campX = Width / 2 - (campWith / 2); campY = campMargin; break;
+                case 6: campX = Width / 2 - (campWith / 2); campY = Height - campHeight - campMargin; break;
+                case 3: campX = Width - campWith - campMargin; campY = campMargin; break;
+                case 8: campX = Width - campWith - campMargin; campY = Height / 2 - (campHeight / 2); break;
+                case 2: campX = Width - campWith - campMargin; campY = Height - campHeight - campMargin; break;
+                default: throw new NotImplementedException();
+            }
+
+            var camp = new Rect(campX, campY, campWith, campHeight);
             for (var i = 0; i < _parameters.WallDimX; i++)
             {
                 for (var j = 0; j < _parameters.WallDimY; j++)
