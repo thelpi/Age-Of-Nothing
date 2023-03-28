@@ -17,6 +17,8 @@
     <None Remove="Resources\Images\horse.png" />
     <None Remove="Resources\Images\market.png" />
     <None Remove="Resources\Images\mine.png" />
+    <None Remove="Resources\Images\monastery.png" />
+    <None Remove="Resources\Images\monk.png" />
     <None Remove="Resources\Images\population.png" />
     <None Remove="Resources\Images\rock.png" />
     <None Remove="Resources\Images\sword.png" />
@@ -51,6 +53,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\mine.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\monastery.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\monk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\population.png">
